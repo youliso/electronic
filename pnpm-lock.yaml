@@ -10,6 +10,15 @@ importers:
       prettier: 2.5.1
       rollup: 2.64.0
 
+  packages/update:
+    specifiers:
+      builder-util-runtime: ^9.0.0-alpha.0
+      electron-updater: ^4.6.1
+    dependencies:
+      electron-updater: 4.6.1
+    devDependencies:
+      builder-util-runtime: 9.0.0-alpha.0
+
   packages/window:
     specifiers:
       electron: 16.0.6
@@ -52,6 +61,14 @@ packages:
     resolution: {integrity: sha512-lrCEyAVs0sJ+uq5uPn2j1NkAHryhBA8Q1fP2hC2zRiOPyJBMB53ZsdmNX3yPo/sj29EH/3452h1DsIoPTiGELg==, tarball: '@types/node/download/@types/node-14.18.6.tgz'}
     dev: true
 
+  /@types/semver/7.3.9:
+    resolution: {integrity: sha1-FSxsIKdojDC5Z+wYQdMazlaYY/w=, tarball: '@types/semver/download/@types/semver-7.3.9.tgz'}
+    dev: false
+
+  /argparse/2.0.1:
+    resolution: {integrity: sha1-JG9Q88p4oyQPbJl+ipvR6sSeSzg=, tarball: argparse/download/argparse-2.0.1.tgz}
+    dev: false
+
   /boolean/3.1.4:
     resolution: {integrity: sha1-9RovtYOKmeBvm27B7bZ03mcCZDU=, tarball: boolean/download/boolean-3.1.4.tgz}
     dev: true
@@ -63,6 +80,26 @@ packages:
 
   /buffer-from/1.1.2:
     resolution: {integrity: sha1-KxRqb9cugLT1XSVfNe1Zo6mkG9U=, tarball: buffer-from/download/buffer-from-1.1.2.tgz}
+    dev: true
+
+  /builder-util-runtime/8.9.1:
+    resolution: {integrity: sha1-JfBms/vCCz5iNqm5VrHrsOM/9mo=, tarball: builder-util-runtime/download/builder-util-runtime-8.9.1.tgz}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      debug: 4.3.3
+      sax: 1.2.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /builder-util-runtime/9.0.0-alpha.0:
+    resolution: {integrity: sha512-Z4GQFewXPXV3jbFBzGHOQ+JOe9Tpeye7P5idwNFpAsnCTmt10ZVWrv6M1nmXgkHfHSb9rUy/Jtamxk+nfEnjoQ==, tarball: builder-util-runtime/download/builder-util-runtime-9.0.0-alpha.0.tgz}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      debug: 4.3.3
+      sax: 1.2.4
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /cacheable-request/6.1.0:
@@ -122,7 +159,6 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.2
-    dev: true
 
   /decompress-response/3.3.0:
     resolution: {integrity: sha1-gKTdMjdIOEv6JICDYirt7Jgq3/M=, tarball: decompress-response/download/decompress-response-3.3.0.tgz}
@@ -151,6 +187,21 @@ packages:
   /duplexer3/0.1.4:
     resolution: {integrity: sha1-7gHdHKwO08vH/b6jfcCo8c4ALOI=, tarball: duplexer3/download/duplexer3-0.1.4.tgz}
     dev: true
+
+  /electron-updater/4.6.1:
+    resolution: {integrity: sha1-gMqAXE9RsuaCqsKdGP7XXWpTPTI=, tarball: electron-updater/download/electron-updater-4.6.1.tgz}
+    dependencies:
+      '@types/semver': 7.3.9
+      builder-util-runtime: 8.9.1
+      fs-extra: 10.0.0
+      js-yaml: 4.1.0
+      lazy-val: 1.0.5
+      lodash.escaperegexp: 4.1.2
+      lodash.isequal: 4.5.0
+      semver: 7.3.5
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /electron/16.0.6:
     resolution: {integrity: sha512-Xs9dYLYhcJf3wXn8m2gDqFTb1L862KEhMxOx9swfFBHj6NoUPPtUgw/RyPQ0tXN1XPxG9vnBkoI0BdcKwrLKuQ==, tarball: electron/download/electron-16.0.6.tgz}
@@ -208,6 +259,15 @@ packages:
     dependencies:
       pend: 1.2.0
     dev: true
+
+  /fs-extra/10.0.0:
+    resolution: {integrity: sha1-n/YbZV3eU/s0qC34S7IUzoAuF8E=, tarball: fs-extra/download/fs-extra-10.0.0.tgz}
+    engines: {node: '>=12'}
+    dependencies:
+      graceful-fs: 4.2.9
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: false
 
   /fs-extra/8.1.0:
     resolution: {integrity: sha1-SdQ8RaiM2Wd2aMt74bRu/bjS4cA=, tarball: fs-extra/download/fs-extra-8.1.0.tgz}
@@ -293,7 +353,6 @@ packages:
 
   /graceful-fs/4.2.9:
     resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==, tarball: graceful-fs/download/graceful-fs-4.2.9.tgz}
-    dev: true
 
   /http-cache-semantics/4.1.0:
     resolution: {integrity: sha1-SekcXL82yblLz81xwj1SSex045A=, tarball: http-cache-semantics/download/http-cache-semantics-4.1.0.tgz}
@@ -312,6 +371,13 @@ packages:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==, tarball: isarray/download/isarray-1.0.0.tgz}
     dev: true
 
+  /js-yaml/4.1.0:
+    resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==, tarball: js-yaml/download/js-yaml-4.1.0.tgz}
+    hasBin: true
+    dependencies:
+      argparse: 2.0.1
+    dev: false
+
   /json-buffer/3.0.0:
     resolution: {integrity: sha1-Wx85evx11ne96Lz8Dkfh+aPZqJg=, tarball: json-buffer/download/json-buffer-3.0.0.tgz}
     dev: true
@@ -327,11 +393,31 @@ packages:
       graceful-fs: 4.2.9
     dev: true
 
+  /jsonfile/6.1.0:
+    resolution: {integrity: sha1-vFWyY0eTxnnsZAMJTrE2mKbsCq4=, tarball: jsonfile/download/jsonfile-6.1.0.tgz}
+    dependencies:
+      universalify: 2.0.0
+    optionalDependencies:
+      graceful-fs: 4.2.9
+    dev: false
+
   /keyv/3.1.0:
     resolution: {integrity: sha1-7MIoSG9pmR5J6UdkhaW+Ho/FxNk=, tarball: keyv/download/keyv-3.1.0.tgz}
     dependencies:
       json-buffer: 3.0.0
     dev: true
+
+  /lazy-val/1.0.5:
+    resolution: {integrity: sha1-bPO59bwxzufuPjacCDK3WD3Nkj0=, tarball: lazy-val/download/lazy-val-1.0.5.tgz}
+    dev: false
+
+  /lodash.escaperegexp/4.1.2:
+    resolution: {integrity: sha1-ZHYsSGGAglGKw99Mz11YhtriA0c=, tarball: lodash.escaperegexp/download/lodash.escaperegexp-4.1.2.tgz}
+    dev: false
+
+  /lodash.isequal/4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==, tarball: lodash.isequal/download/lodash.isequal-4.5.0.tgz}
+    dev: false
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: lodash/download/lodash-4.17.21.tgz}
@@ -353,8 +439,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
-    dev: true
-    optional: true
 
   /matcher/3.0.0:
     resolution: {integrity: sha1-vZBg9MW3CqgEHMxvgDaHYJlPMMo=, tarball: matcher/download/matcher-3.0.0.tgz}
@@ -386,7 +470,6 @@ packages:
 
   /ms/2.1.2:
     resolution: {integrity: sha1-0J0fNXtEP0kzgqjrPM0YOHKuYAk=, tarball: ms/download/ms-2.1.2.tgz}
-    dev: true
 
   /normalize-url/4.5.1:
     resolution: {integrity: sha1-DdkM8SiO4dExO4cIHJpZMu5IUYo=, tarball: normalize-url/download/normalize-url-4.5.1.tgz}
@@ -504,6 +587,9 @@ packages:
     resolution: {integrity: sha1-mR7GnSluAxN0fVm9/St0XDX4go0=, tarball: safe-buffer/download/safe-buffer-5.1.2.tgz}
     dev: true
 
+  /sax/1.2.4:
+    resolution: {integrity: sha1-KBYjTiN4vdxOU1T6tcqold9xANk=, tarball: sax/download/sax-1.2.4.tgz}
+
   /semver-compare/1.0.0:
     resolution: {integrity: sha1-De4hahyUGrN+nvsXiPavxf9VN/w=, tarball: semver-compare/download/semver-compare-1.0.0.tgz}
     dev: true
@@ -520,8 +606,6 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
-    dev: true
-    optional: true
 
   /serialize-error/7.0.1:
     resolution: {integrity: sha1-8TYLBEf2H/tIPsQVfHN/q313jhg=, tarball: serialize-error/download/serialize-error-7.0.1.tgz}
@@ -577,6 +661,11 @@ packages:
     engines: {node: '>= 4.0.0'}
     dev: true
 
+  /universalify/2.0.0:
+    resolution: {integrity: sha1-daSYTv7cSwiXXFrrc/Uw0C3yVxc=, tarball: universalify/download/universalify-2.0.0.tgz}
+    engines: {node: '>= 10.0.0'}
+    dev: false
+
   /url-parse-lax/3.0.0:
     resolution: {integrity: sha1-FrXK/Afb42dsGxmZF3gj1lA6yww=, tarball: url-parse-lax/download/url-parse-lax-3.0.0.tgz}
     engines: {node: '>=4'}
@@ -594,8 +683,6 @@ packages:
 
   /yallist/4.0.0:
     resolution: {integrity: sha1-m7knkNnA7/7GO+c1GeEaNQGaOnI=, tarball: yallist/download/yallist-4.0.0.tgz}
-    dev: true
-    optional: true
 
   /yauzl/2.10.0:
     resolution: {integrity: sha1-x+sXyT4RLLEIb6bY5R+wZnt5pfk=, tarball: yauzl/download/yauzl-2.10.0.tgz}
