@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "traceResolution": false,
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "target": "esnext",
+    "module": "esnext",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "rootDir": ".",
+    "isolatedModules": true,
+    "allowJs": true,
+    "importHelpers": true,
+    "jsx": "preserve",
+    "allowSyntheticDefaultImports": true,
+    "paths": {}
+  },
+  "include": ["packages/*/src/"]
+}
