@@ -1,7 +1,6 @@
 {
-  "private": true,
   "name": "ym-electron",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "ym electron",
   "keywords": [],
   "author": "youliso",
@@ -13,7 +12,8 @@
     "node": ">=16.14.0"
   },
   "files": [
-    "dist"
+    "main",
+    "renderer"
   ],
   "devDependencies": {
     "lerna": "^4.0.0"

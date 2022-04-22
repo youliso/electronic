@@ -21,14 +21,14 @@ const external = [...builtinModules, 'electron', 'electron-updater', 'builder-ut
 const config = [
   {
     input: './src/index.ts',
-    output: [{ file: '../../dist/renderer/index.mjs', format: 'esm', sourcemap: true }],
+    output: [{ file: '../../renderer/index.mjs', format: 'esm', sourcemap: true }],
     plugins: plugins()
   },
   {
     input: './src/index.ts',
     output: [
       {
-        file: '../../dist/renderer/index.js',
+        file: '../../renderer/index.js',
         exports: 'auto',
         format: 'commonjs',
         sourcemap: true
