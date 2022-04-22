@@ -1,145 +1,99 @@
-import type { BrowserWindowConstructorOptions, LoadFileOptions, LoadURLOptions } from 'electron';
+import type {
+  BrowserWindowConstructorOptions,
+  LoadFileOptions,
+  LoadURLOptions,
+  WebContents
+} from 'electron';
+import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
 import { join } from 'path';
 import { app, screen, ipcMain, BrowserWindow } from 'electron';
 
-interface Customize {
-  // 唯一id
-  id?: number;
-  // 标题 (仅路由下生效)
-  title?: string;
-  // 指定网页
-  url?: string;
-  // 指定路由
-  route?: string;
-  // 参数数据
-  loadOptions?: LoadURLOptions | LoadFileOptions;
-  // 父类窗口宽度
-  currentWidth?: number;
-  // 父类窗口高度
-  currentHeight?: number;
-  // 父类窗口是否全屏
-  currentMaximized?: boolean;
-  // 此路由是否单窗口
-  isOneWindow?: boolean;
-  // 是否主窗口
-  isMainWin?: boolean;
-  // 父窗口id
-  parentId?: number;
-  // 进程参数
-  argv?: any;
-  // 自定义参数
-  data?: any;
-}
-
-declare global {
-  namespace Electron {
-    interface BrowserWindow {
-      customize: Customize;
-    }
-
-    interface BrowserWindowConstructorOptions {
-      customize?: Customize;
-    }
-  }
-}
-
-type WindowAlwaysOnTopOpt =
-  | 'normal'
-  | 'floating'
-  | 'torn-off-menu'
-  | 'modal-panel'
-  | 'main-menu'
-  | 'status'
-  | 'pop-up-menu'
-  | 'screen-saver';
-
-type WindowFuncOpt = 'close' | 'hide' | 'show' | 'minimize' | 'maximize' | 'restore' | 'reload';
-
-type WindowStatusOpt =
-  | 'isMaximized'
-  | 'isMinimized'
-  | 'isFullScreen'
-  | 'isAlwaysOnTop'
-  | 'isVisible'
-  | 'isFocused'
-  | 'isModal';
-
 /**
  * 窗口配置
+ * @param customize
+ * @param bwOptions
+ * @returns
  */
-export function browserWindowInit(
+function browserWindowAssembly(
   customize: Customize,
-  args: BrowserWindowConstructorOptions = {}
-): BrowserWindow {
+  bwOptions: BrowserWindowConstructorOptions = {}
+) {
   if (!customize) throw new Error('not customize');
-  args.minWidth = args.minWidth || args.width;
-  args.minHeight = args.minHeight || args.height;
-  args.width = args.width;
-  args.height = args.height;
+  bwOptions.minWidth = bwOptions.minWidth || bwOptions.width;
+  bwOptions.minHeight = bwOptions.minHeight || bwOptions.height;
+  bwOptions.width = bwOptions.width;
+  bwOptions.height = bwOptions.height;
   // darwin下modal会造成整个窗口关闭(?)
-  if (process.platform === 'darwin') delete args.modal;
-  const isLocal = !customize.route;
-  let opt: BrowserWindowConstructorOptions = Object.assign(args, {
+  if (process.platform === 'darwin') delete bwOptions.modal;
+  customize.headNative = customize.headNative || false;
+  customize.isPackaged = app.isPackaged;
+  let bwOpt: BrowserWindowConstructorOptions = Object.assign(bwOptions, {
     autoHideMenuBar: true,
-    titleBarStyle: customize.route ? 'hidden' : 'default',
+    titleBarStyle: customize.headNative ? 'default' : 'hidden',
     minimizable: true,
     maximizable: true,
-    frame: isLocal,
-    show: isLocal,
+    frame: customize.headNative,
+    show: customize.headNative,
     webPreferences: {
-      preload: join(__dirname, './preload.js'),
+      preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
       devTools: !app.isPackaged,
-      webSecurity: false
+      webSecurity: false,
+      webviewTag: !customize.headNative && customize.url
     }
   });
-  const isParentId = customize.hasOwnProperty('customize');
+  const isParentId =
+    customize.parentId !== null &&
+    customize.parentId !== undefined &&
+    typeof customize.parentId === 'number';
   let parenWin: BrowserWindow | null = null;
-  if (isParentId) parenWin = Window.getInstance().get(customize.parentId as number);
-  if (isParentId && parenWin) {
-    opt.parent = parenWin;
-    const currentWH = opt.parent.getBounds();
+  isParentId && (parenWin = Window.getInstance().get(customize.parentId as number));
+  if (parenWin) {
+    bwOpt.parent = parenWin;
+    const currentWH = bwOpt.parent.getBounds();
     customize.currentWidth = currentWH.width;
     customize.currentHeight = currentWH.height;
-    customize.currentMaximized = opt.parent.isMaximized();
+    customize.currentMaximized = bwOpt.parent.isMaximized();
     if (customize.currentMaximized) {
       const displayWorkAreaSize = screen.getPrimaryDisplay().workAreaSize;
-      opt.x = ((displayWorkAreaSize.width - (opt.width || 0)) / 2) | 0;
-      opt.y = ((displayWorkAreaSize.height - (opt.height || 0)) / 2) | 0;
+      bwOpt.x = ((displayWorkAreaSize.width - (bwOpt.width || 0)) / 2) | 0;
+      bwOpt.y = ((displayWorkAreaSize.height - (bwOpt.height || 0)) / 2) | 0;
     } else {
-      const currentPosition = opt.parent.getPosition();
-      opt.x =
-        (currentPosition[0] + (currentWH.width - (opt.width || customize.currentWidth)) / 2) | 0;
-      opt.y =
-        (currentPosition[1] + (currentWH.height - (opt.height || customize.currentHeight)) / 2) | 0;
-    }
-  } else {
-    const main = Window.getInstance().getMain();
-    if (main) {
-      const mainPosition = main.getPosition();
-      const mainBounds = main.getBounds();
-      opt.x = (mainPosition[0] + (mainBounds.width - (opt.width as number)) / 2) | 0;
-      opt.y = (mainPosition[1] + (mainBounds.height - (opt.height as number)) / 2) | 0;
+      const currentPosition = bwOpt.parent.getPosition();
+      bwOpt.x =
+        (currentPosition[0] + (currentWH.width - (bwOpt.width || customize.currentWidth)) / 2) | 0;
+      bwOpt.y =
+        (currentPosition[1] + (currentWH.height - (bwOpt.height || customize.currentHeight)) / 2) |
+        0;
     }
   }
-  const win = new BrowserWindow(opt);
-  //子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
-  if (isParentId && parenWin) {
-    win.once('closed', () => {
-      parenWin?.focus();
+
+  return { bwOpt, isParentId, parenWin };
+}
+
+/**
+ * 窗口打开预处理
+ */
+function windowOpenHandler(webContents: WebContents, parentId?: number) {
+  webContents.setWindowOpenHandler(({ url }) => {
+    Window.getInstance().create({
+      url,
+      parentId
     });
-  }
-  if (!customize.argv) customize.argv = process.argv;
-  customize.id = win.id;
-  win.customize = customize;
-  return win;
+    return { action: 'deny' };
+  });
 }
 
 /**
  * 窗口加载
  */
-function load(win: BrowserWindow) {
+async function load(url: string, win: BrowserWindow) {
+  // 窗口内创建拦截
+  windowOpenHandler(win.webContents);
+  win.webContents.on('did-attach-webview', (_, webContents) =>
+    windowOpenHandler(webContents, win.id)
+  );
   win.webContents.on('did-finish-load', () => win.webContents.send('window-load', win.customize));
   // 窗口最大最小监听
   win.on('maximize', () => win.webContents.send('window-maximize-status', 'maximize'));
@@ -147,13 +101,11 @@ function load(win: BrowserWindow) {
   // 聚焦失焦监听
   win.on('blur', () => win.webContents.send('window-blur-focus', 'blur'));
   win.on('focus', () => win.webContents.send('window-blur-focus', 'focus'));
-  if (win.customize.url) {
-    if (win.customize.url.startsWith('https://') || win.customize.url.startsWith('http://')) {
-      win.loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions);
-      return;
-    }
-    win.loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions);
-  }
+
+  if (url.startsWith('https://') || url.startsWith('http://'))
+    await win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
+  else await win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
+  return win.id;
 }
 
 export class Window {
@@ -202,52 +154,72 @@ export class Window {
   /**
    * 创建窗口
    * */
-  create(customize: Customize, opt: BrowserWindowConstructorOptions) {
-    if (customize.isOneWindow) {
+  async create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
+    if (customize.isOneWindow && !customize.url) {
       for (const i of this.getAll()) {
-        if (
-          (customize?.route && customize.route === i.customize?.route) ||
-          (customize?.url && customize.url === i.customize?.url)
-        ) {
+        if (customize?.route && customize.route === i.customize?.route) {
           i.focus();
           return;
         }
       }
     }
-    const win = browserWindowInit(customize, opt);
+    const { bwOpt, isParentId, parenWin } = browserWindowAssembly(customize, bwOptions);
+    const win = new BrowserWindow(bwOpt);
+    //win32 取消原生窗口右键事件
+    process.platform === 'win32' &&
+      win.hookWindowMessage(278, () => {
+        win.setEnabled(false);
+        win.setEnabled(true);
+      });
+    //子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
+    isParentId && win.once('close', () => parenWin?.focus());
+
+    !customize.argv && (customize.argv = process.argv);
+    customize.id = win.id;
+    win.customize = customize;
+
     // 路由 > url
     if (!app.isPackaged) {
       //调试模式
       try {
-        import('fs').then(({ readFileSync }) => {
-          const appPort = readFileSync(join('.port'), 'utf8');
+        return import('fs').then(({ readFileSync }) => {
           win.webContents.openDevTools({ mode: 'detach' });
-          if (!win.customize.url) win.customize.url = `http://localhost:${appPort}`;
-          load(win);
+          let url = `http://localhost:${readFileSync(join('.port'), 'utf8')}`;
+          if (win.customize.url) {
+            win.customize.headNative && (url = win.customize.url);
+            !win.customize.headNative && (win.customize.route = '/Webview');
+          }
+          return load(url, win);
         });
       } catch (e) {
         throw 'not found .port';
       }
-      return;
     }
-    if (!win.customize.url) win.customize.url = join(__dirname, '../index.html');
-    load(win);
+    let url = join(__dirname, '../renderer/index.html');
+    if (win.customize.url) {
+      win.customize.headNative && (url = win.customize.url);
+      !win.customize.headNative && (win.customize.route = '/Webview');
+    }
+    return load(url, win);
   }
 
   /**
    * 窗口关闭、隐藏、显示等常用方法
    */
-  func(type: WindowFuncOpt, id?: number) {
+  func(type: WindowFuncOpt, id?: number, data?: any[]) {
     if (id !== null && id !== undefined) {
       const win = this.get(id as number);
       if (!win) {
         console.error(`not found win -> ${id}`);
         return;
       }
-      win[type]();
+      // @ts-ignore
+      data ? win[type](...data) : win[type]();
       return;
     }
-    for (const i of this.getAll()) i[type]();
+    // @ts-ignore
+    if (data) for (const i of this.getAll()) i[type](...data);
+    else for (const i of this.getAll()) i[type]();
   }
 
   /**
@@ -281,7 +253,10 @@ export class Window {
       console.error('Invalid id, the id can not be a empty');
       return;
     }
-    win.setMinimumSize(args.size[0], args.size[1]);
+    const workAreaSize = args.size[0]
+      ? { width: args.size[0], height: args.size[1] }
+      : screen.getPrimaryDisplay().workAreaSize;
+    win.setMaximumSize(workAreaSize.width, workAreaSize.height);
   }
 
   /**
@@ -376,11 +351,11 @@ export class Window {
       }
     });
     // 窗口消息
-    ipcMain.on('window-func', (event, args) => this.func(args.type, args.id));
+    ipcMain.on('window-func', (event, args) => this.func(args.type, args.id, args.data));
     // 窗口状态
     ipcMain.handle('window-status', async (event, args) => this.getStatus(args.type, args.id));
     // 创建窗口
-    ipcMain.on('window-new', (event, args) => this.create(args.customize, args.opt));
+    ipcMain.handle('window-new', (event, args) => this.create(args.customize, args.opt));
     // 设置窗口是否置顶
     ipcMain.on('window-always-top-set', (event, args) => this.setAlwaysOnTop(args));
     // 设置窗口大小
@@ -412,4 +387,4 @@ export class Window {
   }
 }
 
-export default Window.getInstance();
+export const windowInstance = Window.getInstance();

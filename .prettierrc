@@ -1,3 +1,4 @@
+
 {
   "printWidth": 100,
   "semi": true,
@@ -6,6 +7,5 @@
   "singleQuote": true,
   "trailingComma": "none",
   "bracketSpacing": true,
-  "proseWrap": "always",
-  "htmlWhitespaceSensitivity": "ignore"
+  "proseWrap": "always"
 }

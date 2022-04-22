@@ -1,0 +1,1 @@
+import { logError } from '../ipc';

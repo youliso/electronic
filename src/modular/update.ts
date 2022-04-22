@@ -1,55 +1,42 @@
-import type { AppUpdater } from 'electron-updater';
 import type { AllPublishOptions } from 'builder-util-runtime';
+import type { AppUpdater } from 'electron-updater';
+import type { UpdateMessage } from '../types';
 import { join } from 'path';
-import { readdirSync, existsSync, statSync, unlinkSync, rmdirSync } from 'fs';
 import { AppImageUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
+import { delDir } from './file';
 import { ipcMain, app } from 'electron';
-interface UpdateMessage {
-  code: number;
-  msg: string;
-  value?: any;
-}
-
-function delDir(path: string): void {
-  let files = [];
-  if (existsSync(path)) {
-    files = readdirSync(path);
-    files.forEach((file) => {
-      let curPath = path + '/' + file;
-      if (statSync(curPath).isDirectory()) {
-        delDir(curPath); //递归删除文件夹
-      } else {
-        unlinkSync(curPath); //删除文件
-      }
-    });
-    rmdirSync(path);
-  }
-}
+import { windowInstance } from './window';
+import { logError } from './log';
 
 /**
  * 更新模块 https://www.electron.build/auto-update
  * */
-export default class Update {
+export class Update {
   public autoUpdater: AppUpdater;
 
-  constructor(options: AllPublishOptions) {
-    if (process.platform === 'win32') this.autoUpdater = new NsisUpdater(options);
-    else if (process.platform === 'darwin') this.autoUpdater = new MacUpdater(options);
-    else this.autoUpdater = new AppImageUpdater(options);
+  public options: AllPublishOptions;
+  public dirname: string;
+
+  constructor(options: AllPublishOptions, dirname: string) {
+    this.options = options;
+    this.dirname = dirname;
+    if (process.platform === 'win32') this.autoUpdater = new NsisUpdater(this.options);
+    else if (process.platform === 'darwin') this.autoUpdater = new MacUpdater(this.options);
+    else this.autoUpdater = new AppImageUpdater(this.options);
     //本地开发环境，使用调试app-update.yml地址
     if (!app.isPackaged && !(process.platform === 'darwin')) {
-      this.autoUpdater.updateConfigPath = join('build/cfg/app-update.yml');
+      this.autoUpdater.updateConfigPath = join('resources/build/cfg/app-update.yml');
     }
   }
 
   /**
    * 删除更新包文件
    */
-  handleUpdate(dirname: string) {
+  handleUpdate() {
     const updatePendingPath = join(
       // @ts-ignore
       this.autoUpdater.app.baseCachePath,
-      dirname,
+      this.dirname,
       'pending'
     );
     try {
@@ -84,20 +71,20 @@ export default class Update {
 
   /**
    * 检查更新
-   * @param delName 是否删除历史更新缓存(应用目录名)
+   * @param isDel 是否删除历史更新缓存
    * @param autoDownload 是否在找到更新时自动下载更新
    */
-  checkUpdate(autoDownload: boolean = false, delName?: string) {
-    if (delName) this.handleUpdate(delName);
+  checkUpdate(isDel: boolean, autoDownload: boolean = false) {
+    if (isDel) this.handleUpdate();
     this.autoUpdater.autoDownload = autoDownload;
-    this.autoUpdater.checkForUpdates().catch(console.error);
+    this.autoUpdater.checkForUpdates().catch(logError);
   }
 
   /**
    * 下载更新 (如果autoDownload选项设置为 false，则可以使用此方法
    */
   downloadUpdate() {
-    this.autoUpdater.downloadUpdate().catch(console.error); //TODO待完善
+    this.autoUpdater.downloadUpdate().catch(logError); //TODO待完善
   }
 
   /**
@@ -112,6 +99,8 @@ export default class Update {
    * 开启监听
    */
   on() {
+    //开启更新监听
+    this.open((data: { key: string; value: any }) => windowInstance.send('update-back', data));
     //检查更新
     ipcMain.on('update-check', (event, args) => this.checkUpdate(args.isDel, args.autoDownload));
     //手动下载更新
