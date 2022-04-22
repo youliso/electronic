@@ -9,7 +9,7 @@ import type {
   WindowAlwaysOnTopOpt,
   WindowFuncOpt,
   WindowStatusOpt,
-} from "../types";
+} from "../../types";
 import { join } from "path";
 import { app, screen, ipcMain, BrowserWindow } from "electron";
 import { logError } from "./log";

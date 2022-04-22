@@ -1,4 +1,4 @@
-import type { AppInfo, AppPathKey } from "../types";
+import type { AppInfo, AppPathKey } from "../../types";
 
 /**
  * 日志(info)

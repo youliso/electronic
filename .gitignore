@@ -1,4 +1,2 @@
-node_modules/
-/main/
-/renderer/
-/preload/
+/node_modules/
+/dist/

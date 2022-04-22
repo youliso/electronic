@@ -1,6 +1,6 @@
 import type { CookiesGetFilter, CookiesSetDetails } from 'electron';
 import { ipcMain, session } from 'electron';
-import { bytesToSize } from '../utils';
+import { bytesToSize } from '../../utils';
 
 /**
  * 监听

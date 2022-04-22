@@ -7,7 +7,9 @@ import typescript from "rollup-plugin-typescript2";
 
 const plugins = () => [
   json(),
-  typescript({ tsconfig: "./tsconfig.json" }),
+  typescript({
+    tsconfig: "./tsconfig.json",
+  }),
   commonjs(),
   resolve({
     preferBuiltins: true,
@@ -23,19 +25,13 @@ const external = [
 ];
 
 /** @type {import('rollup').RollupOptions[]} */
-const config = [
-  {
-    input: "./src/index.ts",
-    output: [
-      { file: "../../renderer/index.mjs", format: "esm", sourcemap: false },
-    ],
-    plugins: plugins(),
-  },
-  {
-    input: "./src/index.ts",
+let config = [];
+["main", "preload", "renderer", "types", "utils"].forEach((name) => {
+  config.push({
+    input: `./src/${name}/index.ts`,
     output: [
       {
-        file: "../../renderer/index.js",
+        file: `./dist/${name}.js`,
         exports: "auto",
         format: "commonjs",
         sourcemap: false,
@@ -43,7 +39,20 @@ const config = [
     ],
     external,
     plugins: plugins(),
-  },
-];
+  });
+  name === "renderer" &&
+    config.push({
+      input: `./src/${name}/index.ts`,
+      output: [
+        {
+          file: `./dist/${name}.mjs`,
+          format: "esm",
+          sourcemap: false,
+        },
+      ],
+      external,
+      plugins: plugins(),
+    });
+});
 
 export default config;
