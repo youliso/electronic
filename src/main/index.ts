@@ -1,11 +1,11 @@
 declare global {
   module Electron {
     interface BrowserWindow {
-      customize: import("./types").Customize;
+      customize: import("../types").Customize;
     }
 
     interface BrowserWindowConstructorOptions {
-      customize?: import("./types").Customize;
+      customize?: import("../types").Customize;
     }
   }
 }

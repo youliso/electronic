@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "incremental": true,
-    "outDir": "../../dist",
     "moduleResolution": "node",
     "inlineSourceMap": true,
     "esModuleInterop": true,
@@ -16,14 +15,14 @@
     "listEmittedFiles": false,
     "listFiles": false,
     "pretty": true,
-    "lib": ["DOM", "ES2021"],
+    "lib": ["DOM", "ESNext"],
     "typeRoots": ["node_modules/@types"],
-    "target": "ES2021",
+    "target": "ESNext",
     "module": "ESNext",
     "types": ["node"],
     "declaration": true
   },
-  "include": ["./src/**/*", "packages/utils", "packages/modular", "packages/ipc"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }

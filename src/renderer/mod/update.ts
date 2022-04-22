@@ -1,5 +1,5 @@
 import type { IpcRendererEvent } from 'electron';
-import type { UpdateMessage } from '../types';
+import type { UpdateMessage } from '../../types';
 /**
  * 更新监听
  */

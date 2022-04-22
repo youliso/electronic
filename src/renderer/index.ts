@@ -1,8 +1,8 @@
 declare global {
   interface Window {
-    ipc: import('./types').Ipc;
-    customize: import('./types').Customize;
-    environment: import('./types').Environment;
+    ipc: import('../types').Ipc;
+    customize: import('../types').Customize;
+    environment: import('../types').Environment;
   }
 }
 

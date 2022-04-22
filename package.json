@@ -1,8 +1,16 @@
 {
   "name": "ym-electron",
-  "version": "1.0.2",
+  "version": "1.0.3-beta",
   "description": "ym electron",
-  "keywords": [],
+  "scripts": {
+    "build": "rollup -c rollup.config.js && node scripts/build.js",
+    "build:watch": "rollup -c rollup.config.js -w",
+    "fix:prettier": "prettier \"./src\" --write",
+    "test:prettier": "prettier \"./src\" --list-different"
+  },
+  "keywords": [
+    "electron"
+  ],
   "author": "youliso",
   "repository": {
     "type": "git",
@@ -12,8 +20,18 @@
     "node": ">=16.14.0"
   },
   "files": [
-    "main",
-    "renderer",
-    "preload"
-  ]
+    "**/*"
+  ],
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.1.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "electron": "^18.1.0",
+    "electron-updater": "^5.0.1",
+    "prettier": "^2.3.1",
+    "rollup": "^2.51.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.31.2",
+    "typescript": "^4.3.2"
+  }
 }

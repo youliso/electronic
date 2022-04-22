@@ -1,5 +1,5 @@
 import type { IpcRendererEvent, BrowserWindowConstructorOptions } from 'electron';
-import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
+import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../../types';
 
 /**
  * 窗口初始化 (i)
