@@ -23,7 +23,12 @@
     "types": ["node"],
     "declaration": true
   },
-  "include": ["./src/**/*", "packages/utils", "packages/modular", "packages/ipc"],
+  "include": [
+    "./src/**/*",
+    "packages/utils",
+    "packages/modular",
+    "packages/ipc"
+  ],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }
