@@ -1,5 +1,1 @@
-/package-lock.json
-/node_modules/
-/.idea/
-.rollup.cache
-dist
+node_modules/
