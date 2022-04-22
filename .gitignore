@@ -1,3 +1,4 @@
 node_modules/
 main/
 renderer/
+preload/

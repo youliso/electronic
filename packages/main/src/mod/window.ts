@@ -2,11 +2,17 @@ import type {
   BrowserWindowConstructorOptions,
   LoadFileOptions,
   LoadURLOptions,
-  WebContents
-} from 'electron';
-import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
-import { join } from 'path';
-import { app, screen, ipcMain, BrowserWindow } from 'electron';
+  WebContents,
+} from "electron";
+import type {
+  Customize,
+  WindowAlwaysOnTopOpt,
+  WindowFuncOpt,
+  WindowStatusOpt,
+} from "../types";
+import { join } from "path";
+import { app, screen, ipcMain, BrowserWindow } from "electron";
+import { logError } from "./log";
 
 /**
  * 窗口配置
@@ -18,37 +24,38 @@ function browserWindowAssembly(
   customize: Customize,
   bwOptions: BrowserWindowConstructorOptions = {}
 ) {
-  if (!customize) throw new Error('not customize');
+  if (!customize) throw new Error("not customize");
   bwOptions.minWidth = bwOptions.minWidth || bwOptions.width;
   bwOptions.minHeight = bwOptions.minHeight || bwOptions.height;
   bwOptions.width = bwOptions.width;
   bwOptions.height = bwOptions.height;
   // darwin下modal会造成整个窗口关闭(?)
-  if (process.platform === 'darwin') delete bwOptions.modal;
+  if (process.platform === "darwin") delete bwOptions.modal;
   customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
   let bwOpt: BrowserWindowConstructorOptions = Object.assign(bwOptions, {
     autoHideMenuBar: true,
-    titleBarStyle: customize.headNative ? 'default' : 'hidden',
+    titleBarStyle: customize.headNative ? "default" : "hidden",
     minimizable: true,
     maximizable: true,
     frame: customize.headNative,
     show: customize.headNative,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
       devTools: !app.isPackaged,
       webSecurity: false,
-      webviewTag: !customize.headNative && customize.url
-    }
+      webviewTag: !customize.headNative && customize.url,
+    },
   });
   const isParentId =
     customize.parentId !== null &&
     customize.parentId !== undefined &&
-    typeof customize.parentId === 'number';
+    typeof customize.parentId === "number";
   let parenWin: BrowserWindow | null = null;
-  isParentId && (parenWin = Window.getInstance().get(customize.parentId as number));
+  isParentId &&
+    (parenWin = Window.getInstance().get(customize.parentId as number));
   if (parenWin) {
     bwOpt.parent = parenWin;
     const currentWH = bwOpt.parent.getBounds();
@@ -62,9 +69,12 @@ function browserWindowAssembly(
     } else {
       const currentPosition = bwOpt.parent.getPosition();
       bwOpt.x =
-        (currentPosition[0] + (currentWH.width - (bwOpt.width || customize.currentWidth)) / 2) | 0;
+        (currentPosition[0] +
+          (currentWH.width - (bwOpt.width || customize.currentWidth)) / 2) |
+        0;
       bwOpt.y =
-        (currentPosition[1] + (currentWH.height - (bwOpt.height || customize.currentHeight)) / 2) |
+        (currentPosition[1] +
+          (currentWH.height - (bwOpt.height || customize.currentHeight)) / 2) |
         0;
     }
   }
@@ -79,9 +89,9 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
   webContents.setWindowOpenHandler(({ url }) => {
     Window.getInstance().create({
       url,
-      parentId
+      parentId,
     });
-    return { action: 'deny' };
+    return { action: "deny" };
   });
 }
 
@@ -91,20 +101,31 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
 async function load(url: string, win: BrowserWindow) {
   // 窗口内创建拦截
   windowOpenHandler(win.webContents);
-  win.webContents.on('did-attach-webview', (_, webContents) =>
+  win.webContents.on("did-attach-webview", (_, webContents) =>
     windowOpenHandler(webContents, win.id)
   );
-  win.webContents.on('did-finish-load', () => win.webContents.send('window-load', win.customize));
+  win.webContents.on("did-finish-load", () =>
+    win.webContents.send("window-load", win.customize)
+  );
   // 窗口最大最小监听
-  win.on('maximize', () => win.webContents.send('window-maximize-status', 'maximize'));
-  win.on('unmaximize', () => win.webContents.send('window-maximize-status', 'unmaximize'));
+  win.on("maximize", () =>
+    win.webContents.send("window-maximize-status", "maximize")
+  );
+  win.on("unmaximize", () =>
+    win.webContents.send("window-maximize-status", "unmaximize")
+  );
   // 聚焦失焦监听
-  win.on('blur', () => win.webContents.send('window-blur-focus', 'blur'));
-  win.on('focus', () => win.webContents.send('window-blur-focus', 'focus'));
+  win.on("blur", () => win.webContents.send("window-blur-focus", "blur"));
+  win.on("focus", () => win.webContents.send("window-blur-focus", "focus"));
 
-  if (url.startsWith('https://') || url.startsWith('http://'))
-    await win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
-  else await win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
+  if (url.startsWith("https://") || url.startsWith("http://"))
+    await win
+      .loadURL(url, win.customize.loadOptions as LoadURLOptions)
+      .catch(logError);
+  else
+    await win
+      .loadFile(url, win.customize.loadOptions as LoadFileOptions)
+      .catch(logError);
   return win.id;
 }
 
@@ -154,7 +175,10 @@ export class Window {
   /**
    * 创建窗口
    * */
-  async create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
+  async create(
+    customize: Customize,
+    bwOptions: BrowserWindowConstructorOptions = {}
+  ) {
     if (customize.isOneWindow && !customize.url) {
       for (const i of this.getAll()) {
         if (customize?.route && customize.route === i.customize?.route) {
@@ -163,16 +187,19 @@ export class Window {
         }
       }
     }
-    const { bwOpt, isParentId, parenWin } = browserWindowAssembly(customize, bwOptions);
+    const { bwOpt, isParentId, parenWin } = browserWindowAssembly(
+      customize,
+      bwOptions
+    );
     const win = new BrowserWindow(bwOpt);
     //win32 取消原生窗口右键事件
-    process.platform === 'win32' &&
+    process.platform === "win32" &&
       win.hookWindowMessage(278, () => {
         win.setEnabled(false);
         win.setEnabled(true);
       });
     //子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
-    isParentId && win.once('close', () => parenWin?.focus());
+    isParentId && win.once("close", () => parenWin?.focus());
 
     !customize.argv && (customize.argv = process.argv);
     customize.id = win.id;
@@ -182,23 +209,23 @@ export class Window {
     if (!app.isPackaged) {
       //调试模式
       try {
-        return import('fs').then(({ readFileSync }) => {
-          win.webContents.openDevTools({ mode: 'detach' });
-          let url = `http://localhost:${readFileSync(join('.port'), 'utf8')}`;
+        return import("fs").then(({ readFileSync }) => {
+          win.webContents.openDevTools({ mode: "detach" });
+          let url = `http://localhost:${readFileSync(join(".port"), "utf8")}`;
           if (win.customize.url) {
             win.customize.headNative && (url = win.customize.url);
-            !win.customize.headNative && (win.customize.route = '/Webview');
+            !win.customize.headNative && (win.customize.route = "/Webview");
           }
           return load(url, win);
         });
       } catch (e) {
-        throw 'not found .port';
+        throw "not found .port";
       }
     }
-    let url = join(__dirname, '../renderer/index.html');
+    let url = join(__dirname, "../renderer/index.html");
     if (win.customize.url) {
       win.customize.headNative && (url = win.customize.url);
-      !win.customize.headNative && (win.customize.route = '/Webview');
+      !win.customize.headNative && (win.customize.route = "/Webview");
     }
     return load(url, win);
   }
@@ -238,7 +265,7 @@ export class Window {
   getStatus(type: WindowStatusOpt, id: number) {
     const win = this.get(id);
     if (!win) {
-      console.error('Invalid id, the id can not be a empty');
+      console.error("Invalid id, the id can not be a empty");
       return;
     }
     return win[type]();
@@ -250,7 +277,7 @@ export class Window {
   setMinSize(args: { id: number; size: number[] }) {
     const win = this.get(args.id);
     if (!win) {
-      console.error('Invalid id, the id can not be a empty');
+      console.error("Invalid id, the id can not be a empty");
       return;
     }
     const workAreaSize = args.size[0]
@@ -265,7 +292,7 @@ export class Window {
   setMaxSize(args: { id: number; size: number[] }) {
     const win = this.get(args.id);
     if (!win) {
-      console.error('Invalid id, the id can not be a empty');
+      console.error("Invalid id, the id can not be a empty");
       return;
     }
     win.setMaximumSize(args.size[0], args.size[1]);
@@ -274,24 +301,34 @@ export class Window {
   /**
    * 设置窗口大小
    */
-  setSize(args: { id: number; size: number[]; resizable: boolean; center: boolean }) {
+  setSize(args: {
+    id: number;
+    size: number[];
+    resizable: boolean;
+    center: boolean;
+  }) {
     let Rectangle: { [key: string]: number } = {
       width: args.size[0] | 0,
-      height: args.size[1] | 0
+      height: args.size[1] | 0,
     };
     const win = this.get(args.id);
     if (!win) {
-      console.error('Invalid id, the id can not be a empty');
+      console.error("Invalid id, the id can not be a empty");
       return;
     }
     const winBounds = win.getBounds();
-    if (Rectangle.width === winBounds.width && Rectangle.height === winBounds.height) return;
+    if (
+      Rectangle.width === winBounds.width &&
+      Rectangle.height === winBounds.height
+    )
+      return;
     if (!args.center) {
       const winPosition = win.getPosition();
       Rectangle.x = (winPosition[0] + (winBounds.width - args.size[0]) / 2) | 0;
-      Rectangle.y = (winPosition[1] + (winBounds.height - args.size[1]) / 2) | 0;
+      Rectangle.y =
+        (winPosition[1] + (winBounds.height - args.size[1]) / 2) | 0;
     }
-    win.once('resize', () => {
+    win.once("resize", () => {
       if (args.center) win.center();
     });
     win.setResizable(args.resizable);
@@ -305,7 +342,7 @@ export class Window {
   setBackgroundColor(args: { id: number; color: string }) {
     const win = this.get(args.id);
     if (!win) {
-      console.error('Invalid id, the id can not be a empty');
+      console.error("Invalid id, the id can not be a empty");
       return;
     }
     win.setBackgroundColor(args.color);
@@ -314,13 +351,17 @@ export class Window {
   /**
    * 设置窗口是否置顶
    */
-  setAlwaysOnTop(args: { id: number; is: boolean; type?: WindowAlwaysOnTopOpt }) {
+  setAlwaysOnTop(args: {
+    id: number;
+    is: boolean;
+    type?: WindowAlwaysOnTopOpt;
+  }) {
     const win = this.get(args.id);
     if (!win) {
-      console.error('Invalid id, the id can not be a empty');
+      console.error("Invalid id, the id can not be a empty");
       return;
     }
-    win.setAlwaysOnTop(args.is, args.type || 'normal');
+    win.setAlwaysOnTop(args.is, args.type || "normal");
   }
 
   /**
@@ -328,22 +369,22 @@ export class Window {
    */
   on() {
     // 窗口数据更新
-    ipcMain.on('window-update', (event, args) => {
+    ipcMain.on("window-update", (event, args) => {
       if (args?.id) {
         const win = this.get(args.id);
         if (!win) {
-          console.error('Invalid id, the id can not be a empty');
+          console.error("Invalid id, the id can not be a empty");
           return;
         }
         win.customize = args;
       }
     });
     // 最大化最小化窗口
-    ipcMain.on('window-max-min-size', (event, id) => {
+    ipcMain.on("window-max-min-size", (event, id) => {
       if (id !== null && id !== undefined) {
         const win = this.get(id);
         if (!win) {
-          console.error('Invalid id, the id can not be a empty');
+          console.error("Invalid id, the id can not be a empty");
           return;
         }
         if (win.isMaximized()) win.unmaximize();
@@ -351,23 +392,33 @@ export class Window {
       }
     });
     // 窗口消息
-    ipcMain.on('window-func', (event, args) => this.func(args.type, args.id, args.data));
+    ipcMain.on("window-func", (event, args) =>
+      this.func(args.type, args.id, args.data)
+    );
     // 窗口状态
-    ipcMain.handle('window-status', async (event, args) => this.getStatus(args.type, args.id));
+    ipcMain.handle("window-status", async (event, args) =>
+      this.getStatus(args.type, args.id)
+    );
     // 创建窗口
-    ipcMain.handle('window-new', (event, args) => this.create(args.customize, args.opt));
+    ipcMain.handle("window-new", (event, args) =>
+      this.create(args.customize, args.opt)
+    );
     // 设置窗口是否置顶
-    ipcMain.on('window-always-top-set', (event, args) => this.setAlwaysOnTop(args));
+    ipcMain.on("window-always-top-set", (event, args) =>
+      this.setAlwaysOnTop(args)
+    );
     // 设置窗口大小
-    ipcMain.on('window-size-set', (event, args) => this.setSize(args));
+    ipcMain.on("window-size-set", (event, args) => this.setSize(args));
     // 设置窗口最小大小
-    ipcMain.on('window-min-size-set', (event, args) => this.setMinSize(args));
+    ipcMain.on("window-min-size-set", (event, args) => this.setMinSize(args));
     // 设置窗口最大大小
-    ipcMain.on('window-max-size-set', (event, args) => this.setMaxSize(args));
+    ipcMain.on("window-max-size-set", (event, args) => this.setMaxSize(args));
     // 设置窗口背景颜色
-    ipcMain.on('window-bg-color-set', (event, args) => this.setBackgroundColor(args));
+    ipcMain.on("window-bg-color-set", (event, args) =>
+      this.setBackgroundColor(args)
+    );
     // 窗口消息
-    ipcMain.on('window-message-send', (event, args) => {
+    ipcMain.on("window-message-send", (event, args) => {
       const channel = `window-message-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         for (const i of args.acceptIds) this.send(channel, args.value, i);
@@ -379,9 +430,11 @@ export class Window {
           if (win.id !== args.id) win.webContents.send(channel, args.value);
     });
     //通过路由获取窗口id (不传route查全部)
-    ipcMain.handle('window-id-get', async (event, args) => {
+    ipcMain.handle("window-id-get", async (event, args) => {
       return this.getAll()
-        .filter((win) => (args.route ? win.customize?.route === args.route : true))
+        .filter((win) =>
+          args.route ? win.customize?.route === args.route : true
+        )
         .map((win) => win.id);
     });
   }

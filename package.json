@@ -1,6 +1,6 @@
 {
   "name": "ym-electron",
-  "version": "0.0.5",
+  "version": "0.0.9",
   "description": "ym electron",
   "keywords": [],
   "author": "youliso",
@@ -13,9 +13,7 @@
   },
   "files": [
     "main",
-    "renderer"
-  ],
-  "devDependencies": {
-    "lerna": "^4.0.0"
-  }
+    "renderer",
+    "preload"
+  ]
 }
