@@ -12,8 +12,8 @@
     "node": ">=16.14.0"
   },
   "main": "dist/modular/index.js",
-  "module": "dist/module/index.js",
-  "typings": "dist/main/src/index.d.ts",
+  "module": "dist/modular/index.js",
+  "typings": "dist/modular/src/types/index.d.ts",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "build:watch": "rollup -c rollup.config.js -w",
