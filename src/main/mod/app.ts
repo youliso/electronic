@@ -44,6 +44,18 @@ class App {
   }
 
   /**
+   * 必要模块
+   */
+  modular() {
+    logOn();
+    fileOn();
+    pathOn();
+    globalInstance.on();
+    shortcutInstance.on();
+    windowInstance.on();
+  }
+
+  /**
    * 监听
    */
   beforeOn() {
@@ -144,15 +156,6 @@ class App {
       app.relaunch({ args: process.argv.slice(1) });
       if (args) app.exit(0);
     });
-  }
-
-  modular() {
-    logOn();
-    fileOn();
-    pathOn();
-    shortcutInstance.on();
-    globalInstance.on();
-    windowInstance.on();
   }
 }
 

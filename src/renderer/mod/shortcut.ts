@@ -27,14 +27,14 @@ export async function shortcut(
  * 清除快捷键
  * @param key
  */
-export async function unShortcut(key: string): Promise<void> {
+export async function shortcutUn(key: string): Promise<void> {
   return await window.ipc.invoke("shortcut-unregister", key);
 }
 
 /**
  * 清空全部快捷键
  */
-export async function unShortcutAll(): Promise<void> {
+export async function shortcutUnAll(): Promise<void> {
   return await window.ipc.invoke("shortcut-unregisterAll");
 }
 
