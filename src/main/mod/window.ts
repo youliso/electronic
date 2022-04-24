@@ -105,7 +105,7 @@ async function load(url: string, win: BrowserWindow) {
     windowOpenHandler(webContents, win.id)
   );
   win.webContents.on("did-finish-load", () =>
-    win.webContents.send("window-load", win.customize)
+    win.webContents.send("window-load", { id: win.id, ...win.customize })
   );
   // 窗口最大最小监听
   win.on("maximize", () =>
@@ -192,22 +192,21 @@ export class Window {
       bwOptions
     );
     const win = new BrowserWindow(bwOpt);
-    //win32 取消原生窗口右键事件
+    // win32 取消原生窗口右键事件
     process.platform === "win32" &&
       win.hookWindowMessage(278, () => {
         win.setEnabled(false);
         win.setEnabled(true);
       });
-    //子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
+    // 子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
     isParentId && win.once("close", () => parenWin?.focus());
-
+    // 参数设置
     !customize.argv && (customize.argv = process.argv);
-    customize.id = win.id;
     win.customize = customize;
 
     // 路由 > url
     if (!app.isPackaged) {
-      //调试模式
+      // 调试模式
       try {
         return import("fs").then(({ readFileSync }) => {
           win.webContents.openDevTools({ mode: "detach" });

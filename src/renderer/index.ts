@@ -1,9 +1,3 @@
-declare global {
-  interface Window {
-    customize: import("../types").Customize;
-  }
-}
-
 export * from "./mod/app";
 export * from "./mod/file";
 export * from "./mod/path";

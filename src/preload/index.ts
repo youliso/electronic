@@ -5,14 +5,12 @@ import { EOL } from "os";
 declare global {
   interface Window {
     ipc: import("../types").Ipc;
+    customize: import("../types").Customize;
     environment: import("../types").Environment;
   }
 }
 
-export function preloadDefaultInit(
-  isSecondInstanceWin: boolean,
-  defaultEnv?: { [key: string]: any }
-) {
+export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
   contextBridge.exposeInMainWorld("ipc", {
     send: (channel: string, args?: any) => ipcRenderer.send(channel, args),
     sendSync: (channel: string, args?: any) =>
@@ -34,7 +32,6 @@ export function preloadDefaultInit(
     EOL,
     systemVersion: process.getSystemVersion(),
     platform: process.platform,
-    isSecondInstanceWin,
     ...defaultEnv,
   });
 }
