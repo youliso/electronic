@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-export default function preloadInit(
+export function preloadDefaultInit(
   isSecondInstanceWin: boolean,
   defaultEnv?: { [key: string]: any }
 ) {
