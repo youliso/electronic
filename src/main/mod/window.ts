@@ -159,12 +159,12 @@ export class Window {
    * 获取主窗口(无主窗口获取后存在窗口)
    */
   getMain() {
-    const all = BrowserWindow.getAllWindows().reverse();
+    const all = this.getAll().reverse();
     let win: BrowserWindow | null = null;
     for (let index = 0; index < all.length; index++) {
       const item = all[index];
       if (index === 0) win = item;
-      if (item.customize.isMainWin) {
+      if (item?.customize?.isMainWin) {
         win = item;
         break;
       }

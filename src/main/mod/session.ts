@@ -1,6 +1,6 @@
-import type { CookiesGetFilter, CookiesSetDetails } from 'electron';
-import { ipcMain, session } from 'electron';
-import { bytesToSize } from '../../utils';
+import type { CookiesGetFilter, CookiesSetDetails } from "electron";
+import { ipcMain, session } from "electron";
+import { bytesToSize } from "../../utils";
 
 /**
  * 监听
@@ -20,14 +20,16 @@ export class Session {
   webRequest() {
     session.defaultSession.webRequest.onBeforeSendHeaders(
       {
-        urls: ['http://*/*', 'https://*/*']
+        urls: ["http://*/*", "https://*/*"],
       },
       (details, callback) => {
-        const keys = Object.keys(this.urlHeaders).filter((key: string) =>
-          [0, 7, 8].includes(details.url.indexOf(key))
-        );
-        for (const key of keys)
-          for (const v in this.urlHeaders[key]) details.requestHeaders[v] = this.urlHeaders[key][v];
+        const urls = Object.keys(this.urlHeaders);
+        const keys = urls.filter((key: string) => details.url.startsWith(key));
+        keys.forEach((key) => {
+          for (const v in this.urlHeaders[key]) {
+            details.requestHeaders[v] = this.urlHeaders[key][v];
+          }
+        });
         callback({ requestHeaders: details.requestHeaders });
       }
     );
@@ -89,15 +91,19 @@ export class Session {
   on() {
     this.webRequest();
     //设置url请求头
-    ipcMain.on('session-headers-set', async (event, args) => {
+    ipcMain.on("session-headers-set", async (event, args) => {
       this.urlHeaders = Object.assign(this.urlHeaders, args);
     });
     //设置 Cookies
-    ipcMain.handle('session-cookies-set', async (event, args) => this.setCookies(args));
+    ipcMain.handle("session-cookies-set", async (event, args) =>
+      this.setCookies(args)
+    );
     //获取 Cookies
-    ipcMain.handle('session-cookies-get', async (event, args) => this.getCookies(args));
+    ipcMain.handle("session-cookies-get", async (event, args) =>
+      this.getCookies(args)
+    );
     //移除 Cookies
-    ipcMain.handle('session-cookies-remove', async (event, args) =>
+    ipcMain.handle("session-cookies-remove", async (event, args) =>
       this.removeCookies(args.url, args.name)
     );
   }
