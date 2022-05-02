@@ -1,6 +1,5 @@
 import type { CookiesGetFilter, CookiesSetDetails } from "electron";
 import { ipcMain, session } from "electron";
-import { bytesToSize } from "../../utils";
 
 /**
  * 监听
@@ -75,7 +74,7 @@ export class Session {
    * @returns treatedBytes {bytes, unit}
    */
   async getCacheSize() {
-    return bytesToSize(await session.defaultSession.getCacheSize());
+    return await session.defaultSession.getCacheSize();
   }
 
   /**
