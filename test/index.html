@@ -2,5 +2,18 @@
 <html>
   <body>
     <h1>hello</h1>
+    <script>
+      window.ipc.once("window-load", (_, args) => {
+        window.customize = args;
+        setTimeout(
+          () =>
+            window.ipc.send("window-func", {
+              type: "show",
+              id: window.customize.id,
+            }),
+          200
+        );
+      });
+    </script>
   </body>
 </html>

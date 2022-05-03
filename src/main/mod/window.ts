@@ -33,29 +33,28 @@ function browserWindowAssembly(
   if (process.platform === "darwin") delete bwOptions.modal;
   customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
-  let bwOpt: BrowserWindowConstructorOptions = {
-    ...bwOptions,
-    autoHideMenuBar: bwOptions.autoHideMenuBar || true,
-    titleBarStyle:
-      bwOptions.titleBarStyle || customize.headNative ? "default" : "hidden",
-    minimizable: bwOptions.minimizable || true,
-    maximizable: bwOptions.maximizable || true,
-    frame: bwOptions.frame || customize.headNative,
-    show: bwOptions.show || customize.headNative,
-    webPreferences: {
-      preload:
-        bwOptions.webPreferences?.preload ||
-        join(__dirname, "../preload/index.js"),
-      contextIsolation: bwOptions.webPreferences?.contextIsolation || true,
-      nodeIntegration: bwOptions.webPreferences?.nodeIntegration || false,
-      devTools: bwOptions.webPreferences?.devTools || !app.isPackaged,
-      webSecurity: bwOptions.webPreferences?.webSecurity || false,
-      webviewTag:
-        bwOptions.webPreferences?.webviewTag ||
-        (!customize.headNative && !!customize.url) ||
-        false,
+  bwOptions.webPreferences = Object.assign(
+    {
+      preload: join(__dirname, "../preload/index.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      devTools: !app.isPackaged,
+      webSecurity: false,
+      webviewTag: !customize.headNative && customize.url,
     },
-  };
+    bwOptions.webPreferences
+  );
+  let bwOpt: BrowserWindowConstructorOptions = Object.assign(
+    {
+      autoHideMenuBar: true,
+      titleBarStyle: customize.headNative ? "default" : "hidden",
+      minimizable: true,
+      maximizable: true,
+      frame: customize.headNative,
+      show: customize.headNative,
+    },
+    bwOptions
+  );
   const isParentId =
     customize.parentId !== null &&
     customize.parentId !== undefined &&

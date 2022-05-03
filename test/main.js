@@ -15,7 +15,8 @@ appInstance
       {
         width: 800,
         height: 600,
-        show: true,
+        frame: true,
+        show: false,
         webPreferences: {
           preload: join(__dirname, "../test/preload.js"),
         },
