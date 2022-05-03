@@ -284,10 +284,7 @@ export class Window {
       console.error("Invalid id, the id can not be a empty");
       return;
     }
-    const workAreaSize = args.size[0]
-      ? { width: args.size[0], height: args.size[1] }
-      : screen.getPrimaryDisplay().workAreaSize;
-    win.setMaximumSize(workAreaSize.width, workAreaSize.height);
+    win.setMinimumSize(args.size[0], args.size[1]);
   }
 
   /**
@@ -299,7 +296,10 @@ export class Window {
       console.error("Invalid id, the id can not be a empty");
       return;
     }
-    win.setMaximumSize(args.size[0], args.size[1]);
+    const workAreaSize = args.size[0]
+      ? { width: args.size[0], height: args.size[1] }
+      : screen.getPrimaryDisplay().workAreaSize;
+    win.setMaximumSize(workAreaSize.width, workAreaSize.height);
   }
 
   /**
