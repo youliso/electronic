@@ -66,7 +66,7 @@ class App {
     else {
       app.on("second-instance", (event, argv) => {
         // 当运行第二个实例时是否为创建窗口
-        if (this.isSecondInstanceWin) {
+        if (!this.isSecondInstanceWin) {
           const main = windowInstance.getMain();
           if (main) {
             if (main.isMinimized()) main.restore();
