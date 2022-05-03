@@ -33,22 +33,29 @@ function browserWindowAssembly(
   if (process.platform === "darwin") delete bwOptions.modal;
   customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
-  let bwOpt: BrowserWindowConstructorOptions = Object.assign(bwOptions, {
-    autoHideMenuBar: true,
-    titleBarStyle: customize.headNative ? "default" : "hidden",
-    minimizable: true,
-    maximizable: true,
-    frame: customize.headNative,
-    show: customize.headNative,
+  let bwOpt: BrowserWindowConstructorOptions = {
+    ...bwOptions,
+    autoHideMenuBar: bwOptions.autoHideMenuBar || true,
+    titleBarStyle:
+      bwOptions.titleBarStyle || customize.headNative ? "default" : "hidden",
+    minimizable: bwOptions.minimizable || true,
+    maximizable: bwOptions.maximizable || true,
+    frame: bwOptions.frame || customize.headNative,
+    show: bwOptions.show || customize.headNative,
     webPreferences: {
-      preload: join(__dirname, "../preload/index.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
+      preload:
+        bwOptions.webPreferences?.preload ||
+        join(__dirname, "../preload/index.js"),
+      contextIsolation: bwOptions.webPreferences?.contextIsolation || true,
+      nodeIntegration: bwOptions.webPreferences?.nodeIntegration || false,
       devTools: bwOptions.webPreferences?.devTools || !app.isPackaged,
-      webSecurity: false,
-      webviewTag: !customize.headNative && customize.url,
+      webSecurity: bwOptions.webPreferences?.webSecurity || false,
+      webviewTag:
+        bwOptions.webPreferences?.webviewTag ||
+        (!customize.headNative && !!customize.url) ||
+        false,
     },
-  });
+  };
   const isParentId =
     customize.parentId !== null &&
     customize.parentId !== undefined &&
@@ -136,6 +143,10 @@ async function load(url: string, win: BrowserWindow) {
 
 export class Window {
   private static instance: Window;
+  // html加载路径
+  public loadUrl: string = join(__dirname, "../renderer/index.html");
+  // 外部窗口跳转路由（webview）
+  public viewRoute: string = "/Webview";
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
@@ -208,30 +219,14 @@ export class Window {
     // 参数设置
     !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
-
-    // 路由 > url
-    if (!app.isPackaged) {
-      // 调试模式
-      try {
-        return import("fs").then(({ readFileSync }) => {
-          win.webContents.openDevTools({ mode: "detach" });
-          let url = `http://localhost:${readFileSync(join(".port"), "utf8")}`;
-          if (win.customize.url) {
-            win.customize.headNative && (url = win.customize.url);
-            !win.customize.headNative && (win.customize.route = "/Webview");
-          }
-          return load(url, win);
-        });
-      } catch (e) {
-        throw "not found .port";
-      }
-    }
-    let url = join(__dirname, "../renderer/index.html");
+    // 调试打开F12
+    !app.isPackaged && win.webContents.openDevTools({ mode: "detach" });
+    // 是否跳转外部链接
     if (win.customize.url) {
-      win.customize.headNative && (url = win.customize.url);
-      !win.customize.headNative && (win.customize.route = "/Webview");
+      win.customize.headNative && (this.loadUrl = win.customize.url);
+      !win.customize.headNative && (win.customize.route = this.viewRoute);
     }
-    return load(url, win);
+    return load(this.loadUrl, win);
   }
 
   /**
