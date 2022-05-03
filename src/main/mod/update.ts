@@ -6,7 +6,7 @@ import { AppImageUpdater, MacUpdater, NsisUpdater } from "electron-updater";
 import { delDir } from "./file";
 import { ipcMain, app } from "electron";
 import { windowInstance } from "./window";
-import { logError } from "./log";
+import { logInfo, logError } from "./log";
 
 /**
  * 更新模块 https://www.electron.build/auto-update
@@ -33,6 +33,11 @@ export class Update {
     if (!app.isPackaged && !(process.platform === "darwin")) {
       this.autoUpdater.updateConfigPath = join(defaultConfigPath);
     }
+    this.autoUpdater.logger = {
+      info: logInfo,
+      warn: logError,
+      error: logError,
+    };
   }
 
   /**
@@ -119,7 +124,7 @@ export class Update {
     );
     //检查更新
     ipcMain.on("update-check", (event, args) =>
-      this.checkUpdate(args.isDel, args.autoDownload)
+      this.checkUpdate(args.isDel, args.autoDownload, args.url)
     );
     //手动下载更新
     ipcMain.on("update-download", (event, args) => this.downloadUpdate());
