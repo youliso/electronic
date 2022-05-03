@@ -151,6 +151,10 @@ class App {
     ipcMain.handle("app-open-url", async (event, args) => {
       return await shell.openExternal(args);
     });
+    //app退出
+    ipcMain.on("app-quit", (event, args) => {
+      app.quit();
+    });
     //app重启
     ipcMain.on("app-relaunch", (event, args) => {
       app.relaunch({ args: process.argv.slice(1) });
