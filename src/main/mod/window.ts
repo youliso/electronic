@@ -33,25 +33,22 @@ function browserWindowAssembly(
   if (process.platform === "darwin") delete bwOptions.modal;
   customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
-  let bwOpt: BrowserWindowConstructorOptions = Object.assign(
-    {
-      autoHideMenuBar: true,
-      titleBarStyle: customize.headNative ? "default" : "hidden",
-      minimizable: true,
-      maximizable: true,
-      frame: customize.headNative,
-      show: customize.headNative,
-      webPreferences: {
-        preload: join(__dirname, "../preload/index.js"),
-        contextIsolation: true,
-        nodeIntegration: false,
-        devTools: !app.isPackaged,
-        webSecurity: false,
-        webviewTag: !customize.headNative && customize.url,
-      },
+  let bwOpt: BrowserWindowConstructorOptions = Object.assign(bwOptions, {
+    autoHideMenuBar: true,
+    titleBarStyle: customize.headNative ? "default" : "hidden",
+    minimizable: true,
+    maximizable: true,
+    frame: customize.headNative,
+    show: customize.headNative,
+    webPreferences: {
+      preload: join(__dirname, "../preload/index.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      devTools: bwOptions.webPreferences?.devTools || !app.isPackaged,
+      webSecurity: false,
+      webviewTag: !customize.headNative && customize.url,
     },
-    bwOptions
-  );
+  });
   const isParentId =
     customize.parentId !== null &&
     customize.parentId !== undefined &&
