@@ -1,6 +1,6 @@
 {
   "name": "ym-electron",
-  "version": "1.0.3-beta",
+  "version": "1.0.16",
   "description": "ym electron",
   "scripts": {
     "build": "rollup -c rollup.config.js && node scripts/build.js",
@@ -17,6 +17,7 @@
     "url": "https://github.com/youliso/electron-modules"
   },
   "engines": {
+    "electron": ">=13",
     "node": ">=16.14.0"
   },
   "files": [

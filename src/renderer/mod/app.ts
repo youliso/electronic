@@ -47,6 +47,13 @@ export async function getResourcesPath(
 }
 
 /**
+ * app退出
+ */
+export function quit() {
+  window.ipc.send("app-quit");
+}
+
+/**
  * app重启
  * @param once 是否立即重启
  */

@@ -26,7 +26,7 @@ const external = [
 
 /** @type {import('rollup').RollupOptions[]} */
 let config = [];
-["main", "preload", "renderer", "types", "utils"].forEach((name) => {
+["main", "preload", "renderer", "types"].forEach((name) => {
   config.push({
     input: `./src/${name}/index.ts`,
     output: [

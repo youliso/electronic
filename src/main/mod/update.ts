@@ -1,12 +1,12 @@
-import type { AllPublishOptions } from 'builder-util-runtime';
-import type { AppUpdater } from 'electron-updater';
-import type { UpdateMessage } from '../../types';
-import { join } from 'path';
-import { AppImageUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
-import { delDir } from './file';
-import { ipcMain, app } from 'electron';
-import { windowInstance } from './window';
-import { logError } from './log';
+import type { AllPublishOptions } from "builder-util-runtime";
+import type { AppUpdater } from "electron-updater";
+import type { UpdateMessage } from "../../types";
+import { join } from "path";
+import { AppImageUpdater, MacUpdater, NsisUpdater } from "electron-updater";
+import { delDir } from "./file";
+import { ipcMain, app } from "electron";
+import { windowInstance } from "./window";
+import { logInfo, logError } from "./log";
 
 /**
  * 更新模块 https://www.electron.build/auto-update
@@ -17,16 +17,27 @@ export class Update {
   public options: AllPublishOptions;
   public dirname: string;
 
-  constructor(options: AllPublishOptions, dirname: string) {
+  constructor(
+    options: AllPublishOptions,
+    defaultConfigPath: string,
+    dirname: string
+  ) {
     this.options = options;
     this.dirname = dirname;
-    if (process.platform === 'win32') this.autoUpdater = new NsisUpdater(this.options);
-    else if (process.platform === 'darwin') this.autoUpdater = new MacUpdater(this.options);
+    if (process.platform === "win32")
+      this.autoUpdater = new NsisUpdater(this.options);
+    else if (process.platform === "darwin")
+      this.autoUpdater = new MacUpdater(this.options);
     else this.autoUpdater = new AppImageUpdater(this.options);
     //本地开发环境，使用调试app-update.yml地址
-    if (!app.isPackaged && !(process.platform === 'darwin')) {
-      this.autoUpdater.updateConfigPath = join('resources/build/cfg/app-update.yml');
+    if (!app.isPackaged && !(process.platform === "darwin")) {
+      this.autoUpdater.updateConfigPath = join(defaultConfigPath);
     }
+    this.autoUpdater.logger = {
+      info: logInfo,
+      warn: logError,
+      error: logError,
+    };
   }
 
   /**
@@ -37,7 +48,7 @@ export class Update {
       // @ts-ignore
       this.autoUpdater.app.baseCachePath,
       this.dirname,
-      'pending'
+      "pending"
     );
     try {
       delDir(updatePendingPath);
@@ -49,33 +60,41 @@ export class Update {
    */
   open(callback: Function) {
     const message: { [key: string]: UpdateMessage } = {
-      error: { code: 0, msg: '检查更新出错' },
-      checking: { code: 1, msg: '正在检查更新' },
-      updateAva: { code: 2, msg: '检测到新版本' },
-      updateDown: { code: 3, msg: '下载中' },
-      updateDownload: { code: 4, msg: '下载完成' },
-      updateNotAva: { code: 5, msg: '当前为最新版本' }
+      error: { code: 0, msg: "检查更新出错" },
+      checking: { code: 1, msg: "正在检查更新" },
+      updateAva: { code: 2, msg: "检测到新版本" },
+      updateDown: { code: 3, msg: "下载中" },
+      updateDownload: { code: 4, msg: "下载完成" },
+      updateNotAva: { code: 5, msg: "当前为最新版本" },
     };
-    this.autoUpdater.on('error', () => callback(message.error));
-    this.autoUpdater.on('checking-for-update', () => callback(message.checking));
-    this.autoUpdater.on('update-available', () => callback(message.updateAva));
-    this.autoUpdater.on('update-not-available', () => callback(message.updateNotAva));
+    this.autoUpdater.on("error", () => callback(message.error));
+    this.autoUpdater.on("checking-for-update", () =>
+      callback(message.checking)
+    );
+    this.autoUpdater.on("update-available", () => callback(message.updateAva));
+    this.autoUpdater.on("update-not-available", () =>
+      callback(message.updateNotAva)
+    );
     // 更新下载进度事件
-    this.autoUpdater.on('download-progress', (progressObj) => {
+    this.autoUpdater.on("download-progress", (progressObj) => {
       message.updateDown.value = progressObj;
       callback(message.updateDown);
     });
     // 下载完成事件
-    this.autoUpdater.on('update-downloaded', () => callback(message.updateDownload));
+    this.autoUpdater.on("update-downloaded", () =>
+      callback(message.updateDownload)
+    );
   }
 
   /**
    * 检查更新
    * @param isDel 是否删除历史更新缓存
    * @param autoDownload 是否在找到更新时自动下载更新
+   * @param url 更新地址（不传用默认地址）
    */
-  checkUpdate(isDel: boolean, autoDownload: boolean = false) {
+  checkUpdate(isDel: boolean, autoDownload: boolean = false, url?: string) {
     if (isDel) this.handleUpdate();
+    url && this.autoUpdater.setFeedURL(url);
     this.autoUpdater.autoDownload = autoDownload;
     this.autoUpdater.checkForUpdates().catch(logError);
   }
@@ -100,12 +119,18 @@ export class Update {
    */
   on() {
     //开启更新监听
-    this.open((data: { key: string; value: any }) => windowInstance.send('update-back', data));
+    this.open((data: { key: string; value: any }) =>
+      windowInstance.send("update-back", data)
+    );
     //检查更新
-    ipcMain.on('update-check', (event, args) => this.checkUpdate(args.isDel, args.autoDownload));
+    ipcMain.on("update-check", (event, args) =>
+      this.checkUpdate(args.isDel, args.autoDownload, args.url)
+    );
     //手动下载更新
-    ipcMain.on('update-download', (event, args) => this.downloadUpdate());
+    ipcMain.on("update-download", (event, args) => this.downloadUpdate());
     // 关闭程序安装新的软件 isSilent 是否静默更新
-    ipcMain.on('update-install', (event, isSilent) => this.updateQuitInstall(isSilent));
+    ipcMain.on("update-install", (event, isSilent) =>
+      this.updateQuitInstall(isSilent)
+    );
   }
 }

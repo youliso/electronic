@@ -44,6 +44,18 @@ class App {
   }
 
   /**
+   * 必要模块
+   */
+  modular() {
+    logOn();
+    fileOn();
+    pathOn();
+    globalInstance.on();
+    shortcutInstance.on();
+    windowInstance.on();
+  }
+
+  /**
    * 监听
    */
   beforeOn() {
@@ -139,20 +151,15 @@ class App {
     ipcMain.handle("app-open-url", async (event, args) => {
       return await shell.openExternal(args);
     });
+    //app退出
+    ipcMain.on("app-quit", (event, args) => {
+      app.quit();
+    });
     //app重启
     ipcMain.on("app-relaunch", (event, args) => {
       app.relaunch({ args: process.argv.slice(1) });
       if (args) app.exit(0);
     });
-  }
-
-  modular() {
-    logOn();
-    fileOn();
-    pathOn();
-    shortcutInstance.on();
-    globalInstance.on();
-    windowInstance.on();
   }
 }
 

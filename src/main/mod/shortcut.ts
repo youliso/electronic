@@ -1,7 +1,7 @@
+import type { Accelerator } from "../../types";
 import { globalShortcut, ipcMain } from "electron";
 import { windowInstance } from "./window";
-import { deepCopy } from "../../utils";
-import type { Accelerator } from "../../types";
+import { deepCopy } from "./utils";
 
 class Shortcut {
   private static instance: Shortcut;

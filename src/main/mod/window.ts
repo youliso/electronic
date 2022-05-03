@@ -44,7 +44,7 @@ function browserWindowAssembly(
       preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      devTools: !app.isPackaged,
+      devTools: bwOptions.webPreferences?.devTools || !app.isPackaged,
       webSecurity: false,
       webviewTag: !customize.headNative && customize.url,
     },
@@ -101,11 +101,16 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
 async function load(url: string, win: BrowserWindow) {
   // 窗口内创建拦截
   windowOpenHandler(win.webContents);
+  // 窗口usb插拔消息监听
+  process.platform === "win32" &&
+    win.hookWindowMessage(0x0219, (wParam, lParam) =>
+      win.webContents.send("window-hook-message", { wParam, lParam })
+    );
   win.webContents.on("did-attach-webview", (_, webContents) =>
     windowOpenHandler(webContents, win.id)
   );
   win.webContents.on("did-finish-load", () =>
-    win.webContents.send("window-load", win.customize)
+    win.webContents.send("window-load", { id: win.id, ...win.customize })
   );
   // 窗口最大最小监听
   win.on("maximize", () =>
@@ -159,12 +164,12 @@ export class Window {
    * 获取主窗口(无主窗口获取后存在窗口)
    */
   getMain() {
-    const all = BrowserWindow.getAllWindows().reverse();
+    const all = this.getAll().reverse();
     let win: BrowserWindow | null = null;
     for (let index = 0; index < all.length; index++) {
       const item = all[index];
       if (index === 0) win = item;
-      if (item.customize.isMainWin) {
+      if (item?.customize?.isMainWin) {
         win = item;
         break;
       }
@@ -192,22 +197,21 @@ export class Window {
       bwOptions
     );
     const win = new BrowserWindow(bwOpt);
-    //win32 取消原生窗口右键事件
+    // win32 取消原生窗口右键事件
     process.platform === "win32" &&
       win.hookWindowMessage(278, () => {
         win.setEnabled(false);
         win.setEnabled(true);
       });
-    //子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
+    // 子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
     isParentId && win.once("close", () => parenWin?.focus());
-
+    // 参数设置
     !customize.argv && (customize.argv = process.argv);
-    customize.id = win.id;
     win.customize = customize;
 
     // 路由 > url
     if (!app.isPackaged) {
-      //调试模式
+      // 调试模式
       try {
         return import("fs").then(({ readFileSync }) => {
           win.webContents.openDevTools({ mode: "detach" });
@@ -280,10 +284,7 @@ export class Window {
       console.error("Invalid id, the id can not be a empty");
       return;
     }
-    const workAreaSize = args.size[0]
-      ? { width: args.size[0], height: args.size[1] }
-      : screen.getPrimaryDisplay().workAreaSize;
-    win.setMaximumSize(workAreaSize.width, workAreaSize.height);
+    win.setMinimumSize(args.size[0], args.size[1]);
   }
 
   /**
@@ -295,7 +296,10 @@ export class Window {
       console.error("Invalid id, the id can not be a empty");
       return;
     }
-    win.setMaximumSize(args.size[0], args.size[1]);
+    const workAreaSize = args.size[0]
+      ? { width: args.size[0], height: args.size[1] }
+      : screen.getPrimaryDisplay().workAreaSize;
+    win.setMaximumSize(workAreaSize.width, workAreaSize.height);
   }
 
   /**

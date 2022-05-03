@@ -1,11 +1,21 @@
-import type { IpcRendererEvent, BrowserWindowConstructorOptions } from 'electron';
-import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../../types';
+import type {
+  IpcRendererEvent,
+  BrowserWindowConstructorOptions,
+} from "electron";
+import type {
+  Customize,
+  WindowAlwaysOnTopOpt,
+  WindowFuncOpt,
+  WindowStatusOpt,
+} from "../../types";
 
 /**
  * 窗口初始化 (i)
  * */
-export function windowLoad(listener: (event: IpcRendererEvent, args: Customize) => void) {
-  window.ipc.once('window-load', listener);
+export function windowLoad(
+  listener: (event: IpcRendererEvent, args: Customize) => void
+) {
+  window.ipc.once("window-load", listener);
 }
 
 /**
@@ -13,39 +23,51 @@ export function windowLoad(listener: (event: IpcRendererEvent, args: Customize) 
  */
 export function windowUpdate(route: string) {
   window.customize.route = route;
-  window.ipc.send('window-update', window.customize);
+  window.ipc.send("window-update", window.customize);
+}
+
+/**
+ * usb插拔消息监听
+ */
+export function windowHookMessageUSB(
+  listener: (
+    event: IpcRendererEvent,
+    args: { wParam: any; lParam: any }
+  ) => void
+) {
+  window.ipc.on("window-hook-message", listener);
 }
 
 /**
  * 窗口聚焦失焦监听
  */
 export function windowBlurFocusOn(
-  listener: (event: IpcRendererEvent, args: 'blur' | 'focus') => void
+  listener: (event: IpcRendererEvent, args: "blur" | "focus") => void
 ) {
-  window.ipc.on('window-blur-focus', listener);
+  window.ipc.on("window-blur-focus", listener);
 }
 
 /**
  * 关闭窗口聚焦失焦监听
  */
 export function windowBlurFocusRemove() {
-  window.ipc.removeAllListeners('window-blur-focus');
+  window.ipc.removeAllListeners("window-blur-focus");
 }
 
 /**
  * 窗口大小化监听
  */
 export function windowMaximizeOn(
-  listener: (event: IpcRendererEvent, args: 'maximize' | 'unmaximize') => void
+  listener: (event: IpcRendererEvent, args: "maximize" | "unmaximize") => void
 ) {
-  window.ipc.on('window-maximize-status', listener);
+  window.ipc.on("window-maximize-status", listener);
 }
 
 /**
  * 关闭窗口大小化监听
  */
 export function windowMaximizeRemove() {
-  window.ipc.removeAllListeners('window-maximize-status');
+  window.ipc.removeAllListeners("window-maximize-status");
 }
 
 /**
@@ -53,7 +75,7 @@ export function windowMaximizeRemove() {
  */
 export function windowMessageOn(
   listener: (event: IpcRendererEvent, args: any) => void,
-  channel: string = 'default'
+  channel: string = "default"
 ) {
   window.ipc.on(`window-message-${channel}-back`, listener);
 }
@@ -61,7 +83,7 @@ export function windowMessageOn(
 /**
  * 关闭窗口消息监听
  */
-export function windowMessageRemove(channel: string = 'default') {
+export function windowMessageRemove(channel: string = "default") {
   window.ipc.removeAllListeners(`window-message-${channel}-back`);
 }
 
@@ -71,18 +93,18 @@ export function windowMessageRemove(channel: string = 'default') {
 export function windowMessageSend(
   value: any, //需要发送的内容
   acceptIds: number[] = [], //指定窗口id发送
-  channel: string = 'default', //监听key（保证唯一）
+  channel: string = "default", //监听key（保证唯一）
   isback: boolean = false //是否给自身反馈
 ) {
-  if (acceptIds.length === 0 && typeof window.customize.parentId === 'number') {
+  if (acceptIds.length === 0 && typeof window.customize.parentId === "number") {
     acceptIds = [window.customize.parentId];
   }
-  window.ipc.send('window-message-send', {
+  window.ipc.send("window-message-send", {
     channel,
     value,
     isback,
     acceptIds,
-    id: window.customize.id
+    id: window.customize.id,
   });
 }
 
@@ -93,7 +115,7 @@ export function windowCreate(
   customize: Customize,
   opt?: BrowserWindowConstructorOptions
 ): Promise<number | undefined> {
-  return window.ipc.invoke('window-new', { customize, opt });
+  return window.ipc.invoke("window-new", { customize, opt });
 }
 
 /**
@@ -103,7 +125,7 @@ export async function windowStatus(
   type: WindowStatusOpt,
   id: number = window.customize.id as number
 ): Promise<boolean> {
-  return await window.ipc.invoke('window-status', { type, id });
+  return await window.ipc.invoke("window-status", { type, id });
 }
 
 /**
@@ -114,7 +136,7 @@ export function windowAlwaysOnTop(
   type?: WindowAlwaysOnTopOpt,
   id: number = window.customize.id as number
 ) {
-  window.ipc.send('window-always-top-set', { id, is, type });
+  window.ipc.send("window-always-top-set", { id, is, type });
 }
 
 /**
@@ -126,14 +148,14 @@ export function windowSetSize(
   center: boolean = false,
   id: number = window.customize.id as number
 ) {
-  window.ipc.send('window-size-set', { id, size, resizable, center });
+  window.ipc.send("window-size-set", { id, size, resizable, center });
 }
 
 /**
  * 设置窗口 最大/最小 大小
  */
 export function windowSetMaxMinSize(
-  type: 'max' | 'min',
+  type: "max" | "min",
   size: number | undefined[],
   id: number = window.customize.id as number
 ) {
@@ -147,21 +169,21 @@ export function windowSetBackgroundColor(
   color: string,
   id: number = window.customize.id as number
 ) {
-  window.ipc.send('window-bg-color-set', { id, color });
+  window.ipc.send("window-bg-color-set", { id, color });
 }
 
 /**
  * 最大化&最小化当前窗口
  */
 export function windowMaxMin(id: number = window.customize.id as number) {
-  window.ipc.send('window-max-min-size', id);
+  window.ipc.send("window-max-min-size", id);
 }
 
 /**
  * 关闭窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowClose(id: number = window.customize.id as number) {
-  window.ipc.send('window-func', { type: 'close', id });
+  window.ipc.send("window-func", { type: "close", id });
 }
 
 /**
@@ -169,29 +191,32 @@ export function windowClose(id: number = window.customize.id as number) {
  * @param id 窗口id
  * @param time 延迟显示时间
  */
-export function windowShow(time: number = 0, id: number = window.customize.id as number) {
-  setTimeout(() => window.ipc.send('window-func', { type: 'show', id }), time);
+export function windowShow(
+  time: number = 0,
+  id: number = window.customize.id as number
+) {
+  setTimeout(() => window.ipc.send("window-func", { type: "show", id }), time);
 }
 
 /**
  * 窗口隐藏
  */
 export function windowHide(id: number = window.customize.id as number) {
-  window.ipc.send('window-func', { type: 'hide', id });
+  window.ipc.send("window-func", { type: "hide", id });
 }
 
 /**
  * 最小化窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowMin(id: number = window.customize.id as number) {
-  window.ipc.send('window-func', { type: 'minimize', id });
+  window.ipc.send("window-func", { type: "minimize", id });
 }
 
 /**
  * 最大化窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowMax(id: number = window.customize.id as number) {
-  window.ipc.send('window-func', { type: 'maximize', id });
+  window.ipc.send("window-func", { type: "maximize", id });
 }
 
 /**
@@ -202,12 +227,12 @@ export function windowFunc(
   data?: any[],
   id: number = window.customize.id as number
 ) {
-  window.ipc.send('window-func', { type, data, id });
+  window.ipc.send("window-func", { type, data, id });
 }
 
 /**
  * 通过路由获取窗口id (不传route查全部)
  */
 export async function windowIdGet(route?: string): Promise<number[]> {
-  return await window.ipc.invoke('window-id-get', { route });
+  return await window.ipc.invoke("window-id-get", { route });
 }
