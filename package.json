@@ -1,6 +1,6 @@
 {
   "name": "ym-electron",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "ym electron",
   "scripts": {
     "build": "rollup -c rollup.config.js && node scripts/build.js",

@@ -101,6 +101,11 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
 async function load(url: string, win: BrowserWindow) {
   // 窗口内创建拦截
   windowOpenHandler(win.webContents);
+  // 窗口usb插拔消息监听
+  process.platform === "win32" &&
+    win.hookWindowMessage(0x0219, (wParam, lParam) =>
+      win.webContents.send("window-hook-message", { wParam, lParam })
+    );
   win.webContents.on("did-attach-webview", (_, webContents) =>
     windowOpenHandler(webContents, win.id)
   );
