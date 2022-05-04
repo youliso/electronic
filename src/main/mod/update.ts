@@ -6,7 +6,7 @@ import { AppImageUpdater, MacUpdater, NsisUpdater } from "electron-updater";
 import { delDir } from "./file";
 import { ipcMain, app } from "electron";
 import { windowInstance } from "./window";
-import { logInfo, logError } from "./log";
+import { logInfo, logWarn, logError } from "./log";
 
 /**
  * 更新模块 https://www.electron.build/auto-update
@@ -35,7 +35,7 @@ export class Update {
     }
     this.autoUpdater.logger = {
       info: logInfo,
-      warn: logError,
+      warn: logWarn,
       error: logError,
     };
   }

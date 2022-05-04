@@ -1,12 +1,13 @@
 {
   "name": "ym-electron",
-  "version": "1.0.16",
+  "version": "1.0.21",
   "description": "ym electron",
   "scripts": {
     "build": "rollup -c rollup.config.js && node scripts/build.js",
     "build:watch": "rollup -c rollup.config.js -w",
     "fix:prettier": "prettier \"./src\" --write",
-    "test:prettier": "prettier \"./src\" --list-different"
+    "test:prettier": "prettier \"./src\" --list-different",
+    "test": " npx electron ./test/main.js"
   },
   "keywords": [
     "electron"
