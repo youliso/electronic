@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <h1>hello</h1>
     <script>
       window.ipc.once("window-load", (_, args) => {
         window.customize = args;
+        document.body.innerHTML = `
+        <h1>hello electron</h1>
+        <div>environment: <br/>${JSON.stringify(window.environment)}</div>
+        <br/>
+        <div>customize: <br/>${JSON.stringify(window.customize)}</div>`;
         setTimeout(
           () =>
             window.ipc.send("window-func", {
