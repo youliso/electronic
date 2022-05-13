@@ -341,10 +341,10 @@ electron-updater@^5.0.1:
     lodash.isequal "^4.5.0"
     semver "^7.3.5"
 
-electron@^18.2.0:
-  version "18.2.0"
-  resolved "https://registry.npmjs.org/electron/-/electron-18.2.0.tgz#a0cbf8d5d1a1e9d1c195d86cd6937e721ed60fec"
-  integrity sha512-AN+CKalzA57beuvuI90PVgW/yj6zjw7rpb1h8FvIwBJ3toDC3x0Plfzbzh4Ondecbjci7pSg/NA5ngOk804WIQ==
+electron@^18.2.3:
+  version "18.2.3"
+  resolved "https://registry.npmjs.org/electron/-/electron-18.2.3.tgz#36bcb8f71e41631e6b11179eeff291c8228bfd6a"
+  integrity sha512-DJWX03hCRKTscsfXxmW4gmgFuseop+g+m4ml7NfOMfankD8uYyr2Xyi3Ui02inL9qZOlbLMeLVCu6jKCKs8p/w==
   dependencies:
     "@electron/get" "^1.13.0"
     "@types/node" "^16.11.26"
@@ -1025,10 +1025,10 @@ rollup-plugin-typescript2@^0.31.2:
     resolve "^1.20.0"
     tslib "^2.3.1"
 
-rollup@^2.71.1:
-  version "2.71.1"
-  resolved "https://registry.npmjs.org/rollup/-/rollup-2.71.1.tgz#82b259af7733dfd1224a8171013aaaad02971a22"
-  integrity sha512-lMZk3XfUBGjrrZQpvPSoXcZSfKcJ2Bgn+Z0L1MoW2V8Wh7BVM+LOBJTPo16yul2MwL59cXedzW1ruq3rCjSRgw==
+rollup@^2.72.1:
+  version "2.72.1"
+  resolved "https://registry.npmjs.org/rollup/-/rollup-2.72.1.tgz#861c94790537b10008f0ca0fbc60e631aabdd045"
+  integrity sha512-NTc5UGy/NWFGpSqF1lFY8z9Adri6uhyMLI6LvPAXdBKoPRFhIIiBUpt+Qg2awixqO3xvzSijjhnb4+QEZwJmxA==
   optionalDependencies:
     fsevents "~2.3.2"
 
