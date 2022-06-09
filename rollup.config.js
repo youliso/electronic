@@ -26,33 +26,39 @@ const external = [
 
 /** @type {import('rollup').RollupOptions[]} */
 let config = [];
-["main", "preload", "renderer", "types"].forEach((name) => {
-  config.push({
-    input: `./src/${name}/index.ts`,
-    output: [
-      {
-        file: `./dist/${name}.js`,
-        exports: "auto",
-        format: "commonjs",
-        sourcemap: false,
-      },
-    ],
-    external,
-    plugins: plugins(),
-  });
-  name === "renderer" &&
-    config.push({
-      input: `./src/${name}/index.ts`,
-      output: [
-        {
-          file: `./dist/${name}.mjs`,
-          format: "esm",
-          sourcemap: false,
-        },
-      ],
-      external,
-      plugins: plugins(),
-    });
+["main", "preload", "renderer"].forEach((name) => {
+  switch (name) {
+    case "main":
+    case "preload":
+      config.push({
+        input: `./src/${name}/index.ts`,
+        output: [
+          {
+            file: `./dist/${name}.js`,
+            exports: "auto",
+            format: "commonjs",
+            sourcemap: false,
+          },
+        ],
+        external,
+        plugins: plugins(),
+      });
+      break;
+    case "renderer":
+      config.push({
+        input: `./src/${name}/index.ts`,
+        output: [
+          {
+            file: `./dist/${name}.js`,
+            format: "esm",
+            sourcemap: false,
+          },
+        ],
+        external,
+        plugins: plugins(),
+      });
+      break;
+  }
 });
 
 export default config;
