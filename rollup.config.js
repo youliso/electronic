@@ -21,6 +21,16 @@ const plugins = () => [
 
 const external = [
   ...builtinModules,
+  "./file",
+  "./global",
+  "./log",
+  "./path",
+  "./session",
+  "./shortcut",
+  "./tray",
+  "./update",
+  "./utils",
+  "./window",
   "electron",
   "electron-updater",
   "builder-util-runtime",
