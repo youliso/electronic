@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "declarationDir": "./dist",
     "incremental": true,
     "moduleResolution": "node",
     "inlineSourceMap": true,

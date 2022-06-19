@@ -9,10 +9,23 @@ import type {
   WindowAlwaysOnTopOpt,
   WindowFuncOpt,
   WindowStatusOpt,
-} from "../../types";
+} from "../types";
 import { join } from "path";
 import { app, screen, ipcMain, BrowserWindow } from "electron";
 import { logError } from "./log";
+
+
+declare global {
+  module Electron {
+    interface BrowserWindow {
+      customize: Customize;
+    }
+
+    interface BrowserWindowConstructorOptions {
+      customize?: Customize;
+    }
+  }
+}
 
 /**
  * 窗口配置

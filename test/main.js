@@ -1,5 +1,7 @@
-const { appInstance, windowInstance, logError } = require("../dist/main");
 const { join } = require("path");
+const { appInstance } = require("../dist/main/app");
+const { windowInstance } = require("../dist/main/window");
+const { logError } = require("../dist/main/log");
 
 appInstance
   .start()

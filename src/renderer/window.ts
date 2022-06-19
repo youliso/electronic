@@ -7,7 +7,7 @@ import type {
   WindowAlwaysOnTopOpt,
   WindowFuncOpt,
   WindowStatusOpt,
-} from "../../types";
+} from "../types";
 
 /**
  * 窗口初始化 (i)
