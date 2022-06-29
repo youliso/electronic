@@ -1,6 +1,6 @@
 {
-  "name": "ym-electron",
-  "version": "2.0.1",
+  "name": "@youli/electron-modules",
+  "version": "1.0.0",
   "description": "ym electron",
   "scripts": {
     "build": "rollup -c rollup.config.js && node build.js",
@@ -18,20 +18,20 @@
     "url": "https://github.com/youliso/electron-modules"
   },
   "engines": {
-    "electron": ">=13",
+    "electron": ">=17",
     "node": ">=16.14.0"
   },
   "files": [
     "**/*"
   ],
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-commonjs": "^22.0.1",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "electron": "^19.0.4",
-    "electron-updater": "^5.0.1",
+    "electron": "^19.0.6",
+    "electron-updater": "^5.0.5",
     "prettier": "^2.7.1",
-    "rollup": "^2.75.6",
+    "rollup": "^2.75.7",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.32.1",
     "typescript": "^4.7.4"

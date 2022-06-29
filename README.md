@@ -1,6 +1,6 @@
-# ym electron
+# electron-modules
 
-Electron multiwindow mode template
+Electron multiwindow modules
 
 ## template
 
