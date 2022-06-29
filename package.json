@@ -1,7 +1,7 @@
 {
   "name": "@youli/electron-modules",
   "version": "1.0.0",
-  "description": "ym electron",
+  "description": "electron modules",
   "scripts": {
     "build": "rollup -c rollup.config.js && node build.js",
     "build:watch": "rollup -c rollup.config.js -w",

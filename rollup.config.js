@@ -64,7 +64,7 @@ let config = [];
 flies.forEach((path) => {
   if (path.startsWith("types")) return;
   if (path.startsWith("renderer")) {
-    config.push(...[{
+    config.push({
       input: `./src/${path}.ts`,
       output: [
         {
@@ -73,12 +73,6 @@ flies.forEach((path) => {
           format: "commonjs",
           sourcemap: false,
         },
-      ],
-      external,
-      plugins: plugins(),
-    },{
-      input: `./src/${path}.ts`,
-      output: [
         {
           file: `./dist/${path}.mjs`,
           format: "esm",
@@ -87,7 +81,7 @@ flies.forEach((path) => {
       ],
       external,
       plugins: plugins(),
-    }]);
+    });
     return;
   }
   config.push({
