@@ -14,7 +14,6 @@ import { join } from "path";
 import { app, screen, ipcMain, BrowserWindow } from "electron";
 import { logError } from "./log";
 
-
 declare global {
   module Electron {
     interface BrowserWindow {
@@ -48,12 +47,11 @@ function browserWindowAssembly(
   customize.isPackaged = app.isPackaged;
   bwOptions.webPreferences = Object.assign(
     {
-      preload: join(__dirname, "../preload/index.js"),
+      preload: windowInstance.defaultPreload,
       contextIsolation: true,
       nodeIntegration: false,
       devTools: !app.isPackaged,
       webSecurity: false,
-      webviewTag: !customize.headNative && customize.url,
     },
     bwOptions.webPreferences
   );
@@ -117,7 +115,10 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
 /**
  * 窗口加载
  */
-async function load(url: string, win: BrowserWindow) {
+async function load(win: BrowserWindow) {
+  if (!win.customize.url) {
+    throw new Error("[load] not url");
+  }
   // 窗口内创建拦截
   windowOpenHandler(win.webContents);
   // 窗口usb插拔消息监听
@@ -142,23 +143,31 @@ async function load(url: string, win: BrowserWindow) {
   win.on("blur", () => win.webContents.send("window-blur-focus", "blur"));
   win.on("focus", () => win.webContents.send("window-blur-focus", "focus"));
 
-  if (url.startsWith("https://") || url.startsWith("http://"))
+  if (
+    win.customize.url.startsWith("https://") ||
+    win.customize.url.startsWith("http://")
+  )
     await win
-      .loadURL(url, win.customize.loadOptions as LoadURLOptions)
+      .loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions)
       .catch(logError);
   else
     await win
-      .loadFile(url, win.customize.loadOptions as LoadFileOptions)
+      .loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions)
       .catch(logError);
   return win.id;
 }
 
+export interface WindwoDefaultCfg {
+  defaultUrl?: string;
+  defaultPreload?: string;
+}
+
 export class Window {
   private static instance: Window;
-  // html加载路径
-  public loadUrl: string = join(__dirname, "../renderer/index.html");
-  // 外部窗口跳转路由（webview）
-  public viewRoute: string = "/Webview";
+  // 默认html加载路径
+  public defaultUrl: string = join(__dirname, "../renderer/index.html");
+  // 默认加载路径
+  public defaultPreload: string = join(__dirname, "../preload/index.js");
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
@@ -166,6 +175,11 @@ export class Window {
   }
 
   constructor() {}
+
+  setDefaultCfg(cfg: WindwoDefaultCfg = {}) {
+    cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
+    cfg.defaultPreload && (this.defaultPreload = cfg.defaultPreload);
+  }
 
   /**
    * 获取窗口
@@ -233,12 +247,9 @@ export class Window {
     win.customize = customize;
     // 调试打开F12
     !app.isPackaged && win.webContents.openDevTools({ mode: "detach" });
-    // 是否跳转外部链接
-    if (win.customize.url) {
-      win.customize.headNative && (this.loadUrl = win.customize.url);
-      !win.customize.headNative && (win.customize.route = this.viewRoute);
-    }
-    return load(this.loadUrl, win);
+    // 设置默认地址
+    if (!win.customize.url) win.customize.url = this.defaultUrl;
+    return load(win);
   }
 
   /**

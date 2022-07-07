@@ -6,21 +6,28 @@ const { logError } = require("../dist/main/log");
 appInstance
   .start()
   .then(() => {
-    windowInstance.loadUrl = join(__dirname, "../test/index.html");
-
-    // 调试模式
+    
+    // // 调试模式;
     // if (!app.isPackaged) {
     //   try {
-    //     import('fs').then(({ readFileSync }) => {
-    //       import('path').then(({ join }) => {
-    //         windowInstance.loadUrl = `http://localhost:${readFileSync(join('.port'), 'utf8')}`;
+    //     import("fs").then(({ readFileSync }) => {
+    //       import("path").then(({ join }) => {
+    //         windowInstance.defaultUrl = `http://localhost:${readFileSync(
+    //           join(".port"),
+    //           "utf8"
+    //         )}`;
     //         windowInstance.create(customize, opt);
     //       });
     //     });
     //   } catch (e) {
-    //     throw 'not found .port';
+    //     throw "not found .port";
     //   }
     // } else windowInstance.create(customize, opt);
+
+    windowInstance.setDefaultCfg({
+      defaultUrl: join(__dirname, "../test/index.html"),
+      defaultPreload: join(__dirname, "../test/preload.js"),
+    });
 
     windowInstance.create(
       {
@@ -33,9 +40,6 @@ appInstance
         height: 600,
         frame: true,
         show: false,
-        webPreferences: {
-          preload: join(__dirname, "../test/preload.js"),
-        },
       }
     );
   })
