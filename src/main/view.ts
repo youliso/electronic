@@ -34,34 +34,35 @@ export class View {
 
   constructor() {}
 
-  resizeHandler(key: string) {
-    if (!this.views[key]) return;
-    if (!this.views[key].isResize) return;
-    const win = windowInstance.get(this.views[key].winId);
-    if (!win) {
-      throw new Error("[view resizeHandler] not win");
-    }
-    if (!win.isVisible()) return;
+  resizeHandler(winId: number) {
+    const win = windowInstance.get(winId);
+    if (!win || !win.isVisible()) return;
     const winBz = win.getBounds();
-    const owh = this.views[key].owh;
-    this.views[key].bv.setBounds({
-      x: owh[0],
-      y: owh[1],
-      width: winBz.width - owh[0],
-      height: winBz.height - owh[1],
+    const views = Object.keys(this.views)
+      .map((e) => this.views[e])
+      .filter((e) => e.isResize)
+      .filter((e) => e.winId === winId);
+    views.forEach((e) => {
+      e.bv.setBounds({
+        x: e.owh[0],
+        y: e.owh[1],
+        width: winBz.width - e.owh[0],
+        height: winBz.height - e.owh[1],
+      });
     });
   }
 
-  resize(key: string) {
-    if (!this.views[key]) {
-      throw new Error("[view resize] not view");
-    }
-    const win = windowInstance.get(this.views[key].winId);
+  resize(winId: number) {
+    const num = Object.keys(this.views)
+      .map((e) => this.views[e])
+      .map((e) => e.winId)
+      .filter((id) => id === winId).length;
+    if (num > 0) return;
+    const win = windowInstance.get(winId);
     if (!win) {
       throw new Error("[view resize] not win");
     }
-    this.views[key].isResize = true;
-    win.on("resized", () => this.resizeHandler(key));
+    win.on("resized", () => this.resizeHandler(winId));
   }
 
   hide(key: string) {
@@ -73,7 +74,7 @@ export class View {
       throw new Error("[view hide] not win");
     }
     this.views[key].isResize = false;
-    win.setBrowserView(null);
+    win.removeBrowserView(this.views[key].bv);
   }
 
   show(key: string) {
@@ -96,7 +97,7 @@ export class View {
     if (!win) {
       throw new Error("[view remove] not win");
     }
-    win.setBrowserView(null);
+    win.removeBrowserView(this.views[key].bv);
     // @ts-ignore
     this.views[key].bv.webContents.destroy();
     delete this.views[key];
@@ -125,11 +126,12 @@ export class View {
       },
       opt.webPreferences
     );
+    this.resize(opt.winId);
     // @ts-ignore
     this.views[opt.key] = {
       winId: opt.winId,
       owh: opt.owh,
-      isResize: false,
+      isResize: true,
     };
     this.views[opt.key].bv = new BrowserView({
       webPreferences: opt.webPreferences,
@@ -148,6 +150,8 @@ export class View {
         data: opt.data,
       })
     );
+    // 放入win
+    win.setBrowserView(this.views[opt.key].bv);
     // 启动
     if (opt.url.startsWith("https://") || opt.url.startsWith("http://")) {
       await this.views[opt.key].bv.webContents.loadURL(opt.url).catch(logError);
@@ -156,10 +160,12 @@ export class View {
         .loadFile(opt.url)
         .catch(logError);
     }
-    // 放入win
-    win.setBrowserView(this.views[opt.key].bv);
-    this.resize(opt.key);
-    this.resizeHandler(opt.key);
+    this.views[opt.key].bv.setBounds({
+      x: opt.owh[0],
+      y: opt.owh[1],
+      width: winBz.width - opt.owh[0],
+      height: winBz.height - opt.owh[1],
+    });
     return this.views[opt.key].bv.webContents.id;
   }
 
