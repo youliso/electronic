@@ -1,4 +1,4 @@
-import type { WebContents, BrowserViewConstructorOptions } from "electron";
+import type { WebContents, WebPreferences } from "electron";
 import { app, BrowserView, ipcMain } from "electron";
 import { windowInstance } from "./window";
 import { logError } from "./log";
@@ -17,12 +17,12 @@ export interface ViewOpt {
   key: string;
   winId: number;
   owh: [number, number];
-  bvOptions: BrowserViewConstructorOptions;
+  webPreferences: WebPreferences;
   url: string;
   data: any;
 }
 
-export default class View {
+export class View {
   public views: {
     [key: string]: {
       isResize?: boolean;
@@ -63,7 +63,7 @@ export default class View {
       throw new Error("[view resize] not win");
     }
     this.views[key].isResize = true;
-    win.on("resize", () => this.resizeHandler(key));
+    win.on("resized", () => this.resizeHandler(key));
   }
 
   hide(key: string) {
@@ -117,7 +117,7 @@ export default class View {
       throw new Error("[view create] not win");
     }
     const winBz = win.getBounds();
-    opt.bvOptions.webPreferences = Object.assign(
+    opt.webPreferences = Object.assign(
       {
         preload: windowInstance.defaultPreload,
         contextIsolation: true,
@@ -125,22 +125,7 @@ export default class View {
         devTools: !app.isPackaged,
         webSecurity: false,
       },
-      opt.bvOptions.webPreferences
-    );
-    let bvOpt: BrowserViewConstructorOptions = Object.assign(
-      {
-        autoHideMenuBar: true,
-        titleBarStyle: "hidden",
-        minimizable: true,
-        maximizable: true,
-        frame: false,
-        show: false,
-        x: opt.owh[0],
-        y: opt.owh[1],
-        width: winBz.width - opt.owh[0],
-        height: winBz.height - opt.owh[1],
-      },
-      opt.bvOptions
+      opt.webPreferences
     );
     // @ts-ignore
     this.views[opt.key] = {
@@ -148,7 +133,9 @@ export default class View {
       owh: opt.owh,
       isResize: false,
     };
-    this.views[opt.key].bv = new BrowserView(bvOpt);
+    this.views[opt.key].bv = new BrowserView({
+      webPreferences: opt.webPreferences,
+    });
     viewOpenHandler(this.views[opt.key].bv.webContents);
     // 调试打开F12
     !app.isPackaged &&
@@ -174,6 +161,7 @@ export default class View {
     // 放入win
     win.setBrowserView(this.views[opt.key].bv);
     this.resize(opt.key);
+    this.resizeHandler(opt.key);
     return this.views[opt.key].bv.webContents.id;
   }
 

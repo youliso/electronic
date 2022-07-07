@@ -4,9 +4,9 @@ export interface ViewOpt {
   key: string;
   winId: number;
   owh: [number, number];
-  bvOptions: BrowserViewConstructorOptions;
+  webPreferences?: BrowserViewConstructorOptions;
   url: string;
-  data: any;
+  data?: any;
 }
 
 /**
@@ -14,6 +14,7 @@ export interface ViewOpt {
  * @param opt
  */
 export async function viewCreate(opt: ViewOpt): Promise<number | undefined> {
+  opt.webPreferences = opt.webPreferences || {};
   return await window.ipc.invoke("view-new", { opt });
 }
 
