@@ -71,8 +71,7 @@ function browserWindowAssembly(
     customize.parentId !== undefined &&
     typeof customize.parentId === "number";
   let parenWin: BrowserWindow | null = null;
-  isParentId &&
-    (parenWin = Window.getInstance().get(customize.parentId as number));
+  isParentId && (parenWin = windowInstance.get(customize.parentId as number));
   if (parenWin) {
     bwOpt.parent = parenWin;
     const currentWH = bwOpt.parent.getBounds();
@@ -104,7 +103,7 @@ function browserWindowAssembly(
  */
 function windowOpenHandler(webContents: WebContents, parentId?: number) {
   webContents.setWindowOpenHandler(({ url }) => {
-    Window.getInstance().create({
+    windowInstance.create({
       url,
       parentId,
     });
