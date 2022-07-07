@@ -35,9 +35,7 @@ export class View {
   constructor() {}
 
   resizeHandler(key: string) {
-    if (!this.views[key]) {
-      throw new Error("[view resizeHandler] not view");
-    }
+    if (!this.views[key]) return;
     if (!this.views[key].isResize) return;
     const win = windowInstance.get(this.views[key].winId);
     if (!win) {
