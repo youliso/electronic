@@ -45,7 +45,7 @@ export class View {
     });
   }
 
-  resizeHandler(winId: number) {
+  whHandler(winId: number) {
     const win = windowInstance.get(winId);
     if (!win || !win.isVisible()) return;
     const winBz = win.getBounds();
@@ -66,7 +66,9 @@ export class View {
     if (!win) {
       throw new Error("[view resize] not win");
     }
-    win.on("resized", () => this.resizeHandler(winId));
+    win.on("maximize", () => this.whHandler(winId));
+    win.on("unmaximize", () => this.whHandler(winId));
+    win.on("resized", () => this.whHandler(winId));
   }
 
   hideAll() {
