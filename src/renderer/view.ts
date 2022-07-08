@@ -41,3 +41,17 @@ export async function viewShow(key: string): Promise<void> {
 export async function viewRemove(key: string): Promise<void> {
   return await window.ipc.invoke("view-remove", { key });
 }
+
+/**
+ * view隐藏全部
+ */
+export async function viewHideAll(): Promise<void> {
+  return await window.ipc.invoke("view-hide-all");
+}
+
+/**
+ * view卸载全部
+ */
+export async function viewRemoveAll(): Promise<void> {
+  return await window.ipc.invoke("view-remove-all");
+}

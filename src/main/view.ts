@@ -65,6 +65,11 @@ export class View {
     win.on("resized", () => this.resizeHandler(winId));
   }
 
+  hideAll() {
+    const views = Object.keys(this.views);
+    views.forEach((key) => this.hide(key));
+  }
+
   hide(key: string) {
     if (!this.views[key]) {
       throw new Error("[view hide] not view");
@@ -87,6 +92,11 @@ export class View {
     }
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
+  }
+
+  removeAll() {
+    const views = Object.keys(this.views);
+    views.forEach((key) => this.remove(key));
   }
 
   remove(key: string) {
@@ -174,5 +184,7 @@ export class View {
     ipcMain.handle("view-hide", async (event, args) => this.hide(args.key));
     ipcMain.handle("view-show", async (event, args) => this.show(args.key));
     ipcMain.handle("view-remove", async (event, args) => this.remove(args.key));
+    ipcMain.handle("view-hide-all", async (event, args) => this.hideAll());
+    ipcMain.handle("view-remove-all", async (event, args) => this.removeAll());
   }
 }
