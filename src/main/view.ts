@@ -142,6 +142,11 @@ export class View {
     this.views[key].owh = owh;
     newWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
+    newWin.on("closed", () => {
+      // @ts-ignore
+      this.views[key].bv.webContents.destroy();
+      delete this.views[key];
+    });
     return this.views[key].bv.webContents.id;
   }
 
