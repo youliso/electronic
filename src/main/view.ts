@@ -72,15 +72,12 @@ export class View {
   }
 
   hideAll(winId?: number) {
-    const viewKeys = Object.keys(this.views);
-    if (winId !== undefined && winId !== null) {
-      const views = viewKeys.map((key) => this.views[key]);
-      views
-        .filter((e) => e.winId === winId)
-        .forEach((_, i) => this.hide(viewKeys[i]));
-      return;
+    const is = winId !== undefined && winId !== null;
+    for (const key in this.views) {
+      const view = this.views[key];
+      is && view.winId === winId && this.hide(key);
+      !is && this.hide(key);
     }
-    viewKeys.forEach((key) => this.hide(key));
   }
 
   hide(key: string) {
@@ -111,15 +108,12 @@ export class View {
   }
 
   removeAll(winId?: number) {
-    const viewKeys = Object.keys(this.views);
-    if (winId !== undefined && winId !== null) {
-      const views = viewKeys.map((key) => this.views[key]);
-      views
-        .filter((e) => e.winId === winId)
-        .forEach((_, i) => this.remove(viewKeys[i]));
-      return;
+    const is = winId !== undefined && winId !== null;
+    for (const key in this.views) {
+      const view = this.views[key];
+      is && view.winId === winId && this.remove(key);
+      !is && this.remove(key);
     }
-    viewKeys.forEach((key) => this.remove(key));
   }
 
   remove(key: string) {
@@ -163,6 +157,7 @@ export class View {
       // @ts-ignore
       this.views[key].bv.webContents.destroy();
       delete this.views[key];
+      this.hasbeenWins.splice(this.hasbeenWins.indexOf(winId), 1);
     });
     return this.views[key].bv.webContents.id;
   }
@@ -183,6 +178,7 @@ export class View {
       // @ts-ignore
       this.views[opt.key].bv.webContents.destroy();
       delete this.views[opt.key];
+      this.hasbeenWins.splice(this.hasbeenWins.indexOf(opt.winId), 1);
     });
     const winBz = win.getBounds();
     opt.webPreferences = Object.assign(
