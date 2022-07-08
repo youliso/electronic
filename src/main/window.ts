@@ -43,6 +43,7 @@ function browserWindowAssembly(
   bwOptions.height = bwOptions.height;
   // darwin下modal会造成整个窗口关闭(?)
   if (process.platform === "darwin") delete bwOptions.modal;
+  customize.silenceFunc = customize.silenceFunc || false;
   customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
   bwOptions.webPreferences = Object.assign(
@@ -266,8 +267,12 @@ export class Window {
       return;
     }
     // @ts-ignore
-    if (data) for (const i of this.getAll()) i[type](...data);
-    else for (const i of this.getAll()) i[type]();
+    if (data)
+      for (const i of this.getAll()) {
+        // @ts-ignore
+        !i.customize.silenceFunc && i[type](...data);
+      }
+    else for (const i of this.getAll()) !i.customize.silenceFunc && i[type]();
   }
 
   /**

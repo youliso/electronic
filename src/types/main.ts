@@ -31,6 +31,8 @@ export interface Customize {
   argv?: any;
   // 自定义参数
   data?: any;
+  // 窗口不触发广播func
+  silenceFunc?: boolean;
 }
 
 export interface Window {
