@@ -88,16 +88,15 @@ export class View {
     win.removeBrowserView(this.views[key].bv);
   }
 
-  show(key: string, winId?: number) {
+  show(key: string) {
     if (!this.views[key]) {
       throw new Error("[view show] not view");
     }
-    const win = windowInstance.get(winId || this.views[key].winId);
+    const win = windowInstance.get(this.views[key].winId);
     if (!win) {
       throw new Error("[view show] not win");
     }
     if (!win.isVisible()) win.show();
-    winId !== null && winId !== undefined && (this.views[key].winId = winId);
     const winBz = win.getBounds();
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
@@ -121,6 +120,27 @@ export class View {
     // @ts-ignore
     this.views[key].bv.webContents.destroy();
     delete this.views[key];
+  }
+
+  async alone(key: string, winId: number) {
+    if (!this.views[key]) {
+      throw new Error("[view alone] not view");
+    }
+    const oldWin = windowInstance.get(this.views[key].winId);
+    if (!oldWin) {
+      throw new Error("[view alone] not oldWin");
+    }
+    const newWin = windowInstance.get(winId);
+    if (!newWin) {
+      throw new Error("[view alone] not newWin");
+    }
+    oldWin.removeBrowserView(this.views[key].bv);
+    const newWinBz = newWin.getBounds();
+    this.resize(winId);
+    this.views[key].winId = winId;
+    oldWin.setBrowserView(this.views[key].bv);
+    this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
+    return this.views[key].bv.webContents.id;
   }
 
   async create(opt: ViewOpt) {
@@ -186,10 +206,11 @@ export class View {
 
   on() {
     ipcMain.handle("view-new", (event, args) => this.create(args.opt));
-    ipcMain.handle("view-hide", async (event, args) => this.hide(args.key));
-    ipcMain.handle("view-show", async (event, args) =>
-      this.show(args.key, args.winId)
+    ipcMain.handle("view-alone", (event, args) =>
+      this.alone(args.key, args.winId)
     );
+    ipcMain.handle("view-hide", async (event, args) => this.hide(args.key));
+    ipcMain.handle("view-show", async (event, args) => this.show(args.key));
     ipcMain.handle("view-remove", async (event, args) => this.remove(args.key));
     ipcMain.handle("view-hide-all", async (event, args) => this.hideAll());
     ipcMain.handle("view-remove-all", async (event, args) => this.removeAll());
