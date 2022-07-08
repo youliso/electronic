@@ -86,14 +86,16 @@ export class View {
     win.removeBrowserView(this.views[key].bv);
   }
 
-  show(key: string) {
+  show(key: string, winId?: number) {
     if (!this.views[key]) {
       throw new Error("[view show] not view");
     }
-    const win = windowInstance.get(this.views[key].winId);
+    const win = windowInstance.get(winId || this.views[key].winId);
     if (!win) {
       throw new Error("[view show] not win");
     }
+    if (!win.isVisible()) win.show();
+    winId !== null && winId !== undefined && (this.views[key].winId = winId);
     const winBz = win.getBounds();
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
@@ -183,7 +185,9 @@ export class View {
   on() {
     ipcMain.handle("view-new", (event, args) => this.create(args.opt));
     ipcMain.handle("view-hide", async (event, args) => this.hide(args.key));
-    ipcMain.handle("view-show", async (event, args) => this.show(args.key));
+    ipcMain.handle("view-show", async (event, args) =>
+      this.show(args.key, args.winId)
+    );
     ipcMain.handle("view-remove", async (event, args) => this.remove(args.key));
     ipcMain.handle("view-hide-all", async (event, args) => this.hideAll());
     ipcMain.handle("view-remove-all", async (event, args) => this.removeAll());

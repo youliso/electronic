@@ -30,8 +30,8 @@ export async function viewHide(key: string): Promise<void> {
  * view显示
  * @param key
  */
-export async function viewShow(key: string): Promise<void> {
-  return await window.ipc.invoke("view-show", { key });
+export async function viewShow(key: string, winId?: number): Promise<void> {
+  return await window.ipc.invoke("view-show", { key, winId });
 }
 
 /**
