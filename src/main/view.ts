@@ -87,7 +87,7 @@ export class View {
       throw new Error("[view hide] not win");
     }
     this.views[key].isResize = false;
-    win.removeBrowserView(this.views[key].bv);
+    win.setBrowserView(null);
   }
 
   show(key: string) {
@@ -118,7 +118,7 @@ export class View {
     if (!win) {
       throw new Error("[view remove] not win");
     }
-    win.removeBrowserView(this.views[key].bv);
+    win.setBrowserView(null);
     // @ts-ignore
     this.views[key].bv.webContents.destroy();
     delete this.views[key];
@@ -136,7 +136,7 @@ export class View {
     if (!newWin) {
       throw new Error("[view alone] not newWin");
     }
-    oldWin.removeBrowserView(this.views[key].bv);
+    oldWin.setBrowserView(null);
     const newWinBz = newWin.getBounds();
     this.resize(winId);
     this.views[key].isResize = true;
