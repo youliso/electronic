@@ -66,8 +66,9 @@ export class View {
     if (!win) {
       throw new Error("[view resize] not win");
     }
-    win.on("maximize", () => this.whHandler(winId));
-    win.on("unmaximize", () => this.whHandler(winId));
+    win.on("enter-full-screen", () => this.whHandler(winId));
+    win.on("leave-full-screen", () => this.whHandler(winId));
+    win.on("app-command", () => this.whHandler(winId));
     win.on("resized", () => this.whHandler(winId));
   }
 
