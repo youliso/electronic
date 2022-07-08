@@ -30,6 +30,8 @@ export interface ViewItem {
 }
 
 export class View {
+  public hasbeenWins: number[] = [];
+
   public views: {
     [key: string]: ViewItem;
   } = {};
@@ -57,11 +59,7 @@ export class View {
   }
 
   resize(winId: number) {
-    const num = Object.keys(this.views)
-      .map((e) => this.views[e])
-      .map((e) => e.winId)
-      .filter((id) => id === winId).length;
-    if (num > 0) return;
+    if (this.hasbeenWins.indexOf(winId) !== -1) return;
     const win = windowInstance.get(winId);
     if (!win) {
       throw new Error("[view resize] not win");
@@ -105,7 +103,7 @@ export class View {
     if (!win) {
       throw new Error("[view show] not win");
     }
-    if (!win.isVisible()) win.show();
+    win.show();
     const winBz = win.getBounds();
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
@@ -152,7 +150,10 @@ export class View {
     }
     oldWin.removeBrowserView(this.views[key].bv);
     const newWinBz = newWin.getBounds();
-    this.resize(winId);
+    if (this.hasbeenWins.indexOf(winId) === -1) {
+      this.resize(winId);
+      this.hasbeenWins.push(winId);
+    }
     this.views[key].isResize = true;
     this.views[key].winId = winId;
     this.views[key].owh = owh;
@@ -178,6 +179,11 @@ export class View {
     if (!win) {
       throw new Error("[view create] not win");
     }
+    win.on("closed", () => {
+      // @ts-ignore
+      this.views[opt.key].bv.webContents.destroy();
+      delete this.views[opt.key];
+    });
     const winBz = win.getBounds();
     opt.webPreferences = Object.assign(
       {
@@ -189,7 +195,10 @@ export class View {
       },
       opt.webPreferences
     );
-    this.resize(opt.winId);
+    if (this.hasbeenWins.indexOf(opt.winId) === -1) {
+      this.resize(opt.winId);
+      this.hasbeenWins.push(opt.winId);
+    }
     // @ts-ignore
     this.views[opt.key] = {
       winId: opt.winId,
