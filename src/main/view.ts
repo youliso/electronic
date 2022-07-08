@@ -137,6 +137,7 @@ export class View {
     oldWin.removeBrowserView(this.views[key].bv);
     const newWinBz = newWin.getBounds();
     this.resize(winId);
+    this.views[key].isResize = true;
     this.views[key].winId = winId;
     this.views[key].owh = owh;
     oldWin.setBrowserView(this.views[key].bv);
