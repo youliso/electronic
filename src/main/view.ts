@@ -155,7 +155,7 @@ export class View {
       throw new Error("[view create] not ViewOpt");
     }
     if (this.views[opt.key]) {
-      this.show(opt.key);
+      opt.winId === this.views[opt.key].winId && this.show(opt.key);
       return;
     }
     const win = windowInstance.get(opt.winId);
