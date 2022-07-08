@@ -145,6 +145,9 @@ export class View {
     oldWin.removeBrowserView(this.views[key].bv);
     const newWinBz = newWin.getBounds();
     if (this.hasbeenWins.indexOf(winId) === -1) {
+      newWin.on("closed", () => {
+        this.hasbeenWins.splice(this.hasbeenWins.indexOf(winId), 1);
+      });
       this.resize(winId);
       this.hasbeenWins.push(winId);
     }
@@ -153,12 +156,6 @@ export class View {
     this.views[key].owh = owh;
     newWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
-    newWin.on("closed", () => {
-      // @ts-ignore
-      this.views[key].bv.webContents.destroy();
-      delete this.views[key];
-      this.hasbeenWins.splice(this.hasbeenWins.indexOf(winId), 1);
-    });
     return this.views[key].bv.webContents.id;
   }
 
@@ -174,12 +171,6 @@ export class View {
     if (!win) {
       throw new Error("[view create] not win");
     }
-    win.on("closed", () => {
-      // @ts-ignore
-      this.views[opt.key].bv.webContents.destroy();
-      delete this.views[opt.key];
-      this.hasbeenWins.splice(this.hasbeenWins.indexOf(opt.winId), 1);
-    });
     const winBz = win.getBounds();
     opt.webPreferences = Object.assign(
       {
@@ -192,6 +183,9 @@ export class View {
       opt.webPreferences
     );
     if (this.hasbeenWins.indexOf(opt.winId) === -1) {
+      win.on("closed", () => {
+        this.hasbeenWins.splice(this.hasbeenWins.indexOf(opt.winId), 1);
+      });
       this.resize(opt.winId);
       this.hasbeenWins.push(opt.winId);
     }
