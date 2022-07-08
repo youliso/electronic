@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electron-modules",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "electron modules",
   "scripts": {
     "build": "rollup -c rollup.config.js && node build.js",

@@ -22,17 +22,28 @@ export interface ViewOpt {
   data: any;
 }
 
+export interface ViewItem {
+  isResize?: boolean;
+  winId: number; // view所挂载的窗体
+  owh: [number, number]; // view所在窗口宽高偏移量
+  bv: BrowserView; // view主体
+}
+
 export class View {
   public views: {
-    [key: string]: {
-      isResize?: boolean;
-      winId: number; // view所挂载的窗体
-      owh: [number, number]; // view所在窗口宽高偏移量
-      bv: BrowserView; // view主体
-    };
+    [key: string]: ViewItem;
   } = {};
 
   constructor() {}
+
+  setBounds(winWh: number[], view: ViewItem) {
+    view.bv.setBounds({
+      x: view.owh[0],
+      y: view.owh[1],
+      width: winWh[0] - view.owh[0],
+      height: winWh[1] - view.owh[1],
+    });
+  }
 
   resizeHandler(winId: number) {
     const win = windowInstance.get(winId);
@@ -42,14 +53,7 @@ export class View {
       .map((e) => this.views[e])
       .filter((e) => e.isResize)
       .filter((e) => e.winId === winId);
-    views.forEach((e) => {
-      e.bv.setBounds({
-        x: e.owh[0],
-        y: e.owh[1],
-        width: winBz.width - e.owh[0],
-        height: winBz.height - e.owh[1],
-      });
-    });
+    views.forEach((e) => this.setBounds([winBz.width, winBz.height], e));
   }
 
   resize(winId: number) {
@@ -90,8 +94,10 @@ export class View {
     if (!win) {
       throw new Error("[view show] not win");
     }
+    const winBz = win.getBounds();
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
+    this.setBounds([winBz.width, winBz.height], this.views[key]);
   }
 
   removeAll() {
@@ -170,12 +176,7 @@ export class View {
         .loadFile(opt.url)
         .catch(logError);
     }
-    this.views[opt.key].bv.setBounds({
-      x: opt.owh[0],
-      y: opt.owh[1],
-      width: winBz.width - opt.owh[0],
-      height: winBz.height - opt.owh[1],
-    });
+    this.setBounds([winBz.width, winBz.height], this.views[opt.key]);
     return this.views[opt.key].bv.webContents.id;
   }
 
