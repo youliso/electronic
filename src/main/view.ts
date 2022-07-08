@@ -122,7 +122,7 @@ export class View {
     delete this.views[key];
   }
 
-  async alone(key: string, winId: number) {
+  async alone(key: string, winId: number, owh: [number, number] = [0, 0]) {
     if (!this.views[key]) {
       throw new Error("[view alone] not view");
     }
@@ -138,6 +138,7 @@ export class View {
     const newWinBz = newWin.getBounds();
     this.resize(winId);
     this.views[key].winId = winId;
+    this.views[key].owh = owh;
     oldWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
     return this.views[key].bv.webContents.id;
@@ -207,7 +208,7 @@ export class View {
   on() {
     ipcMain.handle("view-new", (event, args) => this.create(args.opt));
     ipcMain.handle("view-alone", (event, args) =>
-      this.alone(args.key, args.winId)
+      this.alone(args.key, args.winId, args.owh)
     );
     ipcMain.handle("view-hide", async (event, args) => this.hide(args.key));
     ipcMain.handle("view-show", async (event, args) => this.show(args.key));

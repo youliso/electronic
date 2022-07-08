@@ -25,9 +25,10 @@ export async function viewCreate(opt: ViewOpt): Promise<number | undefined> {
  */
 export async function viewAlone(
   key: string,
-  winId: number
+  winId: number,
+  owh: [number, number] = [0, 0]
 ): Promise<number | undefined> {
-  return await window.ipc.invoke("view-alone", { key, winId });
+  return await window.ipc.invoke("view-alone", { key, winId, owh });
 }
 
 /**
