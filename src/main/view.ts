@@ -140,7 +140,7 @@ export class View {
     this.views[key].isResize = true;
     this.views[key].winId = winId;
     this.views[key].owh = owh;
-    oldWin.setBrowserView(this.views[key].bv);
+    newWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
     return this.views[key].bv.webContents.id;
   }
