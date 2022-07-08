@@ -68,7 +68,8 @@ export class View {
     }
     win.on("enter-full-screen", () => this.whHandler(winId));
     win.on("leave-full-screen", () => this.whHandler(winId));
-    win.on("app-command", () => this.whHandler(winId));
+    win.on("maximize", () => this.whHandler(winId));
+    win.on("unmaximize", () => this.whHandler(winId));
     win.on("resized", () => this.whHandler(winId));
   }
 
@@ -212,8 +213,13 @@ export class View {
     return this.views[opt.key].bv.webContents.id;
   }
 
+  exist(key: string) {
+    return !!this.views[key];
+  }
+
   on() {
     ipcMain.handle("view-new", (event, args) => this.create(args.opt));
+    ipcMain.handle("view-exist", (event, args) => this.exist(args.key));
     ipcMain.handle("view-alone", (event, args) =>
       this.alone(args.key, args.winId, args.owh)
     );

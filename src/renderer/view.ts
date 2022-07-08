@@ -19,6 +19,14 @@ export async function viewCreate(opt: ViewOpt): Promise<number | undefined> {
 }
 
 /**
+ * view是否存在
+ * @param key
+ */
+export async function viewExist(key: string): Promise<boolean> {
+  return await window.ipc.invoke("view-exist", { key });
+}
+
+/**
  * view切换挂载
  * @param key
  * @param winId
