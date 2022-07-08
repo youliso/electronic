@@ -66,13 +66,13 @@ export async function viewRemove(key: string): Promise<void> {
 /**
  * view隐藏全部
  */
-export async function viewHideAll(): Promise<void> {
-  return await window.ipc.invoke("view-hide-all");
+export async function viewHideAll(winId?: number): Promise<void> {
+  return await window.ipc.invoke("view-hide-all", { winId });
 }
 
 /**
  * view卸载全部
  */
-export async function viewRemoveAll(): Promise<void> {
-  return await window.ipc.invoke("view-remove-all");
+export async function viewRemoveAll(winId?: number): Promise<void> {
+  return await window.ipc.invoke("view-remove-all", { winId });
 }
