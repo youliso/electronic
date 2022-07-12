@@ -1,6 +1,7 @@
 import type { WebContents, WebPreferences } from "electron";
 import { app, BrowserView, ipcMain } from "electron";
 import { windowInstance } from "./window";
+import { getMachineGuid } from "./machine";
 import { logError } from "./log";
 
 /**
@@ -209,6 +210,7 @@ export class View {
         appName: app.getName(),
         systemVersion: process.getSystemVersion(),
         platform: process.platform,
+        machineGuid: getMachineGuid(),
         data: opt.data,
       })
     );

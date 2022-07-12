@@ -18,4 +18,5 @@ export interface Environment {
   EOL: string;
   systemVersion: string;
   platform: NodeJS.Platform;
+  machineGuid: string;
 }

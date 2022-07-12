@@ -31,6 +31,8 @@ const external = [
   "./update",
   "./utils",
   "./window",
+  "./machine",
+  "../main/machine",
   "electron",
   "electron-updater",
   "builder-util-runtime",

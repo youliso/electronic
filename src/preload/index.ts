@@ -1,6 +1,7 @@
 import type { IpcRendererEvent } from "electron";
 import { contextBridge, ipcRenderer } from "electron";
 import { EOL } from "os";
+import { getMachineGuid } from "../main/machine";
 
 declare global {
   interface Window {
@@ -32,6 +33,7 @@ export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
     EOL,
     systemVersion: process.getSystemVersion(),
     platform: process.platform,
+    machineGuid: getMachineGuid(),
     ...defaultEnv,
   });
 }
