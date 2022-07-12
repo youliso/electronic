@@ -6,6 +6,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import json from "@rollup/plugin-json";
 import typescript from "rollup-plugin-typescript2";
+import copy from "rollup-plugin-copy";
 
 const plugins = () => [
   json(),
@@ -63,10 +64,12 @@ const flies = file(srcPath).map((e) =>
   e.substring(dPathLength + 4, e.length - 3)
 );
 let config = [];
-flies.forEach((path) => {
+flies.forEach((path, index) => {
+  if (path.startsWith("assets")) return;
   if (path.startsWith("types")) return;
+  let cfg;
   if (path.startsWith("renderer")) {
-    config.push({
+    cfg = {
       input: `./src/${path}.ts`,
       output: [
         {
@@ -83,22 +86,30 @@ flies.forEach((path) => {
       ],
       external,
       plugins: plugins(),
-    });
-    return;
+    };
+  } else {
+    cfg = {
+      input: `./src/${path}.ts`,
+      output: [
+        {
+          file: `./dist/${path}.js`,
+          exports: "auto",
+          format: "commonjs",
+          sourcemap: false,
+        },
+      ],
+      external,
+      plugins: plugins(),
+    };
   }
-  config.push({
-    input: `./src/${path}.ts`,
-    output: [
-      {
-        file: `./dist/${path}.js`,
-        exports: "auto",
-        format: "commonjs",
-        sourcemap: false,
-      },
-    ],
-    external,
-    plugins: plugins(),
-  });
+  if (index === 0) {
+    cfg.plugins.push(
+      copy({
+        targets: [{ src: "src/assets/printer.html", dest: "dist/assets" }],
+      })
+    );
+  }
+  config.push(cfg);
 });
 
 export default config;
