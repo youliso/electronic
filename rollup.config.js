@@ -6,13 +6,15 @@ import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import json from "@rollup/plugin-json";
 import typescript from "rollup-plugin-typescript2";
-import copy from "rollup-plugin-copy";
 
 const plugins = () => [
   json(),
   commonjs(),
   typescript({
     useTsconfigDeclarationDir: true,
+    preferBuiltins: true,
+    browser: false,
+    extensions: [".mjs", ".ts", ".js", ".json", ".node"],
   }),
   nodeResolve({
     preferBuiltins: true,
@@ -101,13 +103,6 @@ flies.forEach((path, index) => {
       external,
       plugins: plugins(),
     };
-  }
-  if (index === 0) {
-    cfg.plugins.push(
-      copy({
-        targets: [{ src: "src/assets/printer.html", dest: "dist/assets" }],
-      })
-    );
   }
   config.push(cfg);
 });
