@@ -108,6 +108,48 @@ export class View {
     this.setBounds([winBz.width, winBz.height], this.views[key]);
   }
 
+  stop(key: string) {
+    if (!this.views[key]) {
+      throw new Error("[view stop] not view");
+    }
+    return this.views[key].bv.webContents.stop();
+  }
+
+  reload(key: string) {
+    if (!this.views[key]) {
+      throw new Error("[view reload] not view");
+    }
+    return this.views[key].bv.webContents.reload();
+  }
+
+  canGoBack(key: string) {
+    if (!this.views[key]) {
+      throw new Error("[view canGoBack] not view");
+    }
+    return this.views[key].bv.webContents.canGoBack();
+  }
+
+  goBack(key: string) {
+    if (!this.views[key]) {
+      throw new Error("[view goBack] not view");
+    }
+    this.views[key].bv.webContents.goBack();
+  }
+
+  canGoForward(key: string) {
+    if (!this.views[key]) {
+      throw new Error("[view canGoForward] not view");
+    }
+    this.views[key].bv.webContents.canGoForward();
+  }
+
+  goForward(key: string) {
+    if (!this.views[key]) {
+      throw new Error("[view goForward] not view");
+    }
+    this.views[key].bv.webContents.goForward();
+  }
+
   removeAll(winId?: number) {
     const is = winId !== undefined && winId !== null;
     for (const key in this.views) {
@@ -155,6 +197,7 @@ export class View {
     this.views[key].isResize = true;
     this.views[key].winId = winId;
     this.views[key].owh = owh;
+    this.views[key].bv.webContents.send("view-alone-open");
     newWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
     return this.views[key].bv.webContents.id;
@@ -241,6 +284,20 @@ export class View {
     );
     ipcMain.handle("view-hide", async (event, args) => this.hide(args.key));
     ipcMain.handle("view-show", async (event, args) => this.show(args.key));
+    ipcMain.handle("view-stop", async (event, args) => this.stop(args.key));
+    ipcMain.handle("view-reload", async (event, args) => this.reload(args.key));
+    ipcMain.handle("view-can-go-back", async (event, args) =>
+      this.canGoBack(args.key)
+    );
+    ipcMain.handle("view-go-back", async (event, args) =>
+      this.goBack(args.key)
+    );
+    ipcMain.handle("view-can-go-forwar", async (event, args) =>
+      this.canGoForward(args.key)
+    );
+    ipcMain.handle("view-go-forwar", async (event, args) =>
+      this.goForward(args.key)
+    );
     ipcMain.handle("view-remove", async (event, args) => this.remove(args.key));
     ipcMain.handle("view-hide-all", async (event, args) =>
       this.hideAll(args.winId)

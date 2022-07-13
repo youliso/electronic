@@ -76,3 +76,31 @@ export async function viewHideAll(winId?: number): Promise<void> {
 export async function viewRemoveAll(winId?: number): Promise<void> {
   return await window.ipc.invoke("view-remove-all", { winId });
 }
+
+/**
+ * https://www.electronjs.org/zh/docs/latest/api/web-contents
+ */
+
+export async function stop(key: string) {
+  return await window.ipc.invoke("view-stop", { key });
+}
+
+export async function reload(key: string) {
+  return await window.ipc.invoke("view-reload", { key });
+}
+
+export async function canGoBack(key: string) {
+  return await window.ipc.invoke("view-can-go-back", { key });
+}
+
+export async function goBack(key: string) {
+  return await window.ipc.invoke("view-go-back", { key });
+}
+
+export async function canGoForward(key: string) {
+  return await window.ipc.invoke("view-can-go-forward", { key });
+}
+
+export async function goForward(key: string) {
+  return await window.ipc.invoke("view-go-forward", { key });
+}
