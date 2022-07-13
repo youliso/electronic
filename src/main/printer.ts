@@ -1,5 +1,4 @@
 import type { WebContentsPrintOptions } from "electron";
-import { resolve } from "path";
 import { ipcMain, BrowserWindow } from "electron";
 
 export class Printer {
@@ -7,7 +6,7 @@ export class Printer {
 
   data: any[] = [];
 
-  async open() {
+  async open(path: string) {
     this.win = new BrowserWindow({
       show: false,
       width: 0,
@@ -29,7 +28,7 @@ export class Printer {
     this.win.on("close", () => {
       this.win = null;
     });
-    await this.win.loadFile(resolve(__dirname, "../assets/printer.html"));
+    await this.win.loadFile(path);
   }
 
   async printOpt(args: any) {
@@ -73,7 +72,6 @@ export class Printer {
   }
 
   on() {
-    this.open();
     //设置宽高
     ipcMain.on("printer-size", (event, args) => {
       if (this.win) this.win.setSize(args[0], args[1]);
