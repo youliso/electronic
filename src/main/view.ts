@@ -249,7 +249,8 @@ export class View {
     // 初次参数
     this.views[opt.key].bv.webContents.on("did-finish-load", () =>
       this.views[opt.key].bv.webContents.send("window-load", {
-        isView: !isAlone,
+        isAlone,
+        isView: true,
         appVersion: app.getVersion(),
         appName: app.getName(),
         systemVersion: process.getSystemVersion(),
