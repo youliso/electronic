@@ -13,9 +13,12 @@ export interface ViewOpt {
  * view创建
  * @param opt
  */
-export async function viewCreate(opt: ViewOpt): Promise<number | undefined> {
+export async function viewCreate(
+  opt: ViewOpt,
+  isAlone: boolean = false
+): Promise<number | undefined> {
   opt.webPreferences = opt.webPreferences || {};
-  return await window.ipc.invoke("view-new", { opt });
+  return await window.ipc.invoke("view-new", { opt, isAlone });
 }
 
 /**

@@ -119,7 +119,7 @@ export class View {
     if (!this.views[key]) {
       throw new Error("[view reload] not view");
     }
-    return this.views[key].bv.webContents.reload();
+    this.views[key].bv.webContents.reload();
   }
 
   canGoBack(key: string) {
@@ -140,7 +140,7 @@ export class View {
     if (!this.views[key]) {
       throw new Error("[view canGoForward] not view");
     }
-    this.views[key].bv.webContents.canGoForward();
+    return this.views[key].bv.webContents.canGoForward();
   }
 
   goForward(key: string) {
@@ -203,7 +203,7 @@ export class View {
     return this.views[key].bv.webContents.id;
   }
 
-  async create(opt: ViewOpt) {
+  async create(opt: ViewOpt, isAlone: boolean = false) {
     if (!opt) {
       throw new Error("[view create] not ViewOpt");
     }
@@ -249,7 +249,7 @@ export class View {
     // 初次参数
     this.views[opt.key].bv.webContents.on("did-finish-load", () =>
       this.views[opt.key].bv.webContents.send("window-load", {
-        isView: true,
+        isView: isAlone || false,
         appVersion: app.getVersion(),
         appName: app.getName(),
         systemVersion: process.getSystemVersion(),
@@ -277,7 +277,9 @@ export class View {
   }
 
   on() {
-    ipcMain.handle("view-new", (event, args) => this.create(args.opt));
+    ipcMain.handle("view-new", (event, args) =>
+      this.create(args.opt, args.isAlone)
+    );
     ipcMain.handle("view-exist", (event, args) => this.exist(args.key));
     ipcMain.handle("view-alone", (event, args) =>
       this.alone(args.key, args.winId, args.owh)
