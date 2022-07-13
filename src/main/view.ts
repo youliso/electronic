@@ -292,10 +292,10 @@ export class View {
     ipcMain.handle("view-go-back", async (event, args) =>
       this.goBack(args.key)
     );
-    ipcMain.handle("view-can-go-forwar", async (event, args) =>
+    ipcMain.handle("view-can-go-forward", async (event, args) =>
       this.canGoForward(args.key)
     );
-    ipcMain.handle("view-go-forwar", async (event, args) =>
+    ipcMain.handle("view-go-forward", async (event, args) =>
       this.goForward(args.key)
     );
     ipcMain.handle("view-remove", async (event, args) => this.remove(args.key));
