@@ -197,6 +197,26 @@ export class View {
     this.views[key].isResize = true;
     this.views[key].winId = winId;
     this.views[key].owh = owh;
+    this.views[key].bv.webContents.removeAllListeners("page-title-updated");
+    this.views[key].bv.webContents.removeAllListeners("did-navigate");
+    this.views[key].bv.webContents.removeAllListeners("did-navigate-in-page");
+    this.views[key].bv.webContents.on("page-title-updated", (_, title) => {
+      newWin.webContents.send("view-title-update", { key, title });
+    });
+    this.views[key].bv.webContents.on("did-navigate", () => {
+      newWin.webContents.send("view-page-update", {
+        key,
+        canGoBack: this.views[key].bv.webContents.canGoBack(),
+        canGoForward: this.views[key].bv.webContents.canGoForward(),
+      });
+    });
+    this.views[key].bv.webContents.on("did-navigate-in-page", () => {
+      newWin.webContents.send("view-page-update", {
+        key,
+        canGoBack: this.views[key].bv.webContents.canGoBack(),
+        canGoForward: this.views[key].bv.webContents.canGoForward(),
+      });
+    });
     this.views[key].bv.webContents.send("view-alone-open");
     newWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
@@ -246,11 +266,16 @@ export class View {
     // 调试打开F12
     !app.isPackaged &&
       this.views[opt.key].bv.webContents.openDevTools({ mode: "detach" });
-    // title更新监听
-    this.views[opt.key].bv.webContents.on("page-title-updated", (title) => {
+    this.views[opt.key].bv.webContents.on("page-title-updated", (_, title) => {
       win.webContents.send("view-title-update", { key: opt.key, title });
     });
-    // 页面更新监听
+    this.views[opt.key].bv.webContents.on("did-navigate", () => {
+      win.webContents.send("view-page-update", {
+        key: opt.key,
+        canGoBack: this.views[opt.key].bv.webContents.canGoBack(),
+        canGoForward: this.views[opt.key].bv.webContents.canGoForward(),
+      });
+    });
     this.views[opt.key].bv.webContents.on("did-navigate-in-page", () => {
       win.webContents.send("view-page-update", {
         key: opt.key,
