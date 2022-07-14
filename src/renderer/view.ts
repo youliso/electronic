@@ -81,13 +81,29 @@ export async function viewRemoveAll(winId?: number): Promise<void> {
 }
 
 /**
- * view更新监听
+ * view更新title监听
  */
 export async function viewTitleUpdate(
-  listener: (event: IpcRendererEvent, title: string) => void
+  listener: (
+    event: IpcRendererEvent,
+    args: { key: string; title: string }
+  ) => void
 ): Promise<void> {
   window.ipc.removeAllListeners("view-title-update");
   window.ipc.on("view-title-update", listener);
+}
+
+/**
+ * view更新page监听
+ */
+export async function viewPageUpdate(
+  listener: (
+    event: IpcRendererEvent,
+    args: { key: string; canGoBack: boolean; canGoForward: boolean }
+  ) => void
+): Promise<void> {
+  window.ipc.removeAllListeners("view-page-update");
+  window.ipc.on("view-page-update", listener);
 }
 
 /**

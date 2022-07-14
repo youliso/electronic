@@ -248,7 +248,15 @@ export class View {
       this.views[opt.key].bv.webContents.openDevTools({ mode: "detach" });
     // title更新监听
     this.views[opt.key].bv.webContents.on("page-title-updated", (title) => {
-      win.webContents.send("view-title-update", title);
+      win.webContents.send("view-title-update", { key: opt.key, title });
+    });
+    // 页面更新监听
+    this.views[opt.key].bv.webContents.on("did-navigate-in-page", () => {
+      win.webContents.send("view-page-update", {
+        key: opt.key,
+        canGoBack: this.views[opt.key].bv.webContents.canGoBack(),
+        canGoForward: this.views[opt.key].bv.webContents.canGoForward(),
+      });
     });
     // 初次参数
     this.views[opt.key].bv.webContents.on("did-finish-load", () =>
