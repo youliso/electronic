@@ -27,6 +27,10 @@ export interface Customize {
   isMainWin?: boolean;
   // 是否已打包环境
   isPackaged?: boolean;
+  // 是否独立弹框view
+  isAlone?: boolean;
+  // 是否view
+  isView?: boolean;
   // 进程参数
   argv?: any;
   // 自定义参数
