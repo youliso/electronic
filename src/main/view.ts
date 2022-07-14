@@ -246,6 +246,10 @@ export class View {
     // 调试打开F12
     !app.isPackaged &&
       this.views[opt.key].bv.webContents.openDevTools({ mode: "detach" });
+    // title更新监听
+    this.views[opt.key].bv.webContents.on("page-title-updated", (title) => {
+      win.webContents.send("view-title-update", title);
+    });
     // 初次参数
     this.views[opt.key].bv.webContents.on("did-finish-load", () =>
       this.views[opt.key].bv.webContents.send("window-load", {

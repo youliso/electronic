@@ -1,4 +1,4 @@
-import type { BrowserViewConstructorOptions } from "electron";
+import type { BrowserViewConstructorOptions, IpcRendererEvent } from "electron";
 
 export interface ViewOpt {
   key: string;
@@ -78,6 +78,16 @@ export async function viewHideAll(winId?: number): Promise<void> {
  */
 export async function viewRemoveAll(winId?: number): Promise<void> {
   return await window.ipc.invoke("view-remove-all", { winId });
+}
+
+/**
+ * view更新监听
+ */
+export async function viewTitleUpdate(
+  listener: (event: IpcRendererEvent, title: string) => void
+): Promise<void> {
+  window.ipc.removeAllListeners("view-title-update");
+  window.ipc.on("view-title-update", listener);
 }
 
 /**
