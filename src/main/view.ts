@@ -24,6 +24,7 @@ export interface ViewOpt {
 }
 
 export interface ViewItem {
+  isAlone: boolean;  // 是否独立窗口启动
   isResize?: boolean;
   winId: number; // view所挂载的窗体
   owh: [number, number]; // view所在窗口宽高偏移量
@@ -159,6 +160,13 @@ export class View {
     }
   }
 
+  openDevTools(key: string) {
+    if (!this.views[key]) {
+      throw new Error("[view goForward] not view");
+    }
+    this.views[key].bv.webContents.openDevTools({ mode: "detach" });
+  }
+
   remove(key: string) {
     if (!this.views[key]) {
       throw new Error("[view remove] not view");
@@ -168,6 +176,7 @@ export class View {
       throw new Error("[view remove] not win");
     }
     win.removeBrowserView(this.views[key].bv);
+    this.views[key].isAlone && win.close();
     // @ts-ignore
     this.views[key].bv.webContents.destroy();
     delete this.views[key];
@@ -194,6 +203,7 @@ export class View {
       this.resize(winId);
       this.hasbeenWins.push(winId);
     }
+    this.views[key].isAlone = true;
     this.views[key].isResize = true;
     this.views[key].winId = winId;
     this.views[key].owh = owh;
@@ -241,7 +251,7 @@ export class View {
         preload: windowInstance.defaultPreload,
         contextIsolation: true,
         nodeIntegration: false,
-        devTools: !app.isPackaged,
+        devTools: true,
         webSecurity: false,
       },
       opt.webPreferences
@@ -258,6 +268,7 @@ export class View {
       winId: opt.winId,
       owh: opt.owh,
       isResize: true,
+      isAlone,
     };
     this.views[opt.key].bv = new BrowserView({
       webPreferences: opt.webPreferences,
@@ -326,6 +337,9 @@ export class View {
     ipcMain.handle("view-show", async (event, args) => this.show(args.key));
     ipcMain.handle("view-stop", async (event, args) => this.stop(args.key));
     ipcMain.handle("view-reload", async (event, args) => this.reload(args.key));
+    ipcMain.handle("view-open-dev-tools", async (event, args) =>
+      this.openDevTools(args.key)
+    );
     ipcMain.handle("view-can-go-back", async (event, args) =>
       this.canGoBack(args.key)
     );

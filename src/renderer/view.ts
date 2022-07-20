@@ -133,3 +133,7 @@ export async function canGoForward(key: string) {
 export async function goForward(key: string) {
   return await window.ipc.invoke("view-go-forward", { key });
 }
+
+export async function openDevTools(key: string) {
+  return await window.ipc.invoke("view-open-dev-tools", { key });
+}
