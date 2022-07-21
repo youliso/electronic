@@ -225,10 +225,7 @@ export function download(url: string, params: RequestDownloadOpt = {}) {
  * @param url
  * @param params
  */
-export default function request<T>(
-  url: string,
-  params: RequestOpt = {}
-): Promise<T> {
+export function request<T>(url: string, params: RequestOpt = {}): Promise<T> {
   return new Promise((resolve, reject) => {
     params.method = params.method || "GET";
     params.args = params.args || { method: params.method };
