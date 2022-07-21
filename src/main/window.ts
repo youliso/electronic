@@ -105,6 +105,7 @@ function browserWindowAssembly(
 function windowOpenHandler(webContents: WebContents, parentId?: number) {
   webContents.setWindowOpenHandler(({ url }) => {
     windowInstance.create({
+      headNative: true,
       url,
       parentId,
     });
