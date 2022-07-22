@@ -24,7 +24,7 @@ export interface ViewOpt {
 }
 
 export interface ViewItem {
-  isAlone: boolean;  // 是否独立窗口启动
+  isAlone: boolean;
   isResize?: boolean;
   winId: number; // view所挂载的窗体
   owh: [number, number]; // view所在窗口宽高偏移量
@@ -32,8 +32,6 @@ export interface ViewItem {
 }
 
 export class View {
-  public hasbeenWins: number[] = [];
-
   public views: {
     [key: string]: ViewItem;
   } = {};
@@ -49,28 +47,11 @@ export class View {
     });
   }
 
-  whHandler(winId: number) {
-    const win = windowInstance.get(winId);
-    if (!win || !win.isVisible()) return;
-    const winBz = win.getBounds();
-    const views = Object.keys(this.views)
-      .map((e) => this.views[e])
-      .filter((e) => e.isResize)
-      .filter((e) => e.winId === winId);
-    views.forEach((e) => this.setBounds([winBz.width, winBz.height], e));
-  }
-
-  resize(winId: number) {
-    if (this.hasbeenWins.indexOf(winId) !== -1) return;
-    const win = windowInstance.get(winId);
-    if (!win) {
-      throw new Error("[view resize] not win");
-    }
-    win.on("enter-full-screen", () => this.whHandler(winId));
-    win.on("leave-full-screen", () => this.whHandler(winId));
-    win.on("maximize", () => this.whHandler(winId));
-    win.on("unmaximize", () => this.whHandler(winId));
-    win.on("resized", () => this.whHandler(winId));
+  setAutoResize(view: ViewItem) {
+    view.bv.setAutoResize({
+      horizontal: true,
+      vertical: true,
+    });
   }
 
   hideAll(winId?: number) {
@@ -196,13 +177,6 @@ export class View {
     }
     oldWin.removeBrowserView(this.views[key].bv);
     const newWinBz = newWin.getBounds();
-    if (this.hasbeenWins.indexOf(winId) === -1) {
-      newWin.on("closed", () => {
-        this.hasbeenWins.splice(this.hasbeenWins.indexOf(winId), 1);
-      });
-      this.resize(winId);
-      this.hasbeenWins.push(winId);
-    }
     this.views[key].isAlone = true;
     this.views[key].isResize = true;
     this.views[key].winId = winId;
@@ -230,6 +204,7 @@ export class View {
     this.views[key].bv.webContents.send("view-alone-open");
     newWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
+    this.setAutoResize(this.views[key]);
     return this.views[key].bv.webContents.id;
   }
 
@@ -256,13 +231,6 @@ export class View {
       },
       opt.webPreferences
     );
-    if (this.hasbeenWins.indexOf(opt.winId) === -1) {
-      win.on("closed", () => {
-        this.hasbeenWins.splice(this.hasbeenWins.indexOf(opt.winId), 1);
-      });
-      this.resize(opt.winId);
-      this.hasbeenWins.push(opt.winId);
-    }
     // @ts-ignore
     this.views[opt.key] = {
       winId: opt.winId,
@@ -318,6 +286,7 @@ export class View {
         .catch(logError);
     }
     this.setBounds([winBz.width, winBz.height], this.views[opt.key]);
+    this.setAutoResize(this.views[opt.key]);
     return this.views[opt.key].bv.webContents.id;
   }
 
