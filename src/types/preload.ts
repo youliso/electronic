@@ -1,22 +1,16 @@
 export interface Ipc {
-  send: (channel: string, args?: any) => void;
-  sendSync: (channel: string, args?: any) => any;
-  on: (
-    channel: string,
-    listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void
-  ) => void;
-  once: (
-    channel: string,
-    listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void
-  ) => void;
-  invoke: (channel: string, args?: any) => Promise<any>;
-  removeAllListeners: (channel: string) => this;
+  send: typeof Electron.ipcRenderer['send']
+  sendSync: typeof Electron.ipcRenderer['sendSync']
+  on: typeof Electron.ipcRenderer['on']
+  once: typeof Electron.ipcRenderer['once']
+  invoke: typeof Electron.ipcRenderer['invoke']
+  removeAllListeners: typeof Electron.ipcRenderer['removeAllListeners']
 }
 
 export interface Environment {
-  [key: string]: any;
-  EOL: string;
-  systemVersion: string;
-  platform: NodeJS.Platform;
-  machineGuid: string;
+  [key: string]: any
+  EOL: string
+  systemVersion: string
+  platform: NodeJS.Platform
+  machineGuid: string
 }
