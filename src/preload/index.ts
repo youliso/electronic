@@ -1,39 +1,41 @@
-import type { IpcRendererEvent } from "electron";
-import { contextBridge, ipcRenderer } from "electron";
-import { EOL } from "os";
-import { getMachineGuid } from "../main/machine";
+import type { IpcRendererEvent } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
+import { EOL } from 'os'
+import { getMachineGuid } from '../main/machine'
+import { Ipc, Customize, Environment } from '../types'
 
 declare global {
   interface Window {
-    ipc: import("../types").Ipc;
-    customize: import("../types").Customize;
-    environment: import("../types").Environment;
+    ipc: Ipc
+    customize: Customize
+    environment: Environment
   }
 }
 
-export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
-  contextBridge.exposeInMainWorld("ipc", {
-    send: (channel: string, args?: any) => ipcRenderer.send(channel, args),
-    sendSync: (channel: string, args?: any) =>
-      ipcRenderer.sendSync(channel, args),
-    on: (
-      channel: string,
-      listener: (event: IpcRendererEvent, ...args: any[]) => void
-    ) => ipcRenderer.on(channel, listener),
-    once: (
-      channel: string,
-      listener: (event: IpcRendererEvent, ...args: any[]) => void
-    ) => ipcRenderer.once(channel, listener),
-    invoke: (channel: string, args: any) => ipcRenderer.invoke(channel, args),
-    removeAllListeners: (channel: string) =>
-      ipcRenderer.removeAllListeners(channel),
-  });
+type IpcReturnType<K extends keyof typeof Electron.ipcRenderer> = ReturnType<
+  typeof Electron.ipcRenderer[K]
+>
 
-  contextBridge.exposeInMainWorld("environment", {
+export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
+  contextBridge.exposeInMainWorld('ipc', {
+    send: (...args: Ipc['send']): IpcReturnType<'send'> =>
+      ipcRenderer.send(...args),
+    sendSync: (...args: Ipc['sendSync']): IpcReturnType<'sendSync'> =>
+      ipcRenderer.sendSync(...args),
+    invoke: (...args: Ipc['invoke']): IpcReturnType<'invoke'> =>
+      ipcRenderer.invoke(...args),
+    on: (...args: Ipc['on']): IpcReturnType<'on'> => ipcRenderer.on(...args),
+    once: (...args: Ipc['once']): IpcReturnType<'once'> =>
+      ipcRenderer.once(...args),
+    removeAllListeners: (channel: string) =>
+      ipcRenderer.removeAllListeners(channel)
+  })
+
+  contextBridge.exposeInMainWorld('environment', {
     EOL,
     systemVersion: process.getSystemVersion(),
     platform: process.platform,
     machineGuid: getMachineGuid(),
-    ...defaultEnv,
-  });
+    ...defaultEnv
+  })
 }
