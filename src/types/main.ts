@@ -1,8 +1,9 @@
-import type { LoadURLOptions, LoadFileOptions } from "electron";
+import type { LoadURLOptions, LoadFileOptions } from 'electron';
 
 export interface Customize {
   // 唯一id
   id?: number;
+  webContentsId?: number;
   // 标题 (仅路由下生效)
   title?: string;
   // 是否使用原生标签栏（路由下默认关闭）
@@ -49,50 +50,50 @@ export interface AppInfo {
 }
 
 export type AppPathKey =
-  | "home"
-  | "appData"
-  | "userData"
-  | "cache"
-  | "temp"
-  | "exe"
-  | "module"
-  | "desktop"
-  | "documents"
-  | "downloads"
-  | "music"
-  | "pictures"
-  | "videos"
-  | "recent"
-  | "logs"
-  | "crashDumps";
+  | 'home'
+  | 'appData'
+  | 'userData'
+  | 'cache'
+  | 'temp'
+  | 'exe'
+  | 'module'
+  | 'desktop'
+  | 'documents'
+  | 'downloads'
+  | 'music'
+  | 'pictures'
+  | 'videos'
+  | 'recent'
+  | 'logs'
+  | 'crashDumps';
 
 export type WindowAlwaysOnTopOpt =
-  | "normal"
-  | "floating"
-  | "torn-off-menu"
-  | "modal-panel"
-  | "main-menu"
-  | "status"
-  | "pop-up-menu"
-  | "screen-saver";
+  | 'normal'
+  | 'floating'
+  | 'torn-off-menu'
+  | 'modal-panel'
+  | 'main-menu'
+  | 'status'
+  | 'pop-up-menu'
+  | 'screen-saver';
 
 export type WindowFuncOpt =
-  | "close"
-  | "hide"
-  | "show"
-  | "minimize"
-  | "maximize"
-  | "restore"
-  | "reload";
+  | 'close'
+  | 'hide'
+  | 'show'
+  | 'minimize'
+  | 'maximize'
+  | 'restore'
+  | 'reload';
 
 export type WindowStatusOpt =
-  | "isMaximized"
-  | "isMinimized"
-  | "isFullScreen"
-  | "isAlwaysOnTop"
-  | "isVisible"
-  | "isFocused"
-  | "isModal";
+  | 'isMaximized'
+  | 'isMinimized'
+  | 'isFullScreen'
+  | 'isAlwaysOnTop'
+  | 'isVisible'
+  | 'isFocused'
+  | 'isModal';
 
 export interface UpdateMessage {
   code: number;
