@@ -2,10 +2,13 @@ import type { CookiesGetFilter, CookiesSetDetails } from 'electron';
 
 /**
  * 设置http/https指定域名请求头
- * 键值对 => 域名: Headers
  */
-export function sessionHeadersSet(args: { [key: string]: { [key: string]: string } }) {
-  window.ipc.send('session-headers-set', args);
+export function sessionHeadersSet(
+  type: 'all' | 'alone',
+  url: string,
+  value: { [key: string]: string }
+) {
+  window.ipc.send('session-headers-set', { type, url, value });
 }
 
 /**

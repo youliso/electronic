@@ -1,20 +1,22 @@
-type IpcParameters<K extends keyof typeof Electron.ipcRenderer> = Parameters<
-  typeof Electron.ipcRenderer[K]
->
-
 export interface Ipc {
-  send: IpcParameters<'send'>
-  sendSync: IpcParameters<'sendSync'>
-  on: IpcParameters<'on'>
-  once: IpcParameters<'once'>
-  invoke: IpcParameters<'invoke'>
-  removeAllListeners: IpcParameters<'removeAllListeners'>
+  send: (channel: string, args?: any) => void;
+  sendSync: (channel: string, args?: any) => any;
+  on: (
+    channel: string,
+    listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void
+  ) => void;
+  once: (
+    channel: string,
+    listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void
+  ) => void;
+  invoke: (channel: string, args?: any) => Promise<any>;
+  removeAllListeners: (channel: string) => this;
 }
 
 export interface Environment {
-  [key: string]: any
-  EOL: string
-  systemVersion: string
-  platform: NodeJS.Platform
-  machineGuid: string
+  [key: string]: any;
+  EOL: string;
+  systemVersion: string;
+  platform: NodeJS.Platform;
+  machineGuid: string;
 }

@@ -1,4 +1,4 @@
-import type { BrowserViewConstructorOptions, IpcRendererEvent } from "electron";
+import type { BrowserViewConstructorOptions, IpcRendererEvent } from 'electron';
 
 export interface ViewOpt {
   key: string;
@@ -18,7 +18,7 @@ export async function viewCreate(
   isAlone: boolean = false
 ): Promise<number | undefined> {
   opt.webPreferences = opt.webPreferences || {};
-  return await window.ipc.invoke("view-new", { opt, isAlone });
+  return await window.ipc.invoke('view-new', { opt, isAlone });
 }
 
 /**
@@ -26,7 +26,7 @@ export async function viewCreate(
  * @param key
  */
 export async function viewExist(key: string): Promise<boolean> {
-  return await window.ipc.invoke("view-exist", { key });
+  return await window.ipc.invoke('view-exist', { key });
 }
 
 /**
@@ -39,7 +39,16 @@ export async function viewAlone(
   winId: number,
   owh: [number, number] = [0, 0]
 ): Promise<number | undefined> {
-  return await window.ipc.invoke("view-alone", { key, winId, owh });
+  return await window.ipc.invoke('view-alone', { key, winId, owh });
+}
+
+/**
+ * view监听独立打开
+ */
+export async function viewAloneOn(
+  listener: (event: any, args: { id: number; isAlone: boolean }) => void
+) {
+  window.ipc.on('view-alone-load', listener);
 }
 
 /**
@@ -47,7 +56,7 @@ export async function viewAlone(
  * @param key
  */
 export async function viewHide(key: string): Promise<void> {
-  return await window.ipc.invoke("view-hide", { key });
+  return await window.ipc.invoke('view-hide', { key });
 }
 
 /**
@@ -55,7 +64,7 @@ export async function viewHide(key: string): Promise<void> {
  * @param key
  */
 export async function viewShow(key: string): Promise<void> {
-  return await window.ipc.invoke("view-show", { key });
+  return await window.ipc.invoke('view-show', { key });
 }
 
 /**
@@ -63,34 +72,31 @@ export async function viewShow(key: string): Promise<void> {
  * @param key
  */
 export async function viewRemove(key: string): Promise<void> {
-  return await window.ipc.invoke("view-remove", { key });
+  return await window.ipc.invoke('view-remove', { key });
 }
 
 /**
  * view隐藏全部
  */
 export async function viewHideAll(winId?: number): Promise<void> {
-  return await window.ipc.invoke("view-hide-all", { winId });
+  return await window.ipc.invoke('view-hide-all', { winId });
 }
 
 /**
  * view卸载全部
  */
 export async function viewRemoveAll(winId?: number): Promise<void> {
-  return await window.ipc.invoke("view-remove-all", { winId });
+  return await window.ipc.invoke('view-remove-all', { winId });
 }
 
 /**
  * view更新title监听
  */
 export async function viewTitleUpdate(
-  listener: (
-    event: IpcRendererEvent,
-    args: { key: string; title: string }
-  ) => void
+  listener: (event: IpcRendererEvent, args: { key: string; title: string }) => void
 ): Promise<void> {
-  window.ipc.removeAllListeners("view-title-update");
-  window.ipc.on("view-title-update", listener);
+  window.ipc.removeAllListeners('view-title-update');
+  window.ipc.on('view-title-update', listener);
 }
 
 /**
@@ -102,8 +108,8 @@ export async function viewPageUpdate(
     args: { key: string; canGoBack: boolean; canGoForward: boolean }
   ) => void
 ): Promise<void> {
-  window.ipc.removeAllListeners("view-page-update");
-  window.ipc.on("view-page-update", listener);
+  window.ipc.removeAllListeners('view-page-update');
+  window.ipc.on('view-page-update', listener);
 }
 
 /**
@@ -111,29 +117,29 @@ export async function viewPageUpdate(
  */
 
 export async function stop(key: string) {
-  return await window.ipc.invoke("view-stop", { key });
+  return await window.ipc.invoke('view-stop', { key });
 }
 
 export async function reload(key: string) {
-  return await window.ipc.invoke("view-reload", { key });
+  return await window.ipc.invoke('view-reload', { key });
 }
 
 export async function canGoBack(key: string) {
-  return await window.ipc.invoke("view-can-go-back", { key });
+  return await window.ipc.invoke('view-can-go-back', { key });
 }
 
 export async function goBack(key: string) {
-  return await window.ipc.invoke("view-go-back", { key });
+  return await window.ipc.invoke('view-go-back', { key });
 }
 
 export async function canGoForward(key: string) {
-  return await window.ipc.invoke("view-can-go-forward", { key });
+  return await window.ipc.invoke('view-can-go-forward', { key });
 }
 
 export async function goForward(key: string) {
-  return await window.ipc.invoke("view-go-forward", { key });
+  return await window.ipc.invoke('view-go-forward', { key });
 }
 
 export async function openDevTools(key: string) {
-  return await window.ipc.invoke("view-open-dev-tools", { key });
+  return await window.ipc.invoke('view-open-dev-tools', { key });
 }
