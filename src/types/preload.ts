@@ -2,13 +2,18 @@ type IpcParameters<K extends keyof typeof Electron.ipcRenderer> = Parameters<
   typeof Electron.ipcRenderer[K]
 >
 
+export type IpcReturnType<K extends keyof typeof Electron.ipcRenderer> =
+  ReturnType<typeof Electron.ipcRenderer[K]>
+
 export interface Ipc {
-  send: IpcParameters<'send'>
-  sendSync: IpcParameters<'sendSync'>
-  on: IpcParameters<'on'>
-  once: IpcParameters<'once'>
-  invoke: IpcParameters<'invoke'>
-  removeAllListeners: IpcParameters<'removeAllListeners'>
+  send(...args: IpcParameters<'send'>): IpcReturnType<'send'>
+  sendSync(...args: IpcParameters<'sendSync'>): IpcReturnType<'sendSync'>
+  on(...args: IpcParameters<'on'>): IpcReturnType<'on'>
+  once(...args: IpcParameters<'once'>): IpcReturnType<'once'>
+  invoke(...args: IpcParameters<'invoke'>): IpcReturnType<'invoke'>
+  removeAllListeners(
+    ...args: IpcParameters<'removeAllListeners'>
+  ): IpcReturnType<'removeAllListeners'>
 }
 
 export interface Environment {
