@@ -18,7 +18,7 @@ interface Config {
 /**
  * Global
  */
-class Global {
+export class Global {
   private static instance: Global;
 
   public sharedObject: { [key: string]: any } = {};
@@ -130,7 +130,6 @@ class Global {
     }
     cur[lastKey] = value;
   }
-
 }
 
 export const globalInstance = Global.getInstance();

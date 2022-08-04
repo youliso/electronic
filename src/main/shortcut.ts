@@ -1,9 +1,9 @@
-import type { Accelerator } from "../types";
-import { globalShortcut, ipcMain } from "electron";
-import { windowInstance } from "./window";
-import { deepCopy } from "./utils";
+import type { Accelerator } from '../types';
+import { globalShortcut, ipcMain } from 'electron';
+import { windowInstance } from './window';
+import { deepCopy } from './utils';
 
-class Shortcut {
+export class Shortcut {
   private static instance: Shortcut;
 
   private data: Accelerator[] = [];
@@ -31,7 +31,7 @@ class Shortcut {
     for (let i = 0, len = this.data.length; i < len; i++) {
       const accelerator = this.data[i];
       if (
-        (typeof accelerator.key === "string" && accelerator.key === key) ||
+        (typeof accelerator.key === 'string' && accelerator.key === key) ||
         (Array.isArray(accelerator.key) && accelerator.key.indexOf(key) > -1)
       ) {
         return deepCopy<Accelerator>(accelerator);
@@ -54,7 +54,7 @@ class Shortcut {
   private del(key: string) {
     for (let i = 0, len = this.data.length; i < len; i++) {
       const accelerator = this.data[i];
-      if (typeof accelerator.key === "string" && accelerator.key === key) {
+      if (typeof accelerator.key === 'string' && accelerator.key === key) {
         this.data.splice(i, 1);
         break;
       }
@@ -83,7 +83,7 @@ class Shortcut {
    */
   register(accelerator: Accelerator) {
     this.unregister(accelerator.key);
-    if (typeof accelerator.key === "string")
+    if (typeof accelerator.key === 'string')
       globalShortcut.register(accelerator.key, accelerator.callback);
     else globalShortcut.registerAll(accelerator.key, accelerator.callback);
     this.set(accelerator);
@@ -93,7 +93,7 @@ class Shortcut {
    * 清除快捷键
    */
   unregister(key: string | string[]) {
-    if (typeof key === "string") {
+    if (typeof key === 'string') {
       globalShortcut.unregister(key);
       this.del(key);
       return;
@@ -116,26 +116,21 @@ class Shortcut {
    * 监听
    */
   on() {
-    ipcMain.handle(
-      "shortcut-register",
-      (event, args: { name: string; key: string | string[] }) => {
-        const accelerator: Accelerator = {
-          ...args,
-          callback: () => windowInstance.send(`shortcut-back`, args.key),
-        };
-        return this.register(accelerator);
-      }
-    );
-    ipcMain.handle("shortcut-unregister", (event, args) =>
-      this.unregister(args)
-    );
-    ipcMain.handle("shortcut-unregisterAll", () => this.unregisterAll());
-    ipcMain.handle("shortcut-get", (event, args) => {
+    ipcMain.handle('shortcut-register', (event, args: { name: string; key: string | string[] }) => {
+      const accelerator: Accelerator = {
+        ...args,
+        callback: () => windowInstance.send(`shortcut-back`, args.key)
+      };
+      return this.register(accelerator);
+    });
+    ipcMain.handle('shortcut-unregister', (event, args) => this.unregister(args));
+    ipcMain.handle('shortcut-unregisterAll', () => this.unregisterAll());
+    ipcMain.handle('shortcut-get', (event, args) => {
       const accelerator = { ...this.get(args) };
       delete accelerator.callback;
       return accelerator;
     });
-    ipcMain.handle("shortcut-getAll", (event) => {
+    ipcMain.handle('shortcut-getAll', (event) => {
       const acceleratorAll = this.getAll();
       // @ts-ignore
       acceleratorAll.map((e) => delete e.callback);
