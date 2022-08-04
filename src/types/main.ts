@@ -1,8 +1,8 @@
 import type { LoadURLOptions, LoadFileOptions } from 'electron';
 
 export interface Customize {
-  // 唯一id
-  id?: number;
+  // 窗口id
+  winId?: number;
   webContentsId?: number;
   // 标题 (仅路由下生效)
   title?: string;
