@@ -123,7 +123,11 @@ async function load(win: BrowserWindow) {
     windowOpenHandler(webContents, win.id)
   );
   win.webContents.on('did-finish-load', () =>
-    win.webContents.send('window-load', { id: win.id, ...win.customize })
+    win.webContents.send('window-load', {
+      winId: win.id,
+      webContentsId: win.webContents.id,
+      ...win.customize
+    })
   );
   // 窗口最大最小监听
   win.on('maximize', () => win.webContents.send('window-maximize-status', 'maximize'));

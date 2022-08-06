@@ -201,7 +201,7 @@ export class View {
         canGoForward: this.views[key].bv.webContents.canGoForward()
       });
     });
-    this.views[key].bv.webContents.send('view-alone-load', { id: winId, isAlone: true });
+    this.views[key].bv.webContents.send('view-alone-load', { winId, isAlone: true });
     newWin.setBrowserView(this.views[key].bv);
     this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
     this.setAutoResize(this.views[key]);
@@ -264,7 +264,7 @@ export class View {
     // 初次参数
     this.views[opt.key].bv.webContents.on('did-finish-load', () =>
       this.views[opt.key].bv.webContents.send('window-load', {
-        id: opt.winId,
+        winId: opt.winId,
         webContentsId: this.views[opt.key].bv.webContents.id,
         isAlone,
         isView: true,

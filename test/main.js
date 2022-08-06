@@ -1,16 +1,11 @@
-const { join } = require("path");
-const { appInstance } = require("../dist/main/app");
-const { windowInstance } = require("../dist/main/window");
-const { Printer } = require("../dist/main/printer");
-const { logError } = require("../dist/main/log");
+const { join } = require('path');
+const { appInstance } = require('../dist/main/app');
+const { windowInstance } = require('../dist/main/window');
+const { logError } = require('../dist/main/log');
 
 appInstance
   .start()
   .then(() => {
-    const printer = new Printer();
-
-    printer.on();
-
     // // 调试模式;
     // if (!app.isPackaged) {
     //   try {
@@ -29,21 +24,21 @@ appInstance
     // } else windowInstance.create(customize, opt);
 
     windowInstance.setDefaultCfg({
-      defaultUrl: join(__dirname, "../test/index.html"),
-      defaultPreload: join(__dirname, "../test/preload.js"),
+      defaultUrl: join(__dirname, '../test/index.html'),
+      defaultPreload: join(__dirname, '../test/preload.js')
     });
 
     windowInstance.create(
       {
-        title: "electron-template",
-        route: "/",
-        headNative: true,
+        title: 'electron-template',
+        route: '/',
+        headNative: true
       },
       {
         width: 800,
         height: 600,
         frame: true,
-        show: false,
+        show: false
       }
     );
   })
