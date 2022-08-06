@@ -46,7 +46,7 @@ export async function viewAlone(
  * view监听独立打开
  */
 export async function viewAloneOn(
-  listener: (event: any, args: { id: number; isAlone: boolean }) => void
+  listener: (event: any, args: { winId: number; isAlone: boolean }) => void
 ) {
   window.ipc.on('view-alone-load', listener);
 }
