@@ -1,7 +1,5 @@
 import type { IpcRendererEvent } from 'electron';
 import { contextBridge, ipcRenderer } from 'electron';
-import { EOL } from 'os';
-import { getMachineGuid } from '../main/machine';
 import { Ipc, Customize, Environment } from '../types';
 
 declare global {
@@ -25,10 +23,8 @@ export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
   });
 
   contextBridge.exposeInMainWorld('environment', {
-    EOL,
     systemVersion: process.getSystemVersion(),
     platform: process.platform,
-    machineGuid: getMachineGuid(),
     ...defaultEnv
   });
 }

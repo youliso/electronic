@@ -3,6 +3,7 @@ import { app, ipcMain, shell, nativeTheme } from 'electron';
 import { resolve } from 'path';
 import { fileOn } from './file';
 import { pathOn } from './path';
+import { machineOn } from './machine';
 import { logOn, logError } from './log';
 import { shortcutInstance } from './shortcut';
 import { windowInstance } from './window';
@@ -50,6 +51,7 @@ export class App {
     logOn();
     fileOn();
     pathOn();
+    machineOn();
     globalInstance.on();
     shortcutInstance.on();
     windowInstance.on();

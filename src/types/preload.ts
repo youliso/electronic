@@ -15,8 +15,6 @@ export interface Ipc {
 
 export interface Environment {
   [key: string]: any;
-  EOL: string;
   systemVersion: string;
   platform: NodeJS.Platform;
-  machineGuid: string;
 }
