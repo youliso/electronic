@@ -12,7 +12,7 @@ export function deepCopy<T>(obj: any): T {
   keys.map((item, index) => {
     key = item;
     temp = obj[key];
-    if (temp && typeof temp === "object") {
+    if (temp && typeof temp === 'object') {
       if (isArray) result.push(deepCopy(temp));
       else result[key] = deepCopy(temp);
     } else {

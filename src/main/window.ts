@@ -270,6 +270,16 @@ export class Window {
   }
 
   /**
+   * 窗口发送消息
+   */
+  sendByWebContents(key: string, value: any, id?: number) {
+    if (id !== null && id !== undefined) {
+      const webContent = webContents.fromId(id);
+      if (webContent) webContent.send(key, value);
+    } else for (const webContent of webContents.getAllWebContents()) webContent.send(key, value);
+  }
+
+  /**
    * 窗口状态
    */
   getStatus(type: WindowStatusOpt, id: number) {

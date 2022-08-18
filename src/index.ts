@@ -1,1 +1,1 @@
-export default "@youliso";
+export default '@youliso';
