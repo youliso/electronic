@@ -34,8 +34,6 @@ function browserWindowAssembly(
   if (!customize) throw new Error('not customize');
   bwOptions.minWidth = bwOptions.minWidth || bwOptions.width;
   bwOptions.minHeight = bwOptions.minHeight || bwOptions.height;
-  bwOptions.width = bwOptions.width;
-  bwOptions.height = bwOptions.height;
   // darwin下modal会造成整个窗口关闭(?)
   if (process.platform === 'darwin') delete bwOptions.modal;
   customize.silenceFunc = customize.silenceFunc || false;
@@ -65,7 +63,7 @@ function browserWindowAssembly(
   const isParentId =
     customize.parentId !== null &&
     customize.parentId !== undefined &&
-    typeof customize.parentId === 'number';
+    typeof customize.parentId == 'number';
   let parenWin: BrowserWindow | null = null;
   isParentId && (parenWin = windowInstance.get(customize.parentId as number));
   if (parenWin) {
