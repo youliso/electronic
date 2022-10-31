@@ -2,7 +2,7 @@ const { readdirSync, statSync } = require('fs');
 const { resolve, extname } = require('path');
 const { builtinModules } = require('module');
 const { execSync } = require('child_process');
-const { terser } = require('rollup-terser');
+const { minify } = require('rollup-plugin-esbuild-minify');
 const commonjs = require('@rollup/plugin-commonjs');
 const nodeResolve = require('@rollup/plugin-node-resolve');
 const json = require('@rollup/plugin-json');
@@ -20,7 +20,7 @@ const plugins = () => [
   nodeResolve({
     preferBuiltins: true
   }),
-  terser()
+  minify()
 ];
 
 const external = [
