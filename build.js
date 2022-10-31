@@ -8,7 +8,7 @@ const configs = require('./rollup.config.js');
     const bundle = await rollup(config);
     for (const output of config.output) {
       const out = await bundle.write(output);
-      console.log(out.output[0].type, out.output[0].facadeModuleId);
+      console.log(out.output[0].type, out.output[0].fileName, out.output[0].facadeModuleId);
     }
   }
   fs.writeFileSync('./dist/package.json', JSON.stringify(require('./package.json'), null, 2));
