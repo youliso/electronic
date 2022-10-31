@@ -1,6 +1,4 @@
-import { app, ipcMain } from 'electron';
-import { accessSync, constants } from 'fs';
-import { resolve, join, normalize } from 'path';
+import { ipcMain } from 'electron';
 import { logError } from './log';
 import { readFile } from './file';
 
@@ -8,7 +6,7 @@ type Obj<Value> = {} & {
   [key: string]: Value | Obj<Value>;
 };
 
-interface Config {
+export interface Config {
   path: string;
   seat: string;
   parse: boolean;

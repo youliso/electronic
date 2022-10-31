@@ -78,7 +78,6 @@ export class Session {
 
   /**
    * 获取缓存大小
-   * @returns treatedBytes {bytes, unit}
    */
   async getCacheSize() {
     return await session.defaultSession.getCacheSize();
