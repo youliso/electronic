@@ -49,8 +49,8 @@ export class View {
 
   setAutoResize(view: ViewItem) {
     view.bv.setAutoResize({
-      horizontal: true,
-      vertical: true
+      width: true,
+      height: true
     });
   }
 
