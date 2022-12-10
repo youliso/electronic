@@ -1,6 +1,6 @@
 {
-  "name": "@youliso/electron-modules",
-  "version": "1.2.24",
+  "name": "@youliso/electronic",
+  "version": "0.0.1",
   "description": "electron modules",
   "scripts": {
     "build": "node --max_old_space_size=8000 build.js",
@@ -14,10 +14,10 @@
     "electron-updater"
   ],
   "author": "youliso",
-  "homepage": "https://youliso.github.io/electron-modules/",
+  "homepage": "https://youliso.github.io/electronic/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/youliso/electron-modules"
+    "url": "https://github.com/youliso/electronic"
   },
   "publishConfig": {
     "access": "public",

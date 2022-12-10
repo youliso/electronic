@@ -1,4 +1,4 @@
-# electron-modules
+# electronic
 
 Electron multiwindow modules
 
