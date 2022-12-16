@@ -4,7 +4,7 @@ Electron multiwindow modules
 
 ## doc
 
-[https://youliso.github.io/electron-modules/](https://youliso.github.io/electron-modules/)
+[https://youliso.github.io/electronic/](https://youliso.github.io/electronic/)
 
 ## template
 
