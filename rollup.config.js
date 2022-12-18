@@ -107,6 +107,4 @@ flies.forEach((path, index) => {
   config.push(cfg);
 });
 
-execSync(`npx typedoc ${tss} --out ./docs`, { cwd: resolve() });
-
 module.exports = config;
