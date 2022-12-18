@@ -4,7 +4,7 @@ import type {
   LoadURLOptions,
   WebContents
 } from 'electron';
-import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
+import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from './types';
 import { join } from 'path';
 import { app, screen, ipcMain, BrowserWindow, webContents } from 'electron';
 import { logError } from './log';
@@ -114,9 +114,9 @@ async function load(win: BrowserWindow) {
   windowOpenHandler(win.webContents);
   // 窗口usb插拔消息监听
   process.platform === 'win32' &&
-    win.hookWindowMessage(0x0219, (wParam, lParam) =>
-      win.webContents.send('window-hook-message', { wParam, lParam })
-    );
+  win.hookWindowMessage(0x0219, (wParam, lParam) =>
+    win.webContents.send('window-hook-message', { wParam, lParam })
+  );
   win.webContents.on('did-attach-webview', (_, webContents) =>
     windowOpenHandler(webContents, win.id)
   );
@@ -162,7 +162,8 @@ export class Window {
     return Window.instance;
   }
 
-  constructor() {}
+  constructor() {
+  }
 
   setDefaultCfg(cfg: WindwoDefaultCfg = {}) {
     cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
@@ -218,10 +219,10 @@ export class Window {
     const win = new BrowserWindow(bwOpt);
     // win32 取消原生窗口右键事件
     process.platform === 'win32' &&
-      win.hookWindowMessage(278, () => {
-        win.setEnabled(false);
-        win.setEnabled(true);
-      });
+    win.hookWindowMessage(278, () => {
+      win.setEnabled(false);
+      win.setEnabled(true);
+    });
     // 子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
     isParentId && win.once('close', () => parenWin?.focus());
     // 参数设置

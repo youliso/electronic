@@ -36,7 +36,7 @@ const external = [
   './utils',
   './window',
   './machine',
-  '../main/machine',
+  './view',
   'electron',
   'electron-updater',
   'builder-util-runtime'
@@ -67,11 +67,10 @@ const flies = file(srcPath).map((e) => e.substring(dPathLength + 4, e.length - 3
 let config = [];
 let tss = '';
 flies.forEach((path, index) => {
-  tss += `src/${path}.ts `;
-  if (path.startsWith('assets')) return;
   if (path.startsWith('types')) return;
+  tss += `src/${path}.ts `;
   let cfg;
-  if (path.startsWith('renderer')) {
+  if (path.startsWith('ipc')) {
     cfg = {
       input: `./src/${path}.ts`,
       output: [

@@ -11,9 +11,16 @@ const configs = require('./rollup.config.js');
       console.log(out.output[0].type, out.output[0].fileName, out.output[0].facadeModuleId);
     }
   }
-  fs.writeFileSync('./dist/package.json', JSON.stringify(require('./package.json'), null, 2));
+  fs.writeFileSync('./dist/main/package.json', JSON.stringify(require('./package.json'), null, 2));
   fs.writeFileSync(
-    './dist/README.md',
+    './dist/main/README.md',
+    fs.readFileSync(path.resolve('README.md'), { encoding: 'utf8' })
+  );
+  const ipcPack = require('./package.json');
+  ipcPack.name += '-ipc';
+  fs.writeFileSync('./dist/ipc/package.json', JSON.stringify(ipcPack, null, 2));
+  fs.writeFileSync(
+    './dist/ipc/README.md',
     fs.readFileSync(path.resolve('README.md'), { encoding: 'utf8' })
   );
 })();

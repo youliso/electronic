@@ -1,4 +1,4 @@
-import type { Customize } from '../types';
+import type { Customize } from './types';
 import { app, ipcMain, shell, nativeTheme } from 'electron';
 import { resolve } from 'path';
 import { fileOn } from './file';
@@ -26,7 +26,8 @@ export class App {
     return App.instance;
   }
 
-  constructor() {}
+  constructor() {
+  }
 
   /**
    * 启动主进程
@@ -127,7 +128,8 @@ export class App {
       shortcutInstance.register({
         name: '关闭刷新',
         key: 'CommandOrControl+R',
-        callback: () => {}
+        callback: () => {
+        }
       });
     });
     // 失去焦点时发出

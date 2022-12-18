@@ -91,7 +91,10 @@ export function rename(path: string, newPath: string): Promise<0 | 1> {
  * @param path 文件路径
  * @param options 选项
  */
-export function readFile(path: string, options?: { encoding?: BufferEncoding; flag?: string }): Promise<0 | string | Buffer> {
+export function readFile(
+  path: string,
+  options?: { encoding?: BufferEncoding; flag?: string }
+): Promise<0 | string | Buffer> {
   return new Promise((resolve) =>
     fs.readFile(path, options, (err, data) => {
       if (err) resolve(0);
