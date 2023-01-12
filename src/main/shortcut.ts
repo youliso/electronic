@@ -13,7 +13,8 @@ export class Shortcut {
     return Shortcut.instance;
   }
 
-  constructor() {}
+  constructor() {
+  }
 
   /**
    * 添加已注册快捷键
@@ -130,7 +131,7 @@ export class Shortcut {
       delete accelerator.callback;
       return accelerator;
     });
-    ipcMain.handle('shortcut-getAll', (event) => {
+    ipcMain.handle('shortcut-getAll', () => {
       const acceleratorAll = this.getAll();
       // @ts-ignore
       acceleratorAll.map((e) => delete e.callback);

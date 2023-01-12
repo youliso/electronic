@@ -9,7 +9,7 @@ import { logError } from './log';
  */
 function viewOpenHandler(webContents: WebContents) {
   webContents.setWindowOpenHandler(({ url }) => {
-    webContents.loadURL(url);
+    webContents.loadURL(url).catch(logError);
     return { action: 'deny' };
   });
 }

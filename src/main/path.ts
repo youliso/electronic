@@ -22,7 +22,7 @@ export function basename(str: string) {
 }
 
 export function pathOn() {
-  ipcMain.handle('path-sep', async (event, args) => (event.returnValue = sep()));
+  ipcMain.handle('path-sep', async (event) => (event.returnValue = sep()));
   ipcMain.handle('path-isAbsolute', async (event, args) => (event.returnValue = isAbsolute(args)));
   ipcMain.handle('path-dirname', async (event, args) => (event.returnValue = dirname(args)));
   ipcMain.handle('path-normalize', async (event, args) => (event.returnValue = normalize(args)));

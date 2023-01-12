@@ -75,7 +75,6 @@ function requestInit(
 /**
  * 上传
  * @param url
- * @param sendData
  * @param params
  */
 export function upload(url: string, params: RequestUploadOpt) {

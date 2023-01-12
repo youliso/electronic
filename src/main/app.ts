@@ -84,7 +84,7 @@ export class App {
             argv
           },
           this.windowDefaultOpt
-        );
+        ).catch(logError);
       });
     }
     // 渲染进程崩溃监听
@@ -120,7 +120,7 @@ export class App {
     // darwin
     app.on('activate', () => {
       if (windowInstance.getAll().length === 0)
-        windowInstance.create(this.windowDefaultCustomize, this.windowDefaultOpt);
+        windowInstance.create(this.windowDefaultCustomize, this.windowDefaultOpt).catch(logError);
     });
     // 获得焦点时发出
     app.on('browser-window-focus', () => {

@@ -62,8 +62,7 @@ function browserWindowAssembly(
   );
   const isParentId =
     customize.parentId !== null &&
-    customize.parentId !== undefined &&
-    typeof customize.parentId == 'number';
+    customize.parentId !== undefined;
   let parenWin: BrowserWindow | null = null;
   isParentId && (parenWin = windowInstance.get(customize.parentId as number));
   if (parenWin) {
@@ -98,7 +97,7 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
       headNative: true,
       url,
       parentId
-    });
+    }).catch(logError);
     return { action: 'deny' };
   });
 }
@@ -145,7 +144,7 @@ async function load(win: BrowserWindow) {
   return win.id;
 }
 
-export interface WindwoDefaultCfg {
+export interface WindowDefaultCfg {
   defaultUrl?: string;
   defaultPreload?: string;
 }
@@ -165,7 +164,7 @@ export class Window {
   constructor() {
   }
 
-  setDefaultCfg(cfg: WindwoDefaultCfg = {}) {
+  setDefaultCfg(cfg: WindowDefaultCfg = {}) {
     cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
     cfg.defaultPreload && (this.defaultPreload = cfg.defaultPreload);
   }

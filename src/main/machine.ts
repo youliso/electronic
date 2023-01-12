@@ -65,5 +65,5 @@ export function getMachineGuid() {
  * 监听
  */
 export function machineOn() {
-  ipcMain.handle('machineguid-get', async (event, args) => getMachineGuid());
+  ipcMain.handle('machineguid-get', async () => getMachineGuid());
 }

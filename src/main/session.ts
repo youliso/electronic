@@ -8,7 +8,8 @@ export class Session {
   public AllHeaders: { [key: string]: { [key: string]: string } } = {};
   public Headers: { [key: number]: { [key: string]: { [key: string]: string } } } = {};
 
-  constructor() {}
+  constructor() {
+  }
 
   /**
    * 拦截指定http/https请求并更换、增加headers
@@ -87,7 +88,7 @@ export class Session {
    * 清除缓存
    */
   async clearCache() {
-    session.defaultSession.clearCache();
+    await session.defaultSession.clearCache();
   }
 
   /**
