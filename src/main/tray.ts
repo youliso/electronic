@@ -5,10 +5,10 @@ import { windowInstance } from './window';
 export interface TrayOptions {
   name: string;
   iconPath: string,
-  menuTemplate: Array<(MenuItemConstructorOptions) | (MenuItem)>
+  menuTemplate?: Array<(MenuItemConstructorOptions) | (MenuItem)>
 }
 
-export function getMenuTemplate(items: Array<(MenuItemConstructorOptions) | (MenuItem)>) {
+export function getMenuTemplate(items?: Array<(MenuItemConstructorOptions) | (MenuItem)>) {
   return Menu.buildFromTemplate(items || [
     {
       label: '显示',
