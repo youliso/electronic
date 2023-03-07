@@ -16,12 +16,8 @@ export interface Customize {
   loadOptions?: LoadURLOptions | LoadFileOptions;
   // 父窗口id
   parentId?: number;
-  // 父类窗口宽度
-  currentWidth?: number;
-  // 父类窗口高度
-  currentHeight?: number;
-  // 父类窗口是否全屏
-  currentMaximized?: boolean;
+  // 基于父窗口居中
+  parentCenter?: boolean;
   // 此路由是否单窗口
   isOneWindow?: boolean;
   // 是否主窗口

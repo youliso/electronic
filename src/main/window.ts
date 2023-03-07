@@ -22,6 +22,24 @@ declare global {
 }
 
 /**
+ * 计算xy
+ * @param win
+ */
+function countXy(win: BrowserWindow, bwOpt: BrowserWindowConstructorOptions) {
+  const currentWH = win.getBounds();
+  if (win.isMaximized()) {
+    const displayWorkAreaSize = screen.getPrimaryDisplay().workAreaSize;
+    bwOpt.x = ((displayWorkAreaSize.width - (bwOpt.width || 0)) / 2) | 0;
+    bwOpt.y = ((displayWorkAreaSize.height - (bwOpt.height || 0)) / 2) | 0;
+  } else {
+    const currentPosition = win.getPosition();
+    bwOpt.x = (currentPosition[0] + (currentWH.width - (bwOpt.width || currentWH.width)) / 2) | 0;
+    bwOpt.y =
+      (currentPosition[1] + (currentWH.height - (bwOpt.height || currentWH.height)) / 2) | 0;
+  }
+}
+
+/**
  * 窗口配置
  * @param customize
  * @param bwOptions
@@ -60,32 +78,16 @@ function browserWindowAssembly(
     },
     bwOptions
   );
-  const isParentId =
-    customize.parentId !== null &&
-    customize.parentId !== undefined;
-  let parenWin: BrowserWindow | null = null;
-  isParentId && (parenWin = windowInstance.get(customize.parentId as number));
-  if (parenWin) {
-    bwOpt.parent = parenWin;
-    const currentWH = bwOpt.parent.getBounds();
-    customize.currentWidth = currentWH.width;
-    customize.currentHeight = currentWH.height;
-    customize.currentMaximized = bwOpt.parent.isMaximized();
-    if (customize.currentMaximized) {
-      const displayWorkAreaSize = screen.getPrimaryDisplay().workAreaSize;
-      bwOpt.x = ((displayWorkAreaSize.width - (bwOpt.width || 0)) / 2) | 0;
-      bwOpt.y = ((displayWorkAreaSize.height - (bwOpt.height || 0)) / 2) | 0;
-    } else {
-      const currentPosition = bwOpt.parent.getPosition();
-      bwOpt.x =
-        (currentPosition[0] + (currentWH.width - (bwOpt.width || customize.currentWidth)) / 2) | 0;
-      bwOpt.y =
-        (currentPosition[1] + (currentWH.height - (bwOpt.height || customize.currentHeight)) / 2) |
-        0;
-    }
+  let countWin;
+  if (customize.parentId) {
+    countWin = windowInstance.get(customize.parentId as number);
+    if (countWin) bwOpt.parent = countWin;
   }
-
-  return { bwOpt, isParentId, parenWin };
+  if (!countWin) {
+    countWin = windowInstance.getMain();
+  }
+  if (countWin) countXy(countWin, bwOpt);
+  return bwOpt;
 }
 
 /**
@@ -93,11 +95,13 @@ function browserWindowAssembly(
  */
 function windowOpenHandler(webContents: WebContents, parentId?: number) {
   webContents.setWindowOpenHandler(({ url }) => {
-    windowInstance.create({
-      headNative: true,
-      url,
-      parentId
-    }).catch(logError);
+    windowInstance
+      .create({
+        headNative: true,
+        url,
+        parentId
+      })
+      .catch(logError);
     return { action: 'deny' };
   });
 }
@@ -113,9 +117,9 @@ async function load(win: BrowserWindow) {
   windowOpenHandler(win.webContents);
   // 窗口usb插拔消息监听
   process.platform === 'win32' &&
-  win.hookWindowMessage(0x0219, (wParam, lParam) =>
-    win.webContents.send('window-hook-message', { wParam, lParam })
-  );
+    win.hookWindowMessage(0x0219, (wParam, lParam) =>
+      win.webContents.send('window-hook-message', { wParam, lParam })
+    );
   win.webContents.on('did-attach-webview', (_, webContents) =>
     windowOpenHandler(webContents, win.id)
   );
@@ -161,8 +165,7 @@ export class Window {
     return Window.instance;
   }
 
-  constructor() {
-  }
+  constructor() {}
 
   setDefaultCfg(cfg: WindowDefaultCfg = {}) {
     cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
@@ -214,16 +217,16 @@ export class Window {
         }
       }
     }
-    const { bwOpt, isParentId, parenWin } = browserWindowAssembly(customize, bwOptions);
+    const bwOpt = browserWindowAssembly(customize, bwOptions);
     const win = new BrowserWindow(bwOpt);
     // win32 取消原生窗口右键事件
     process.platform === 'win32' &&
-    win.hookWindowMessage(278, () => {
-      win.setEnabled(false);
-      win.setEnabled(true);
-    });
+      win.hookWindowMessage(278, () => {
+        win.setEnabled(false);
+        win.setEnabled(true);
+      });
     // 子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
-    isParentId && win.once('close', () => parenWin?.focus());
+    bwOpt.parent && win.once('close', () => bwOpt.parent?.focus());
     // 参数设置
     !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
