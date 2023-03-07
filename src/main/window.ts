@@ -50,8 +50,6 @@ function browserWindowAssembly(
   bwOptions: BrowserWindowConstructorOptions = {}
 ) {
   if (!customize) throw new Error('not customize');
-  bwOptions.minWidth = bwOptions.minWidth || bwOptions.width;
-  bwOptions.minHeight = bwOptions.minHeight || bwOptions.height;
   // darwin下modal会造成整个窗口关闭(?)
   if (process.platform === 'darwin') delete bwOptions.modal;
   customize.silenceFunc = customize.silenceFunc || false;
@@ -83,10 +81,10 @@ function browserWindowAssembly(
     countWin = windowInstance.get(customize.parentId as number);
     if (countWin) bwOpt.parent = countWin;
   }
-  if (!countWin) {
+  if (customize.center && !countWin) {
     countWin = windowInstance.getMain();
   }
-  if (countWin) countXy(countWin, bwOpt);
+  countWin && countXy(countWin, bwOpt);
   return bwOpt;
 }
 

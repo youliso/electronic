@@ -12,12 +12,12 @@ export interface Customize {
   url?: string;
   // 指定路由
   route?: string;
+  // 基于父/主窗口居中
+  center?: boolean;
   // 参数数据
   loadOptions?: LoadURLOptions | LoadFileOptions;
   // 父窗口id
   parentId?: number;
-  // 基于父窗口居中
-  parentCenter?: boolean;
   // 此路由是否单窗口
   isOneWindow?: boolean;
   // 是否主窗口
