@@ -143,7 +143,7 @@ async function load(win: BrowserWindow) {
     await win
       .loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions)
       .catch(logError);
-  return win.id;
+  return win;
 }
 
 export interface WindowDefaultCfg {
@@ -401,7 +401,16 @@ export class Window {
     // 窗口状态
     ipcMain.handle('window-status', async (event, args) => this.getStatus(args.type, args.id));
     // 创建窗口
-    ipcMain.handle('window-new', (event, args) => this.create(args.customize, args.opt));
+    ipcMain.handle('window-new', async (event, args) => {
+      const newWin = await this.create(args.customize, args.opt);
+      if (newWin) {
+        return {
+          id: newWin.id,
+          webContentsId: newWin.webContents.id
+        };
+      }
+      return null;
+    });
     // 设置窗口是否置顶
     ipcMain.on('window-always-top-set', (event, args) => this.setAlwaysOnTop(args));
     // 设置窗口大小

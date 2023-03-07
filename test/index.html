@@ -2,17 +2,33 @@
 <html>
   <body>
     <h1>hello</h1>
+    <button id="new">新窗口</button>
     <script>
-      window.ipc.once("window-load", (_, args) => {
+      window.ipc.once('window-load', (_, args) => {
         window.customize = args;
         setTimeout(
           () =>
-            window.ipc.send("window-func", {
-              type: "show",
-              id: window.customize.id,
+            window.ipc.send('window-func', {
+              type: 'show',
+              id: window.customize.id
             }),
           200
         );
+      });
+
+      document.getElementById('new').addEventListener('click', () => {
+        window.ipc
+          .invoke('window-new', {
+            customize: {
+              headNative: true,
+              title: 'electron-template'
+            },
+            opt: {
+              width: 400,
+              height: 200
+            }
+          })
+          .then(console.log);
       });
     </script>
   </body>

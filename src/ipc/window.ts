@@ -177,7 +177,7 @@ export function windowMessageContentsSend(
 export function windowCreate(
   customize: Customize,
   opt?: BrowserWindowConstructorOptions
-): Promise<number | undefined> {
+): Promise<{ id: number; webContentsId: number } | undefined> {
   return window.ipc.invoke('window-new', { customize, opt });
 }
 
