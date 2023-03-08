@@ -80,13 +80,13 @@ flies.forEach((path, index) => {
       input: `./src/${path}.ts`,
       output: [
         {
-          file: `./dist/${path}.js`,
+          file: `./dist/${path}.cjs`,
           exports: 'auto',
           format: 'commonjs',
           sourcemap: false
         },
         {
-          file: `./dist/${path}.mjs`,
+          file: `./dist/${path}.js`,
           format: 'esm',
           sourcemap: false
         }

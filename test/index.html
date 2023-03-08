@@ -6,14 +6,10 @@
     <script>
       window.ipc.once('window-load', (_, args) => {
         window.customize = args;
-        setTimeout(
-          () =>
-            window.ipc.send('window-func', {
-              type: 'show',
-              id: window.customize.id
-            }),
-          200
-        );
+        window.ipc.send('window-func', {
+          type: 'show',
+          id: window.customize.id
+        });
       });
 
       document.getElementById('new').addEventListener('click', () => {
