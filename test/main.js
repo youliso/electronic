@@ -35,8 +35,7 @@ appInstance
       {
         width: 800,
         height: 600,
-        frame: true,
-        show: false
+        frame: true
       }
     );
     win && windowInstance.load(win).catch(logError);

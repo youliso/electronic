@@ -6,10 +6,6 @@
     <script>
       window.ipc.once('window-load', (_, args) => {
         window.customize = args;
-        window.ipc.send('window-func', {
-          type: 'show',
-          id: window.customize.id
-        });
       });
 
       document.getElementById('new').addEventListener('click', () => {
