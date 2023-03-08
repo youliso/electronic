@@ -12,6 +12,8 @@ export interface Customize {
   url?: string;
   // 指定路由
   route?: string;
+  // 加载方式（默认url）
+  loadType?: string;
   // 基于父/主窗口居中
   center?: boolean;
   // 参数数据

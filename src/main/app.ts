@@ -26,8 +26,7 @@ export class App {
     return App.instance;
   }
 
-  constructor() {
-  }
+  constructor() {}
 
   /**
    * 启动主进程
@@ -78,13 +77,15 @@ export class App {
           }
           return;
         }
-        windowInstance.create(
+
+        const win = windowInstance.create(
           {
             ...this.windowDefaultCustomize,
             argv
           },
           this.windowDefaultOpt
-        ).catch(logError);
+        );
+        win && windowInstance.load(win).catch(logError);
       });
     }
     // 渲染进程崩溃监听
@@ -119,8 +120,10 @@ export class App {
   afterOn() {
     // darwin
     app.on('activate', () => {
-      if (windowInstance.getAll().length === 0)
-        windowInstance.create(this.windowDefaultCustomize, this.windowDefaultOpt).catch(logError);
+      if (windowInstance.getAll().length === 0) {
+        const win = windowInstance.create(this.windowDefaultCustomize, this.windowDefaultOpt);
+        win && windowInstance.load(win).catch(logError);
+      }
     });
     // 获得焦点时发出
     app.on('browser-window-focus', () => {
@@ -128,8 +131,7 @@ export class App {
       shortcutInstance.register({
         name: '关闭刷新',
         key: 'CommandOrControl+R',
-        callback: () => {
-        }
+        callback: () => {}
       });
     });
     // 失去焦点时发出

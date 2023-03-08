@@ -55,27 +55,23 @@ function browserWindowAssembly(
   customize.silenceFunc = customize.silenceFunc || false;
   customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
-  bwOptions.webPreferences = Object.assign(
-    {
-      preload: windowInstance.defaultPreload,
-      contextIsolation: true,
-      nodeIntegration: false,
-      devTools: !app.isPackaged,
-      webSecurity: false
-    },
-    bwOptions.webPreferences
-  );
-  let bwOpt: BrowserWindowConstructorOptions = Object.assign(
-    {
-      autoHideMenuBar: true,
-      titleBarStyle: customize.headNative ? 'default' : 'hidden',
-      minimizable: true,
-      maximizable: true,
-      frame: customize.headNative,
-      show: customize.headNative
-    },
-    bwOptions
-  );
+  bwOptions.webPreferences = {
+    preload: windowInstance.defaultPreload,
+    contextIsolation: true,
+    nodeIntegration: false,
+    devTools: !app.isPackaged,
+    webSecurity: false,
+    ...bwOptions.webPreferences
+  };
+  let bwOpt: BrowserWindowConstructorOptions = {
+    autoHideMenuBar: true,
+    titleBarStyle: customize.headNative ? 'default' : 'hidden',
+    minimizable: true,
+    maximizable: true,
+    frame: customize.headNative,
+    show: customize.headNative,
+    ...bwOptions
+  };
   let countWin;
   if (customize.parentId) {
     countWin = windowInstance.get(customize.parentId as number);
@@ -93,57 +89,14 @@ function browserWindowAssembly(
  */
 function windowOpenHandler(webContents: WebContents, parentId?: number) {
   webContents.setWindowOpenHandler(({ url }) => {
-    windowInstance
-      .create({
-        headNative: true,
-        url,
-        parentId
-      })
-      .catch(logError);
+    const win = windowInstance.create({
+      headNative: true,
+      url,
+      parentId
+    });
+    win && windowInstance.load(win).catch(logError);
     return { action: 'deny' };
   });
-}
-
-/**
- * 窗口加载
- */
-async function load(win: BrowserWindow) {
-  if (!win.customize.url) {
-    throw new Error('[load] not url');
-  }
-  // 窗口内创建拦截
-  windowOpenHandler(win.webContents);
-  // 窗口usb插拔消息监听
-  process.platform === 'win32' &&
-    win.hookWindowMessage(0x0219, (wParam, lParam) =>
-      win.webContents.send('window-hook-message', { wParam, lParam })
-    );
-  win.webContents.on('did-attach-webview', (_, webContents) =>
-    windowOpenHandler(webContents, win.id)
-  );
-  win.webContents.on('did-finish-load', () =>
-    win.webContents.send('window-load', {
-      winId: win.id,
-      webContentsId: win.webContents.id,
-      ...win.customize
-    })
-  );
-  // 窗口最大最小监听
-  win.on('maximize', () => win.webContents.send('window-maximize-status', 'maximize'));
-  win.on('unmaximize', () => win.webContents.send('window-maximize-status', 'unmaximize'));
-  // 聚焦失焦监听
-  win.on('blur', () => win.webContents.send('window-blur-focus', 'blur'));
-  win.on('focus', () => win.webContents.send('window-blur-focus', 'focus'));
-
-  if (win.customize.url.startsWith('https://') || win.customize.url.startsWith('http://'))
-    await win
-      .loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions)
-      .catch(logError);
-  else
-    await win
-      .loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions)
-      .catch(logError);
-  return win;
 }
 
 export interface WindowDefaultCfg {
@@ -206,7 +159,7 @@ export class Window {
   /**
    * 创建窗口
    * */
-  async create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
+  create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
     if (customize.isOneWindow && !customize.url) {
       for (const i of this.getAll()) {
         if (customize?.route && customize.route === i.customize?.route) {
@@ -228,11 +181,61 @@ export class Window {
     // 参数设置
     !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
-    // 调试打开F12
-    !app.isPackaged && win.webContents.openDevTools({ mode: 'detach' });
     // 设置默认地址
-    if (!win.customize.url) win.customize.url = this.defaultUrl;
-    return load(win);
+    if (!win.customize.url) {
+      win.customize.loadType = 'file';
+      win.customize.url = this.defaultUrl;
+    }
+    return win;
+  }
+
+  /**
+   * 窗口加载
+   */
+  async load(win: BrowserWindow) {
+    if (!win.customize.loadType) {
+      throw new Error('[load] not loadType');
+    }
+    if (!win.customize.url) {
+      throw new Error('[load] not url');
+    }
+    // 窗口内创建拦截
+    windowOpenHandler(win.webContents);
+    // 窗口usb插拔消息监听
+    process.platform === 'win32' &&
+      win.hookWindowMessage(0x0219, (wParam, lParam) =>
+        win.webContents.send('window-hook-message', { wParam, lParam })
+      );
+    win.webContents.on('did-attach-webview', (_, webContents) =>
+      windowOpenHandler(webContents, win.id)
+    );
+    win.webContents.on('did-finish-load', () =>
+      win.webContents.send('window-load', {
+        winId: win.id,
+        webContentsId: win.webContents.id,
+        ...win.customize
+      })
+    );
+    // 窗口最大最小监听
+    win.on('maximize', () => win.webContents.send('window-maximize-status', 'maximize'));
+    win.on('unmaximize', () => win.webContents.send('window-maximize-status', 'unmaximize'));
+    // 聚焦失焦监听
+    win.on('blur', () => win.webContents.send('window-blur-focus', 'blur'));
+    win.on('focus', () => win.webContents.send('window-blur-focus', 'focus'));
+
+    switch (win.customize.loadType) {
+      case 'file':
+        await win
+          .loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions)
+          .catch(logError);
+        break;
+      case 'url':
+      default:
+        await win
+          .loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions)
+          .catch(logError);
+        break;
+    }
   }
 
   /**
@@ -402,8 +405,9 @@ export class Window {
     ipcMain.handle('window-status', async (event, args) => this.getStatus(args.type, args.id));
     // 创建窗口
     ipcMain.handle('window-new', async (event, args) => {
-      const newWin = await this.create(args.customize, args.opt);
+      const newWin = this.create(args.customize, args.opt);
       if (newWin) {
+        await this.load(newWin);
         return {
           id: newWin.id,
           webContentsId: newWin.webContents.id

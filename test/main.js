@@ -26,7 +26,7 @@ appInstance
       defaultPreload: join(__dirname, '../test/preload.js')
     });
 
-    windowInstance.create(
+    const win = windowInstance.create(
       {
         title: 'electron-template',
         route: '/',
@@ -39,5 +39,6 @@ appInstance
         show: false
       }
     );
+    win && windowInstance.load(win).catch(logError);
   })
   .catch(logError);
