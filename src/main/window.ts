@@ -55,23 +55,27 @@ function browserWindowAssembly(
   customize.silenceFunc = customize.silenceFunc || false;
   customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
-  bwOptions.webPreferences = {
-    preload: windowInstance.defaultPreload,
-    contextIsolation: true,
-    nodeIntegration: false,
-    devTools: !app.isPackaged,
-    webSecurity: false,
-    ...bwOptions.webPreferences
-  };
-  let bwOpt: BrowserWindowConstructorOptions = {
-    autoHideMenuBar: true,
-    titleBarStyle: customize.headNative ? 'default' : 'hidden',
-    minimizable: true,
-    maximizable: true,
-    frame: customize.headNative,
-    show: customize.headNative,
-    ...bwOptions
-  };
+  bwOptions.webPreferences = Object.assign(
+    {
+      preload: windowInstance.defaultPreload,
+      contextIsolation: true,
+      nodeIntegration: false,
+      devTools: !app.isPackaged,
+      webSecurity: false
+    },
+    bwOptions.webPreferences
+  );
+  let bwOpt: BrowserWindowConstructorOptions = Object.assign(
+    {
+      autoHideMenuBar: true,
+      titleBarStyle: customize.headNative ? 'default' : 'hidden',
+      minimizable: true,
+      maximizable: true,
+      frame: customize.headNative,
+      show: bwOptions.show || customize.headNative
+    },
+    bwOptions
+  );
   let countWin;
   if (customize.parentId) {
     countWin = windowInstance.get(customize.parentId as number);
@@ -100,12 +104,15 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
 }
 
 export interface WindowDefaultCfg {
+  defaultLoadType?: string;
   defaultUrl?: string;
   defaultPreload?: string;
 }
 
 export class Window {
   private static instance: Window;
+  // 默认html加载方式
+  public defaultLoadType: string = 'file';
   // 默认html加载路径
   public defaultUrl: string = join(__dirname, '../renderer/index.html');
   // 默认加载路径
@@ -119,6 +126,7 @@ export class Window {
   constructor() {}
 
   setDefaultCfg(cfg: WindowDefaultCfg = {}) {
+    cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
     cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
     cfg.defaultPreload && (this.defaultPreload = cfg.defaultPreload);
   }
@@ -183,7 +191,7 @@ export class Window {
     win.customize = customize;
     // 设置默认地址
     if (!win.customize.url) {
-      win.customize.loadType = 'file';
+      win.customize.loadType = this.defaultLoadType;
       win.customize.url = this.defaultUrl;
     }
     return win;
