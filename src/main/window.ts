@@ -21,6 +21,10 @@ declare global {
   }
 }
 
+export interface LoadOptions {
+  openDevTools?: boolean;
+}
+
 /**
  * 计算xy
  * @param win
@@ -60,7 +64,7 @@ function browserWindowAssembly(
       preload: windowInstance.defaultPreload,
       contextIsolation: true,
       nodeIntegration: false,
-      devTools: !app.isPackaged,
+      devTools: false,
       webSecurity: false
     },
     bwOptions.webPreferences
@@ -209,12 +213,16 @@ export class Window {
   /**
    * 窗口加载
    */
-  async load(win: BrowserWindow) {
+  async load(win: BrowserWindow, loadOptions?: LoadOptions) {
     if (!win.customize.loadType) {
       throw new Error('[load] not loadType');
     }
     if (!win.customize.url) {
       throw new Error('[load] not url');
+    }
+    // 开启DevTools
+    if (loadOptions && loadOptions.openDevTools) {
+      win.webContents.openDevTools({ mode: 'detach' });
     }
     // 窗口内创建拦截
     windowOpenHandler(win.webContents);
@@ -422,9 +430,9 @@ export class Window {
     ipcMain.handle('window-status', async (event, args) => this.getStatus(args.type, args.id));
     // 创建窗口
     ipcMain.handle('window-new', async (event, args) => {
-      const newWin = this.create(args.customize, args.opt);
+      const newWin = this.create(args.customize, args.windowOptions);
       if (newWin) {
-        await this.load(newWin);
+        await this.load(newWin, args.loadOptions);
         return {
           id: newWin.id,
           webContentsId: newWin.webContents.id

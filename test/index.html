@@ -17,10 +17,14 @@
               loadType: 'url',
               url: 'https:/baidu.com'
             },
-            opt: {
+            windowOptions: {
               width: 400,
-              height: 200
-            }
+              height: 200,
+              webPreferences: {
+                devTools: true
+              }
+            },
+            loadOptions: { openDevTools: true }
           })
           .then(console.log);
       });

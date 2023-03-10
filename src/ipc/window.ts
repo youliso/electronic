@@ -171,14 +171,19 @@ export function windowMessageContentsSend(
   });
 }
 
+export interface LoadOptions {
+  openDevTools?: boolean;
+}
+
 /**
- * 创建窗口
+ * 创建并加载窗口
  */
 export function windowCreate(
   customize: Customize,
-  opt?: BrowserWindowConstructorOptions
+  windowOptions?: BrowserWindowConstructorOptions,
+  loadOptions?: LoadOptions
 ): Promise<{ id: number; webContentsId: number } | undefined> {
-  return window.ipc.invoke('window-new', { customize, opt });
+  return window.ipc.invoke('window-new', { customize, windowOptions, loadOptions });
 }
 
 /**

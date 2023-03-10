@@ -35,9 +35,12 @@ appInstance
       {
         width: 800,
         height: 600,
-        frame: true
+        frame: true,
+        webPreferences: {
+          devTools: true
+        }
       }
     );
-    win && windowInstance.load(win).catch(logError);
+    win && windowInstance.load(win, { openDevTools: true }).catch(logError);
   })
   .catch(logError);
