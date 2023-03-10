@@ -195,9 +195,12 @@ export class Window {
     // 参数设置
     !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
+    // 设置默认地址加载模式
+    if (!win.customize.loadType) {
+      win.customize.loadType = this.defaultLoadType;
+    }
     // 设置默认地址
     if (!win.customize.url) {
-      win.customize.loadType = this.defaultLoadType;
       win.customize.url = this.defaultUrl;
     }
     return win;
