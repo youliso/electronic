@@ -68,14 +68,20 @@ function browserWindowAssembly(
   let bwOpt: BrowserWindowConstructorOptions = Object.assign(
     {
       autoHideMenuBar: true,
-      titleBarStyle: customize.headNative ? 'default' : 'hidden',
       minimizable: true,
-      maximizable: true,
-      frame: customize.headNative,
-      show: bwOptions.show || customize.headNative
+      maximizable: true
     },
     bwOptions
   );
+  if (!bwOptions.hasOwnProperty('titleBarStyle')) {
+    bwOptions.titleBarStyle = customize.headNative ? 'default' : 'hidden';
+  }
+  if (!bwOptions.hasOwnProperty('frame')) {
+    bwOptions.frame = customize.headNative;
+  }
+  if (!bwOptions.hasOwnProperty('show')) {
+    bwOptions.show = customize.headNative;
+  }
   let countWin;
   if (customize.parentId) {
     countWin = windowInstance.get(customize.parentId as number);

@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "electron modules",
   "scripts": {
     "build": "node --max_old_space_size=8000 build.js",
