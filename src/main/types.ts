@@ -6,8 +6,6 @@ export interface Customize {
   webContentsId?: number;
   // 标题 (仅路由下生效)
   title?: string;
-  // 是否使用原生标签栏（路由下默认关闭）
-  headNative?: boolean;
   // 指定网页
   url?: string;
   // 指定路由

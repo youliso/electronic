@@ -57,7 +57,6 @@ function browserWindowAssembly(
   // darwin下modal会造成整个窗口关闭(?)
   if (process.platform === 'darwin') delete bwOptions.modal;
   customize.silenceFunc = customize.silenceFunc || false;
-  customize.headNative = customize.headNative || false;
   customize.isPackaged = app.isPackaged;
   bwOptions.webPreferences = Object.assign(
     {
@@ -77,15 +76,6 @@ function browserWindowAssembly(
     },
     bwOptions
   );
-  if (!bwOptions.hasOwnProperty('titleBarStyle')) {
-    bwOptions.titleBarStyle = customize.headNative ? 'default' : 'hidden';
-  }
-  if (!bwOptions.hasOwnProperty('frame')) {
-    bwOptions.frame = customize.headNative;
-  }
-  if (!bwOptions.hasOwnProperty('show')) {
-    bwOptions.show = customize.headNative;
-  }
   let countWin;
   if (customize.parentId) {
     countWin = windowInstance.get(customize.parentId as number);
@@ -104,7 +94,6 @@ function browserWindowAssembly(
 function windowOpenHandler(webContents: WebContents, parentId?: number) {
   webContents.setWindowOpenHandler(({ url }) => {
     const win = windowInstance.create({
-      headNative: true,
       url,
       parentId
     });
