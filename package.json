@@ -16,7 +16,6 @@
     "electron-updater"
   ],
   "author": "youliso",
-  "homepage": "https://youliso.github.io/electronic/",
   "repository": {
     "type": "git",
     "url": "https://github.com/youliso/electronic"
