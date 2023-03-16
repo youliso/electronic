@@ -1,4 +1,4 @@
-import { LoadFileOptions, LoadURLOptions } from 'electron';
+import type { LoadURLOptions, LoadFileOptions } from 'electron';
 
 export interface Customize {
   // 窗口id
@@ -10,6 +10,8 @@ export interface Customize {
   url?: string;
   // 指定路由
   route?: string;
+  // 加载方式（默认url）
+  loadType?: string;
   // 基于父/主窗口居中
   center?: boolean;
   // 参数数据
@@ -37,29 +39,6 @@ export interface Customize {
 export interface Window {
   customize: Customize;
 }
-
-export interface AppInfo {
-  name: string;
-  version: string;
-}
-
-export type AppPathKey =
-  | 'home'
-  | 'appData'
-  | 'userData'
-  | 'cache'
-  | 'temp'
-  | 'exe'
-  | 'module'
-  | 'desktop'
-  | 'documents'
-  | 'downloads'
-  | 'music'
-  | 'pictures'
-  | 'videos'
-  | 'recent'
-  | 'logs'
-  | 'crashDumps';
 
 export type WindowAlwaysOnTopOpt =
   | 'normal'
@@ -101,3 +80,36 @@ export type Accelerator = {
   key: string | string[];
   callback: () => void;
 };
+
+export interface Window {
+  customize: Customize;
+}
+
+export interface AppInfo {
+  name: string;
+  version: string;
+}
+
+export type AppPathKey =
+  | 'home'
+  | 'appData'
+  | 'userData'
+  | 'cache'
+  | 'temp'
+  | 'exe'
+  | 'module'
+  | 'desktop'
+  | 'documents'
+  | 'downloads'
+  | 'music'
+  | 'pictures'
+  | 'videos'
+  | 'recent'
+  | 'logs'
+  | 'crashDumps';
+
+export interface UpdateMessage {
+  code: number;
+  msg: string;
+  value?: any;
+}

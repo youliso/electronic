@@ -1,4 +1,4 @@
-import type { Customize } from './types';
+import type { Customize } from '../types';
 import { app, ipcMain, shell, nativeTheme } from 'electron';
 import { resolve } from 'path';
 import { fileOn } from './file';

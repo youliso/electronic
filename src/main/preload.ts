@@ -1,6 +1,6 @@
 import type { IpcRendererEvent } from 'electron';
 import { contextBridge, ipcRenderer } from 'electron';
-import { Customize } from './types';
+import { Customize } from '../types';
 
 export interface Ipc {
   send: (channel: string, args?: any) => void;

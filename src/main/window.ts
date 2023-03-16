@@ -4,7 +4,7 @@ import type {
   LoadURLOptions,
   WebContents
 } from 'electron';
-import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from './types';
+import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
 import { join } from 'path';
 import { app, screen, ipcMain, BrowserWindow, webContents } from 'electron';
 import { logError } from './log';

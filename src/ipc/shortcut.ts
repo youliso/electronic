@@ -1,5 +1,5 @@
 import type { IpcRendererEvent } from 'electron';
-import type { Accelerator } from './types';
+import type { Accelerator } from '../types';
 
 /**
  * 快捷键监听

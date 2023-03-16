@@ -1,4 +1,4 @@
-import { AppInfo, AppPathKey } from './types';
+import { AppInfo, AppPathKey } from '../types';
 
 
 /**
