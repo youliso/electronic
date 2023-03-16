@@ -6,7 +6,6 @@ export * from './log';
 export * from './machine';
 export * from './net';
 export * from './path';
-export * from './preload';
 export * from './session';
 export * from './shortcut';
 export * from './tray';

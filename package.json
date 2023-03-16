@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "electron modules",
   "scripts": {
     "build": "node --max_old_space_size=8000 build.js",
@@ -9,6 +9,8 @@
     "test:prettier": "prettier \"./src\" --list-different --config .prettierrc",
     "test": " npx electron ./test/main.js"
   },
+  "main": "index.js",
+  "types": "mian/index.d.ts",
   "keywords": [
     "electron",
     "electron-updater"

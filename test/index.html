@@ -3,7 +3,7 @@
   <body>
     <h1>hello</h1>
     <button id="new">新窗口</button>
-    <script>
+    <script type="module">
       window.ipc.once('window-load', (_, args) => {
         window.customize = args;
       });

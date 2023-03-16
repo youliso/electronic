@@ -24,7 +24,6 @@ export interface Environment {
   platform: NodeJS.Platform;
 }
 
-
 declare global {
   interface Window {
     ipc: Ipc;

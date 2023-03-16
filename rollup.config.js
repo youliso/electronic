@@ -37,6 +37,7 @@ const external = [
   './session',
   './shortcut',
   './tray',
+  '../types',
   './update',
   './utils',
   './view',
@@ -79,12 +80,6 @@ flies.forEach((path, index) => {
       input: `./src/${path}.ts`,
       output: [
         {
-          file: `./dist/${path}.cjs`,
-          exports: 'auto',
-          format: 'commonjs',
-          sourcemap: false
-        },
-        {
           file: `./dist/${path}.js`,
           format: 'esm',
           sourcemap: false
@@ -99,6 +94,7 @@ flies.forEach((path, index) => {
       output: [
         {
           file: `./dist/${path}.js`,
+          exports: 'auto',
           format: 'commonjs',
           sourcemap: false
         }
