@@ -1,38 +1,75 @@
 import type { LoadURLOptions, LoadFileOptions } from 'electron';
 
+export type Position = 'center';
+
 export interface Customize {
-  // 窗口id
+  /**
+   * 窗口id
+   */
   winId?: number;
+  /**
+   * 网页内容id
+   */
   webContentsId?: number;
-  // 标题 (仅路由下生效)
+  /**
+   * 标题 (仅路由下生效)
+   */
   title?: string;
-  // 指定网页
+  /**
+   * 指定网页
+   */
   url?: string;
-  // 指定路由
+  /**
+   * 指定路由
+   */
   route?: string;
-  // 加载方式（默认url）
+  /**
+   * 加载方式（默认url）
+   */
   loadType?: string;
-  // 基于父/主窗口居中
-  center?: boolean;
-  // 参数数据
+  /**
+   * 基于父/主窗口位置默认（center）
+   */
+  position?: Position;
+  /**
+   * 参数数据
+   */
   loadOptions?: LoadURLOptions | LoadFileOptions;
-  // 父窗口id
+  /**
+   * 父窗口id
+   */
   parentId?: number;
-  // 此路由是否单窗口
+  /**
+   * 此路由是否单窗口
+   */
   isOneWindow?: boolean;
-  // 是否主窗口
+  /**
+   * 是否主窗口
+   */
   isMainWin?: boolean;
-  // 是否已打包环境
+  /**
+   * 是否已打包环境
+   */
   isPackaged?: boolean;
-  // 是否独立弹框view
+  /**
+   * 是否独立弹框view
+   */
   isAlone?: boolean;
-  // 是否view
+  /**
+   * 是否view
+   */
   isView?: boolean;
-  // 进程参数
+  /**
+   * 进程参数
+   */
   argv?: any;
-  // 自定义参数
+  /**
+   * 自定义参数
+   */
   data?: any;
-  // 窗口不触发广播func
+  /**
+   * 窗口不触发广播func
+   */
   silenceFunc?: boolean;
 }
 

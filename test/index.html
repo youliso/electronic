@@ -15,7 +15,8 @@
               headNative: true,
               title: 'electron-template',
               loadType: 'url',
-              url: 'https:/baidu.com'
+              url: 'https:/baidu.com',
+              position: 'center'
             },
             windowOptions: {
               width: 400,
@@ -23,8 +24,7 @@
               webPreferences: {
                 devTools: true
               }
-            },
-            loadOptions: { openDevTools: true }
+            }
           })
           .then(console.log);
       });

@@ -4,10 +4,16 @@ import type {
   LoadURLOptions,
   WebContents
 } from 'electron';
-import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
+import type {
+  Customize,
+  Position,
+  WindowAlwaysOnTopOpt,
+  WindowFuncOpt,
+  WindowStatusOpt
+} from '../types';
 import { join } from 'path';
 import { app, screen, ipcMain, BrowserWindow, webContents } from 'electron';
-import { logError } from './log';
+import { logError, logWarn } from './log';
 
 declare global {
   module Electron {
@@ -29,17 +35,22 @@ export interface LoadOptions {
  * 计算xy
  * @param win
  */
-function countXy(win: BrowserWindow, bwOpt: BrowserWindowConstructorOptions) {
+function countXy(win: BrowserWindow, bwOpt: BrowserWindowConstructorOptions, position?: Position) {
   const currentWH = win.getBounds();
-  if (win.isMaximized()) {
-    const displayWorkAreaSize = screen.getPrimaryDisplay().workAreaSize;
-    bwOpt.x = ((displayWorkAreaSize.width - (bwOpt.width || 0)) / 2) | 0;
-    bwOpt.y = ((displayWorkAreaSize.height - (bwOpt.height || 0)) / 2) | 0;
-  } else {
-    const currentPosition = win.getPosition();
-    bwOpt.x = (currentPosition[0] + (currentWH.width - (bwOpt.width || currentWH.width)) / 2) | 0;
-    bwOpt.y =
-      (currentPosition[1] + (currentWH.height - (bwOpt.height || currentWH.height)) / 2) | 0;
+  const currentPosition = win.getPosition();
+  const displayWorkAreaSize = screen.getPrimaryDisplay().workAreaSize;
+  switch (position) {
+    case 'center':
+      if (win.isMaximized()) {
+        bwOpt.x = ((displayWorkAreaSize.width - bwOpt.width!) / 2) | 0;
+        bwOpt.y = ((displayWorkAreaSize.height - bwOpt.height!) / 2) | 0;
+      } else {
+        bwOpt.x = (currentPosition[0] + (currentWH.width - bwOpt.width!) / 2) | 0;
+        bwOpt.y = (currentPosition[1] + (currentWH.height - bwOpt.height!) / 2) | 0;
+      }
+      break;
+    default:
+      break;
   }
 }
 
@@ -70,6 +81,8 @@ function browserWindowAssembly(
   );
   let bwOpt: BrowserWindowConstructorOptions = Object.assign(
     {
+      width: 800,
+      height: 600,
       autoHideMenuBar: true,
       minimizable: true,
       maximizable: true
@@ -81,10 +94,10 @@ function browserWindowAssembly(
     countWin = windowInstance.get(customize.parentId as number);
     if (countWin) bwOpt.parent = countWin;
   }
-  if (customize.center && !countWin) {
+  if (customize.position && !countWin) {
     countWin = windowInstance.getMain();
   }
-  countWin && countXy(countWin, bwOpt);
+  countWin && countXy(countWin, bwOpt, customize.position);
   return bwOpt;
 }
 
