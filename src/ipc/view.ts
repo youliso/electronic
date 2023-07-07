@@ -3,7 +3,7 @@ import type { BrowserViewConstructorOptions, IpcRendererEvent } from 'electron';
 export interface ViewOpt {
   key: string;
   winId: number;
-  owh: [number, number];
+  owh: [number, number, number, number];
   webPreferences?: BrowserViewConstructorOptions;
   url: string;
   data?: any;
@@ -37,7 +37,7 @@ export async function viewExist(key: string): Promise<boolean> {
 export async function viewAlone(
   key: string,
   winId: number,
-  owh: [number, number] = [0, 0]
+  owh: [number, number, number, number] = [0, 0, 0, 0]
 ): Promise<number | undefined> {
   return await window.ipc.invoke('view-alone', { key, winId, owh });
 }

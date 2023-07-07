@@ -17,7 +17,7 @@ function viewOpenHandler(webContents: WebContents) {
 export interface ViewOpt {
   key: string;
   winId: number;
-  owh: [number, number];
+  owh: [number, number, number, number];
   webPreferences: WebPreferences;
   url: string;
   data: any;
@@ -27,7 +27,7 @@ export interface ViewItem {
   isAlone: boolean;
   isResize?: boolean;
   winId: number; // view所挂载的窗体
-  owh: [number, number]; // view所在窗口宽高偏移量
+  owh: [number, number, number, number]; // view所在窗口宽高偏移量
   bv: BrowserView; // view主体
 }
 
@@ -87,7 +87,10 @@ export class View {
     const winBz = win.getBounds();
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
-    this.setBounds([winBz.width, winBz.height], this.views[key]);
+    this.setBounds(
+      [winBz.width - this.views[key].owh[2], winBz.height - this.views[key].owh[3]],
+      this.views[key]
+    );
   }
 
   stop(key: string) {
@@ -163,7 +166,7 @@ export class View {
     delete this.views[key];
   }
 
-  async alone(key: string, winId: number, owh: [number, number] = [0, 0]) {
+  async alone(key: string, winId: number, owh: [number, number, number, number] = [0, 0, 0, 0]) {
     if (!this.views[key]) {
       throw new Error('[view alone] not view');
     }
