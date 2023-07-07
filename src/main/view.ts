@@ -40,10 +40,10 @@ export class View {
 
   setBounds(winWh: number[], view: ViewItem) {
     view.bv.setBounds({
-      x: view.owh[0],
-      y: view.owh[1],
-      width: winWh[0] - view.owh[0],
-      height: winWh[1] - view.owh[1]
+      x: view.owh[3],
+      y: view.owh[0],
+      width: winWh[0] - view.owh[1] - view.owh[3],
+      height: winWh[1] - view.owh[0] - view.owh[2]
     });
   }
 
@@ -87,10 +87,7 @@ export class View {
     const winBz = win.getBounds();
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
-    this.setBounds(
-      [winBz.width - this.views[key].owh[2], winBz.height - this.views[key].owh[3]],
-      this.views[key]
-    );
+    this.setBounds([winBz.width, winBz.height], this.views[key]);
   }
 
   stop(key: string) {
