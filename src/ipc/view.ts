@@ -3,7 +3,10 @@ import type { BrowserViewConstructorOptions, IpcRendererEvent } from 'electron';
 export interface ViewOpt {
   key: string;
   winId: number;
-  owh: [number, number, number, number];
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
   webPreferences?: BrowserViewConstructorOptions;
   url: string;
   data?: any;
@@ -37,9 +40,14 @@ export async function viewExist(key: string): Promise<boolean> {
 export async function viewAlone(
   key: string,
   winId: number,
-  owh: [number, number, number, number] = [0, 0, 0, 0]
+  opt: {
+    x: number;
+    y: number;
+    width?: number;
+    height?: number;
+  }
 ): Promise<number | undefined> {
-  return await window.ipc.invoke('view-alone', { key, winId, owh });
+  return await window.ipc.invoke('view-alone', { key, winId, opt });
 }
 
 /**
@@ -122,6 +130,18 @@ export async function stop(key: string) {
 
 export async function reload(key: string) {
   return await window.ipc.invoke('view-reload', { key });
+}
+
+export async function setBounds(
+  key: string,
+  opt: {
+    x: number;
+    y: number;
+    width?: number;
+    height?: number;
+  }
+) {
+  return await window.ipc.invoke('view-set-bounds', { key, opt });
 }
 
 export async function canGoBack(key: string) {

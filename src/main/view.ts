@@ -17,7 +17,10 @@ function viewOpenHandler(webContents: WebContents) {
 export interface ViewOpt {
   key: string;
   winId: number;
-  owh: [number, number, number, number];
+  x: number;
+  y: number;
+  width: number;
+  height: number;
   webPreferences: WebPreferences;
   url: string;
   data: any;
@@ -27,7 +30,10 @@ export interface ViewItem {
   isAlone: boolean;
   isResize?: boolean;
   winId: number; // view所挂载的窗体
-  owh: [number, number, number, number]; // view所在窗口宽高偏移量
+  x: number;
+  y: number;
+  width: number;
+  height: number;
   bv: BrowserView; // view主体
 }
 
@@ -38,12 +44,12 @@ export class View {
 
   constructor() {}
 
-  setBounds(winWh: number[], view: ViewItem) {
+  setBounds(view: ViewItem) {
     view.bv.setBounds({
-      x: view.owh[3],
-      y: view.owh[0],
-      width: winWh[0] - view.owh[1] - view.owh[3],
-      height: winWh[1] - view.owh[0] - view.owh[2]
+      x: view.x,
+      y: view.y,
+      width: view.width,
+      height: view.height
     });
   }
 
@@ -84,10 +90,9 @@ export class View {
       throw new Error('[view show] not win');
     }
     win.show();
-    const winBz = win.getBounds();
     this.views[key].isResize = true;
     win.setBrowserView(this.views[key].bv);
-    this.setBounds([winBz.width, winBz.height], this.views[key]);
+    this.setBounds(this.views[key]);
   }
 
   stop(key: string) {
@@ -163,7 +168,7 @@ export class View {
     delete this.views[key];
   }
 
-  async alone(key: string, winId: number, owh: [number, number, number, number] = [0, 0, 0, 0]) {
+  async alone(key: string, winId: number, opt: ViewOpt) {
     if (!this.views[key]) {
       throw new Error('[view alone] not view');
     }
@@ -180,7 +185,10 @@ export class View {
     this.views[key].isAlone = true;
     this.views[key].isResize = true;
     this.views[key].winId = winId;
-    this.views[key].owh = owh;
+    this.views[key].x = opt.x || 0;
+    this.views[key].x = opt.y || 0;
+    !this.views[key].width && (this.views[key].width = newWinBz.width - this.views[key].x);
+    !this.views[key].height && (this.views[key].height = newWinBz.height - this.views[key].y);
     this.views[key].bv.webContents.removeAllListeners('page-title-updated');
     this.views[key].bv.webContents.removeAllListeners('did-navigate');
     this.views[key].bv.webContents.removeAllListeners('did-navigate-in-page');
@@ -203,7 +211,7 @@ export class View {
     });
     this.views[key].bv.webContents.send('view-alone-load', { winId, isAlone: true });
     newWin.setBrowserView(this.views[key].bv);
-    this.setBounds([newWinBz.width, newWinBz.height], this.views[key]);
+    this.setBounds(this.views[key]);
     this.setAutoResize(this.views[key]);
     return this.views[key].bv.webContents.id;
   }
@@ -234,7 +242,10 @@ export class View {
     // @ts-ignore
     this.views[opt.key] = {
       winId: opt.winId,
-      owh: opt.owh,
+      x: opt.x || 0,
+      y: opt.y || 0,
+      width: opt.width || winBz.width - (opt.x || 0),
+      height: opt.height || winBz.height - (opt.y || 0),
       isResize: true,
       isAlone
     };
@@ -284,7 +295,7 @@ export class View {
     } else {
       await this.views[opt.key].bv.webContents.loadFile(opt.url).catch(logError);
     }
-    this.setBounds([winBz.width, winBz.height], this.views[opt.key]);
+    this.setBounds(this.views[opt.key]);
     this.setAutoResize(this.views[opt.key]);
     return this.views[opt.key].bv.webContents.id;
   }
@@ -296,11 +307,19 @@ export class View {
   on() {
     ipcMain.handle('view-new', (event, args) => this.create(args.opt, args.isAlone));
     ipcMain.handle('view-exist', (event, args) => this.exist(args.key));
-    ipcMain.handle('view-alone', (event, args) => this.alone(args.key, args.winId, args.owh));
+    ipcMain.handle('view-alone', (event, args) => this.alone(args.key, args.winId, args.opt));
     ipcMain.handle('view-hide', async (event, args) => this.hide(args.key));
     ipcMain.handle('view-show', async (event, args) => this.show(args.key));
     ipcMain.handle('view-stop', async (event, args) => this.stop(args.key));
     ipcMain.handle('view-reload', async (event, args) => this.reload(args.key));
+    ipcMain.handle('view-set-bounds', async (event, args) => {
+      args.opt.x && (this.views[args.key].x = args.opt.x);
+      args.opt.y && (this.views[args.key].y = args.opt.y);
+      args.opt.width && (this.views[args.key].width = args.opt.width);
+      args.opt.height && (this.views[args.key].height = args.opt.height);
+      this.setBounds(this.views[args.key]);
+      return 0;
+    });
     ipcMain.handle('view-open-dev-tools', async (event, args) => this.openDevTools(args.key));
     ipcMain.handle('view-can-go-back', async (event, args) => this.canGoBack(args.key));
     ipcMain.handle('view-go-back', async (event, args) => this.goBack(args.key));
