@@ -116,19 +116,50 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
 }
 
 export interface WindowDefaultCfg {
-  defaultLoadType?: string;
+  /**
+   * 默认html加载方式
+   */
+  defaultLoadType?: 'flie' | 'url';
+  /**
+   * 默认html加载路径
+   */
   defaultUrl?: string;
+  /**
+   * 默认Preload加载路径
+   */
   defaultPreload?: string;
+  /**
+   * 窗口默认参数
+   */
+  defaultCustomize?: Customize;
+  /**
+   * 窗口默认参数
+   */
+  defaultBrowserWindowOptions?: Electron.BrowserWindowConstructorOptions;
 }
 
 export class Window {
   private static instance: Window;
-  // 默认html加载方式
-  public defaultLoadType: string = 'file';
-  // 默认html加载路径
+  /**
+   * 默认html加载方式
+   */
+  public defaultLoadType = 'file';
+  /**
+   * 默认html加载路径
+   */
   public defaultUrl: string = join(__dirname, '../renderer/index.html');
-  // 默认加载路径
+  /**
+   * 默认加载路径
+   */
   public defaultPreload: string = join(__dirname, '../preload/index.js');
+  /**
+   * 窗口默认参数
+   */
+  public defaultCustomize: Customize = {};
+  /**
+   * 窗口默认参数
+   */
+  public defaultBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {};
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
@@ -137,10 +168,12 @@ export class Window {
 
   constructor() {}
 
-  setDefaultCfg(cfg: WindowDefaultCfg = {}) {
+  setDefaultCfg(cfg: WindowDefaultCfg) {
     cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
     cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
     cfg.defaultPreload && (this.defaultPreload = cfg.defaultPreload);
+    this.defaultCustomize = cfg.defaultCustomize || {};
+    this.defaultBrowserWindowOptions = cfg.defaultBrowserWindowOptions || {};
   }
 
   /**

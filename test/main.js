@@ -1,36 +1,27 @@
 const { join } = require('path');
-const { appInstance, windowInstance, logError } = require('../dist/main');
+const { app } = require('electron');
+const { appBeforeOn, appOn, windowInstance, logError } = require('../dist/main');
 
-appInstance
-  .start()
+// 设置窗口管理默认参数
+windowInstance.setDefaultCfg({
+  defaultUrl: join(__dirname, '../test/index.html'),
+  defaultPreload: join(__dirname, '../test/preload.js')
+});
+
+appBeforeOn();
+
+app
+  .whenReady()
   .then(() => {
-    // // 调试模式;
-    // if (!app.isPackaged) {
-    //   try {
-    //     import("fs").then(({ readFileSync }) => {
-    //       import("path").then(({ join }) => {
-    //         windowInstance.defaultUrl = `http://localhost:${readFileSync(
-    //           join(".port"),
-    //           "utf8"
-    //         )}`;
-    //         windowInstance.create(customize, opt);
-    //       });
-    //     });
-    //   } catch (e) {
-    //     throw "not found .port";
-    //   }
-    // } else windowInstance.create(customize, opt);
-
-    windowInstance.setDefaultCfg({
-      defaultUrl: join(__dirname, '../test/index.html'),
-      defaultPreload: join(__dirname, '../test/preload.js')
-    });
-
+    // 基础模块监听
+    appOn();
+    windowInstance.on();
+    // 创建窗口
     const win = windowInstance.create(
       {
         title: 'electron-template',
-        route: '/',
-        headNative: true
+        loadType: 'file',
+        route: '/'
       },
       {
         width: 800,
