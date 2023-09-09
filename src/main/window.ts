@@ -119,7 +119,7 @@ export interface WindowDefaultCfg {
   /**
    * 默认html加载方式
    */
-  defaultLoadType?: 'flie' | 'url';
+  defaultLoadType?: 'file' | 'url';
   /**
    * 默认html加载路径
    */
@@ -143,15 +143,15 @@ export class Window {
   /**
    * 默认html加载方式
    */
-  public defaultLoadType = 'file';
+  public defaultLoadType: 'file' | 'url' = 'file';
   /**
    * 默认html加载路径
    */
-  public defaultUrl: string = join(__dirname, '../renderer/index.html');
+  public defaultUrl: string = '';
   /**
    * 默认加载路径
    */
-  public defaultPreload: string = join(__dirname, '../preload/index.js');
+  public defaultPreload: string = '';
   /**
    * 窗口默认参数
    */
