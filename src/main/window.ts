@@ -141,6 +141,14 @@ export interface WindowDefaultCfg {
 export class Window {
   private static instance: Window;
   /**
+   * 创建拦截器
+   */
+  public interceptor:
+    | undefined
+    | ((
+        opt: Electron.BrowserWindowConstructorOptions
+      ) => Electron.BrowserWindowConstructorOptions) = undefined;
+  /**
    * 默认html加载方式
    */
   public defaultLoadType: 'file' | 'url' = 'file';
@@ -221,7 +229,8 @@ export class Window {
         }
       }
     }
-    const bwOpt = browserWindowAssembly(customize, bwOptions);
+    let bwOpt = browserWindowAssembly(customize, bwOptions);
+    this.interceptor && (bwOpt = this.interceptor(bwOpt));
     const win = new BrowserWindow(bwOpt);
     // win32 取消原生窗口右键事件
     process.platform === 'win32' &&
