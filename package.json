@@ -32,15 +32,15 @@
     "**/*"
   ],
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.4",
-    "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.2.1",
-    "electron": "^26.2.0",
-    "electron-updater": "^6.1.4",
-    "prettier": "^3.0.3",
-    "rollup": "^3.29.0",
-    "rollup-plugin-esbuild-minify": "^1.1.0",
-    "rollup-plugin-typescript2": "^0.35.0",
-    "typescript": "^5.2.2"
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "electron": "^27.1.2",
+    "electron-updater": "^6.1.7",
+    "prettier": "^3.1.0",
+    "rollup": "^4.5.2",
+    "rollup-plugin-esbuild-minify": "^1.1.1",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.3.2"
   }
 }
