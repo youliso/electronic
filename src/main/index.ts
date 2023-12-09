@@ -9,7 +9,6 @@ export * from './path';
 export * from './session';
 export * from './shortcut';
 export * from './tray';
-export * from './update';
 export * from './utils';
 export * from './view';
 export * from './window';
