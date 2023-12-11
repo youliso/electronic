@@ -11,7 +11,7 @@ export function windowLoad(listener: (event: IpcRendererEvent, args: Customize) 
 /**
  * 窗口数据更新
  */
-export function updateCustomize(customize: Customize) {
+export function windowUpdateCustomize(customize: Customize) {
   window.ipc.send('window-update', customize);
 }
 
