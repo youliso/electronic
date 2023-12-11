@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "electron modules",
   "scripts": {
     "build": "rollup -c rollup.config.mjs && node build.mjs",
@@ -8,7 +8,7 @@
     "test:prettier": "prettier \"./src\" --list-different --config .prettierrc",
     "test": "npx electron ./test/main.js"
   },
-  "main": "index.js",
+  "main": "mian/index.js",
   "types": "mian/index.d.ts",
   "keywords": [
     "electron",
