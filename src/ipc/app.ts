@@ -1,5 +1,4 @@
-import { AppInfo, AppPathKey } from '../types';
-
+import type { AppInfo, AppPathKey, Customize } from '../types';
 
 /**
  * 日志(info)
@@ -79,4 +78,11 @@ export async function openUrl(url: string): Promise<void> {
  */
 export async function getMachineGuid(): Promise<string> {
   return await window.ipc.invoke('machineguid-get');
+}
+
+/**
+ * 窗口数据更新
+ */
+export function updateCustomize(customize: Customize) {
+  window.ipc.send('window-update', customize);
 }

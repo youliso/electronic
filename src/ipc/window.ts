@@ -9,14 +9,6 @@ export function windowLoad(listener: (event: IpcRendererEvent, args: Customize) 
 }
 
 /**
- * 窗口数据更新
- */
-export function windowUpdate(route: string) {
-  window.customize.route = route;
-  window.ipc.send('window-update', window.customize);
-}
-
-/**
  * usb插拔消息监听
  */
 export function windowHookMessageUSB(
