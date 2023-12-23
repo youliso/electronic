@@ -1,7 +1,7 @@
 import type { IpcRendererEvent } from 'electron';
 import { contextBridge, ipcRenderer } from 'electron';
 import { Customize } from '../types';
-import channels from './channel';
+import { getChannels } from './channel';
 
 export interface Ipc {
   send: (channel: string, args?: any) => void;
@@ -33,25 +33,27 @@ declare global {
   }
 }
 
+const channels = getChannels();
+
 export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
   contextBridge.exposeInMainWorld('ipc', {
     send: (channel: string, args?: any) => {
-      if (!(<any>Object).values(channels).includes(channel)) {
+      if (!channels.includes(channel)) {
         throw new Error('not func: ' + channel);
       }
-      ipcRenderer.send(channel, args);
+      return ipcRenderer.send(channel, args);
     },
     sendSync: (channel: string, args?: any) => {
-      if (!(<any>Object).values(channels).includes(channel)) {
+      if (!channels.includes(channel)) {
         throw new Error('not func: ' + channel);
       }
-      ipcRenderer.sendSync(channel, args);
+      return ipcRenderer.sendSync(channel, args);
     },
     invoke: (channel: string, args: any) => {
-      if (!(<any>Object).values(channels).includes(channel)) {
+      if (!channels.includes(channel)) {
         throw new Error('not func: ' + channel);
       }
-      ipcRenderer.invoke(channel, args);
+      return ipcRenderer.invoke(channel, args);
     },
     on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) =>
       ipcRenderer.on(channel, listener),

@@ -99,17 +99,28 @@ export enum WindowChannel {
   getWinId = 'window-id-get'
 }
 
-export default {
-  ...AppChannel,
-  ...ClipboardChannel,
-  ...FileChannel,
-  ...StoreChannel,
-  ...LogChannel,
-  ...MachineChannel,
-  ...PathChannel,
-  ...SessionChannel,
-  ...ShortcutChannel,
-  ...UpdateChannel,
-  ...ViewChannel,
-  ...WindowChannel
-};
+export function getChannels() {
+  let keys = {
+    ...AppChannel,
+    ...ClipboardChannel,
+    ...FileChannel,
+    ...StoreChannel,
+    ...LogChannel,
+    ...MachineChannel,
+    ...PathChannel,
+    ...SessionChannel,
+    ...ShortcutChannel,
+    ...UpdateChannel,
+    ...ViewChannel,
+    ...WindowChannel
+  };
+  let channels: string[] = [];
+  for (let key in keys) {
+    // @ts-ignore
+    if (isNaN(key)) {
+      // @ts-ignore
+      channels.push(keys[key]);
+    }
+  }
+  return channels;
+}
