@@ -2,6 +2,7 @@ import { statSync, writeFileSync, appendFileSync } from 'fs';
 import { sep } from 'path';
 import { app, ipcMain } from 'electron';
 import { EOL } from 'os';
+import { LogChannel } from '../preload/channel';
 
 const logFile: string = app.getPath('logs');
 
@@ -78,6 +79,6 @@ export function logError(...val: any): void {
  * 监听
  */
 export function logOn() {
-  ipcMain.on('log-info', async (event, args) => logInfo(...args));
-  ipcMain.on('log-error', async (event, args) => logError(...args));
+  ipcMain.on(LogChannel.info, async (event, args) => logInfo(...args));
+  ipcMain.on(LogChannel.error, async (event, args) => logError(...args));
 }

@@ -1,5 +1,6 @@
 import type { IpcRendererEvent } from 'electron';
 import type { Accelerator } from '../types';
+import { ShortcutChannel } from '../preload/channel';
 
 /**
  * 快捷键监听
@@ -15,37 +16,23 @@ export function shortcutOn(listener: (event: IpcRendererEvent, args: any) => voi
  * @param key
  */
 export async function shortcut(name: string, key: string | string[]): Promise<void> {
-  return await window.ipc.invoke('shortcut-register', { name, key });
+  return await window.ipc.invoke(ShortcutChannel.register, { name, key });
 }
 
 /**
  * 清除快捷键
  * @param key
  */
-export async function shortcutUn(key: string): Promise<void> {
-  return await window.ipc.invoke('shortcut-unregister', key);
-}
-
-/**
- * 清空全部快捷键
- */
-export async function shortcutUnAll(): Promise<void> {
-  return await window.ipc.invoke('shortcut-unregisterAll');
+export async function shortcutUn(key?: string): Promise<void> {
+  return await window.ipc.invoke(ShortcutChannel.unregister, key);
 }
 
 /**
  * 获取已注册快捷键
  * @param key
  */
-export async function shortcutGet(key: string): Promise<Accelerator> {
-  return await window.ipc.invoke('shortcut-get', key);
-}
-
-/**
- * 获取全部已注册快捷键
- */
-export async function shortcutGetAll(): Promise<Accelerator[]> {
-  return await window.ipc.invoke('shortcut-getAll');
+export async function shortcutGet(key?: string): Promise<Accelerator> {
+  return await window.ipc.invoke(ShortcutChannel.get, key);
 }
 
 /**

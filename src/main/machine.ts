@@ -1,5 +1,6 @@
 import { execSync } from 'child_process';
 import { ipcMain } from 'electron';
+import { MachineChannel } from '../preload/channel';
 
 // win
 const WinRegBinPath =
@@ -55,15 +56,15 @@ export function getMachineGuid() {
   return process.platform === 'win32'
     ? getMachineGuidWin()
     : process.platform === 'linux'
-    ? getMachineGuidLinux()
-    : process.platform === 'darwin'
-    ? getMachineGuidDarwin()
-    : 'none';
+      ? getMachineGuidLinux()
+      : process.platform === 'darwin'
+        ? getMachineGuidDarwin()
+        : 'none';
 }
 
 /**
  * 监听
  */
 export function machineOn() {
-  ipcMain.handle('machineguid-get', async () => getMachineGuid());
+  ipcMain.handle(MachineChannel.get, async () => getMachineGuid());
 }

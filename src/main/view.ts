@@ -3,6 +3,7 @@ import { app, BrowserView, ipcMain } from 'electron';
 import { windowInstance } from './window';
 import { getMachineGuid } from './machine';
 import { logError } from './log';
+import { ViewChannel } from '../preload/channel';
 
 /**
  * 窗口打开预处理
@@ -305,14 +306,17 @@ export class View {
   }
 
   on() {
-    ipcMain.handle('view-new', (event, args) => this.create(args.opt, args.isAlone));
-    ipcMain.handle('view-exist', (event, args) => this.exist(args.key));
-    ipcMain.handle('view-alone', (event, args) => this.alone(args.key, args.winId, args.opt));
-    ipcMain.handle('view-hide', async (event, args) => this.hide(args.key));
-    ipcMain.handle('view-show', async (event, args) => this.show(args.key));
-    ipcMain.handle('view-stop', async (event, args) => this.stop(args.key));
-    ipcMain.handle('view-reload', async (event, args) => this.reload(args.key));
-    ipcMain.handle('view-set-bounds', async (event, args) => {
+    ipcMain.handle(ViewChannel.new, (event, args) => this.create(args.opt, args.isAlone));
+    ipcMain.handle(ViewChannel.exist, (event, args) => this.exist(args.key));
+    ipcMain.handle(ViewChannel.alone, (event, args) => this.alone(args.key, args.winId, args.opt));
+    ipcMain.handle(ViewChannel.hide, async (event, args) => this.hide(args.key));
+    ipcMain.handle(ViewChannel.hideAll, async (event, args) => this.hideAll(args.winId));
+    ipcMain.handle(ViewChannel.remove, async (event, args) => this.remove(args.key));
+    ipcMain.handle(ViewChannel.removeAll, async (event, args) => this.removeAll(args.winId));
+    ipcMain.handle(ViewChannel.show, async (event, args) => this.show(args.key));
+    ipcMain.handle(ViewChannel.stop, async (event, args) => this.stop(args.key));
+    ipcMain.handle(ViewChannel.reload, async (event, args) => this.reload(args.key));
+    ipcMain.handle(ViewChannel.setBounds, async (event, args) => {
       args.opt.x && (this.views[args.key].x = args.opt.x);
       args.opt.y && (this.views[args.key].y = args.opt.y);
       args.opt.width && (this.views[args.key].width = args.opt.width);
@@ -320,13 +324,10 @@ export class View {
       this.setBounds(this.views[args.key]);
       return 0;
     });
-    ipcMain.handle('view-open-dev-tools', async (event, args) => this.openDevTools(args.key));
-    ipcMain.handle('view-can-go-back', async (event, args) => this.canGoBack(args.key));
-    ipcMain.handle('view-go-back', async (event, args) => this.goBack(args.key));
-    ipcMain.handle('view-can-go-forward', async (event, args) => this.canGoForward(args.key));
-    ipcMain.handle('view-go-forward', async (event, args) => this.goForward(args.key));
-    ipcMain.handle('view-remove', async (event, args) => this.remove(args.key));
-    ipcMain.handle('view-hide-all', async (event, args) => this.hideAll(args.winId));
-    ipcMain.handle('view-remove-all', async (event, args) => this.removeAll(args.winId));
+    ipcMain.handle(ViewChannel.openDevTools, async (event, args) => this.openDevTools(args.key));
+    ipcMain.handle(ViewChannel.canGoBack, async (event, args) => this.canGoBack(args.key));
+    ipcMain.handle(ViewChannel.goBack, async (event, args) => this.goBack(args.key));
+    ipcMain.handle(ViewChannel.canGoForward, async (event, args) => this.canGoForward(args.key));
+    ipcMain.handle(ViewChannel.goForward, async (event, args) => this.goForward(args.key));
   }
 }

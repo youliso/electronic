@@ -1,4 +1,5 @@
 import type { CookiesGetFilter, CookiesSetDetails } from 'electron';
+import { SessionChannel } from '../preload/channel';
 
 /**
  * 设置http/https指定域名请求头
@@ -8,7 +9,7 @@ export function sessionHeadersSet(
   url: string,
   value: { [key: string]: string }
 ) {
-  window.ipc.send('session-headers-set', { type, url, value });
+  window.ipc.send(SessionChannel.setHeaders, { type, url, value });
 }
 
 /**
@@ -16,7 +17,7 @@ export function sessionHeadersSet(
  * @param args
  */
 export function sessionCookiesGet(args: CookiesGetFilter) {
-  return window.ipc.invoke('session-cookies-get', args);
+  return window.ipc.invoke(SessionChannel.getCookies, args);
 }
 
 /**
@@ -24,7 +25,7 @@ export function sessionCookiesGet(args: CookiesGetFilter) {
  * @param args
  */
 export async function sessionCookiesSet(args: CookiesSetDetails) {
-  return window.ipc.invoke('session-cookies-set', args);
+  return window.ipc.invoke(SessionChannel.setCookies, args);
 }
 
 /**
@@ -33,5 +34,5 @@ export async function sessionCookiesSet(args: CookiesSetDetails) {
  * @param name
  */
 export async function sessionCookiesRemove(url: string, name: string) {
-  return window.ipc.invoke('session-cookies-remove', { url, name });
+  return window.ipc.invoke(SessionChannel.unCookies, { url, name });
 }

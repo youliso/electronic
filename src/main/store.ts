@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { logError } from './log';
 import { readFile } from './file';
+import { StoreChannel } from '../preload/channel';
 
 type Obj<Value> = {} & {
   [key: string]: Value | Obj<Value>;
@@ -13,17 +14,14 @@ export interface Config {
   opt?: { encoding?: BufferEncoding; flag?: string };
 }
 
-/**
- * Global
- */
-export class Global {
-  private static instance: Global;
+export class Store {
+  private static instance: Store;
 
   public sharedObject: { [key: string]: any } = {};
 
   static getInstance() {
-    if (!Global.instance) Global.instance = new Global();
-    return Global.instance;
+    if (!Store.instance) Store.instance = new Store();
+    return Store.instance;
   }
 
   constructor() {}
@@ -54,20 +52,6 @@ export class Global {
         logError(`[cfg ${conf.path}]`, e);
       }
     }
-  }
-
-  /**
-   * 开启监听
-   */
-  on() {
-    //赋值(sharedObject)
-    ipcMain.handle('global-sharedObject-set', (event, args) => {
-      return this.sendGlobal(args.key, args.value);
-    });
-    //获取(sharedObject)
-    ipcMain.handle('global-sharedObject-get', (event, key) => {
-      return this.getGlobal(key);
-    });
   }
 
   getGlobal<Value>(key: string): Value | undefined {
@@ -128,6 +112,20 @@ export class Global {
     }
     cur[lastKey] = value;
   }
+
+  /**
+   * 开启监听
+   */
+  on() {
+    //赋值(sharedObject)
+    ipcMain.handle(StoreChannel.set, (event, args) => {
+      return this.sendGlobal(args.key, args.value);
+    });
+    //获取(sharedObject)
+    ipcMain.handle(StoreChannel.get, (event, key) => {
+      return this.getGlobal(key);
+    });
+  }
 }
 
-export const globalInstance = Global.getInstance();
+export const storeInstance = Store.getInstance();

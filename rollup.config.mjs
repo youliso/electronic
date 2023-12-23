@@ -27,12 +27,14 @@ const external = [
   './app',
   './clipboard',
   './file',
-  './global',
+  './store',
   './log',
   './machine',
   './net',
   './path',
   './preload',
+  './channel',
+  '../preload/channel',
   './session',
   './shortcut',
   './tray',
@@ -101,6 +103,8 @@ flies.forEach((path, index) => {
       external,
       plugins: plugins()
     };
+
+    if (path === 'preload\\channel') cfg.output[0].exports = 'named';
   }
   config.push(cfg);
 });

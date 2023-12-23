@@ -1,11 +1,12 @@
 import type { AppInfo, AppPathKey } from '../types';
+import { AppChannel, LogChannel, MachineChannel, StoreChannel } from '../preload/channel';
 
 /**
  * 日志(info)
  * @param args
  */
 export function logInfo(...args: any): void {
-  window.ipc.send('log-info', args);
+  window.ipc.send(LogChannel.info, args);
 }
 
 /**
@@ -13,7 +14,7 @@ export function logInfo(...args: any): void {
  * @param args
  */
 export function logError(...args: any): void {
-  window.ipc.send('log-error', args);
+  window.ipc.send(LogChannel.error, args);
 }
 
 /**
@@ -22,7 +23,7 @@ export function logError(...args: any): void {
  * @param value 值
  */
 export async function sendGlobal(key: string, value: unknown): Promise<void> {
-  return await window.ipc.invoke('global-sharedObject-set', {
+  return await window.ipc.invoke(StoreChannel.set, {
     key,
     value
   });
@@ -33,14 +34,14 @@ export async function sendGlobal(key: string, value: unknown): Promise<void> {
  * @param key 键
  */
 export async function getGlobal<T>(key: string): Promise<T> {
-  return await window.ipc.invoke('global-sharedObject-get', key);
+  return await window.ipc.invoke(StoreChannel.get, key);
 }
 
 /**
  * app退出
  */
 export function quit() {
-  window.ipc.send('app-quit');
+  window.ipc.send(AppChannel.Quit);
 }
 
 /**
@@ -48,7 +49,7 @@ export function quit() {
  * @param once 是否立即重启
  */
 export function relaunch(once: boolean): void {
-  return window.ipc.send('app-relaunch', once);
+  return window.ipc.send(AppChannel.Relaunch, once);
 }
 
 /**
@@ -56,26 +57,26 @@ export function relaunch(once: boolean): void {
  * @returns
  */
 export async function getAppInfo(): Promise<AppInfo> {
-  return await window.ipc.invoke('app-info-get');
+  return await window.ipc.invoke(AppChannel.InfoGet);
 }
 
 /**
  * app常用获取路径
  */
 export async function getAppPath(key: AppPathKey): Promise<string> {
-  return await window.ipc.invoke('app-path-get', key);
+  return await window.ipc.invoke(AppChannel.PathGet, key);
 }
 
 /**
  * app打开url
  */
 export async function openUrl(url: string): Promise<void> {
-  return await window.ipc.invoke('app-open-url', url);
+  return await window.ipc.invoke(AppChannel.OpenUrl, url);
 }
 
 /**
  * 获取设备唯一吗
  */
 export async function getMachineGuid(): Promise<string> {
-  return await window.ipc.invoke('machineguid-get');
+  return await window.ipc.invoke(MachineChannel.get);
 }

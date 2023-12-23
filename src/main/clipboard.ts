@@ -1,10 +1,11 @@
 import { clipboard, ipcMain } from 'electron';
+import { ClipboardChannel } from '../preload/channel';
 
 export function clipboardOn() {
-  ipcMain.handle('app-clipboard-read-text', async (event, args) => {
+  ipcMain.handle(ClipboardChannel.readText, async (event, args) => {
     return clipboard.readText(args.type);
   });
-  ipcMain.handle('app-clipboard-write-text', async (event, args) => {
+  ipcMain.handle(ClipboardChannel.writeText, async (event, args) => {
     return clipboard.writeText(args.text);
   });
 }

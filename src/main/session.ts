@@ -1,5 +1,6 @@
 import type { CookiesGetFilter, CookiesSetDetails } from 'electron';
 import { ipcMain, session } from 'electron';
+import { SessionChannel } from '../preload/channel';
 
 /**
  * 监听
@@ -8,8 +9,7 @@ export class Session {
   public AllHeaders: { [key: string]: { [key: string]: string } } = {};
   public Headers: { [key: number]: { [key: string]: { [key: string]: string } } } = {};
 
-  constructor() {
-  }
+  constructor() {}
 
   /**
    * 拦截指定http/https请求并更换、增加headers
@@ -97,7 +97,7 @@ export class Session {
   on() {
     this.webRequest();
     //设置url请求头
-    ipcMain.on('session-headers-set', async (event, args) => {
+    ipcMain.on(SessionChannel.setHeaders, async (event, args) => {
       switch (args.type) {
         case 'all':
           this.AllHeaders = Object.assign(this.AllHeaders, { [args.url]: args.value });
@@ -110,11 +110,11 @@ export class Session {
       }
     });
     //设置 Cookies
-    ipcMain.handle('session-cookies-set', async (event, args) => this.setCookies(args));
+    ipcMain.handle(SessionChannel.setCookies, async (event, args) => this.setCookies(args));
     //获取 Cookies
-    ipcMain.handle('session-cookies-get', async (event, args) => this.getCookies(args));
+    ipcMain.handle(SessionChannel.getCookies, async (event, args) => this.getCookies(args));
     //移除 Cookies
-    ipcMain.handle('session-cookies-remove', async (event, args) =>
+    ipcMain.handle(SessionChannel.unCookies, async (event, args) =>
       this.removeCookies(args.url, args.name)
     );
   }

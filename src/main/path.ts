@@ -1,5 +1,6 @@
 import path from 'path';
 import { ipcMain } from 'electron';
+import { PathChannel } from '../preload/channel';
 
 export function sep() {
   return path.sep;
@@ -22,9 +23,9 @@ export function basename(str: string) {
 }
 
 export function pathOn() {
-  ipcMain.handle('path-sep', async (event) => sep());
-  ipcMain.handle('path-isAbsolute', async (event, args) => isAbsolute(args));
-  ipcMain.handle('path-dirname', async (event, args) => dirname(args));
-  ipcMain.handle('path-normalize', async (event, args) => normalize(args));
-  ipcMain.handle('path-basename', async (event, args) => basename(args));
+  ipcMain.handle(PathChannel.sep, async (event) => sep());
+  ipcMain.handle(PathChannel.isAbsolute, async (event, args) => isAbsolute(args));
+  ipcMain.handle(PathChannel.dirname, async (event, args) => dirname(args));
+  ipcMain.handle(PathChannel.normalize, async (event, args) => normalize(args));
+  ipcMain.handle(PathChannel.basename, async (event, args) => basename(args));
 }

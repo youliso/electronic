@@ -11,9 +11,9 @@ import type {
   WindowFuncOpt,
   WindowStatusOpt
 } from '../types';
-import { join } from 'path';
 import { app, screen, ipcMain, BrowserWindow, webContents } from 'electron';
-import { logError, logWarn } from './log';
+import { logError } from './log';
+import { WindowChannel } from '../preload/channel';
 
 declare global {
   module Electron {
@@ -446,7 +446,7 @@ export class Window {
    */
   on() {
     // 窗口数据更新
-    ipcMain.on('window-update', (event, args) => {
+    ipcMain.on(WindowChannel.update, (event, args) => {
       if (args?.id) {
         const win = this.get(args.id);
         if (!win) {
@@ -457,7 +457,7 @@ export class Window {
       }
     });
     // 最大化最小化窗口
-    ipcMain.on('window-max-min-size', (event, id) => {
+    ipcMain.on(WindowChannel.maxMinSize, (event, id) => {
       if (id !== null && id !== undefined) {
         const win = this.get(id);
         if (!win) {
@@ -469,11 +469,11 @@ export class Window {
       }
     });
     // 窗口消息
-    ipcMain.on('window-func', (event, args) => this.func(args.type, args.id, args.data));
+    ipcMain.on(WindowChannel.func, (event, args) => this.func(args.type, args.id, args.data));
     // 窗口状态
-    ipcMain.handle('window-status', async (event, args) => this.getStatus(args.type, args.id));
+    ipcMain.handle(WindowChannel.status, async (event, args) => this.getStatus(args.type, args.id));
     // 创建窗口
-    ipcMain.handle('window-new', async (event, args) => {
+    ipcMain.handle(WindowChannel.new, async (event, args) => {
       const newWin = this.create(args.customize, args.windowOptions);
       if (newWin) {
         await this.load(newWin, args.loadOptions);
@@ -485,17 +485,17 @@ export class Window {
       return null;
     });
     // 设置窗口是否置顶
-    ipcMain.on('window-always-top-set', (event, args) => this.setAlwaysOnTop(args));
+    ipcMain.on(WindowChannel.setAlwaysTop, (event, args) => this.setAlwaysOnTop(args));
     // 设置窗口大小
-    ipcMain.on('window-size-set', (event, args) => this.setSize(args));
-    // 设置窗口最小大小
-    ipcMain.on('window-min-size-set', (event, args) => this.setMinSize(args));
-    // 设置窗口最大大小
-    ipcMain.on('window-max-size-set', (event, args) => this.setMaxSize(args));
+    ipcMain.on(WindowChannel.setSize, (event, args) => this.setSize(args));
+    // 设置窗口(最小/最大)大小
+    ipcMain.on(WindowChannel.setMinMaxSize, (event, args) =>
+      args.type === 'min' ? this.setMinSize(args) : this.setMaxSize(args)
+    );
     // 设置窗口背景颜色
-    ipcMain.on('window-bg-color-set', (event, args) => this.setBackgroundColor(args));
+    ipcMain.on(WindowChannel.setBackgroundColor, (event, args) => this.setBackgroundColor(args));
     // 窗口消息
-    ipcMain.on('window-message-send', (event, args) => {
+    ipcMain.on(WindowChannel.sendMessage, (event, args) => {
       const channel = `window-message-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         for (const i of args.acceptIds) this.send(channel, args.value, i);
@@ -509,7 +509,7 @@ export class Window {
         }
       }
     });
-    ipcMain.on('window-message-contents-send', (event, args) => {
+    ipcMain.on(WindowChannel.sendMessageContents, (event, args) => {
       const channel = `window-message-contents-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         for (const i of args.acceptIds) {
@@ -527,7 +527,7 @@ export class Window {
       }
     });
     //通过路由获取窗口id (不传route查全部)
-    ipcMain.handle('window-id-get', async (event, args) => {
+    ipcMain.handle(WindowChannel.getWinId, async (event, args) => {
       return this.getAll()
         .filter((win) => (args.route ? win.customize?.route === args.route : true))
         .map((win) => win.id);

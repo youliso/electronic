@@ -2,6 +2,7 @@ import fs, { MakeDirectoryOptions } from 'fs';
 import { createInterface } from 'readline';
 import { resolve, extname } from 'path';
 import { ipcMain } from 'electron';
+import { FileChannel } from '../preload/channel';
 
 /**
  * 读取目录下指定后缀文件
@@ -195,20 +196,18 @@ export async function appendFile(
  * 监听
  */
 export function fileOn() {
-  ipcMain.handle('file-filebysuffix', async (event, args) =>
-    fileBySuffix(args.path, args.fileName)
-  );
-  ipcMain.handle('file-mkdir', async (event, args) => mkdir(args.path, args.options));
-  ipcMain.handle('file-deldir', async (event, args) => delDir(args.path));
-  ipcMain.handle('file-unlink', async (event, args) => unlink(args.path));
-  ipcMain.handle('file-access', async (event, args) => access(args.path));
-  ipcMain.handle('file-rename', async (event, args) => rename(args.path, args.newPath));
-  ipcMain.handle('file-readfile', async (event, args) => readFile(args.path, args.options));
-  ipcMain.handle('file-readline', async (event, args) => readLine(args.path, args.index));
-  ipcMain.handle('file-writefile', async (event, args) =>
+  ipcMain.handle(FileChannel.suffix, async (event, args) => fileBySuffix(args.path, args.fileName));
+  ipcMain.handle(FileChannel.mkdir, async (event, args) => mkdir(args.path, args.options));
+  ipcMain.handle(FileChannel.deldir, async (event, args) => delDir(args.path));
+  ipcMain.handle(FileChannel.unlink, async (event, args) => unlink(args.path));
+  ipcMain.handle(FileChannel.access, async (event, args) => access(args.path));
+  ipcMain.handle(FileChannel.rename, async (event, args) => rename(args.path, args.newPath));
+  ipcMain.handle(FileChannel.readfile, async (event, args) => readFile(args.path, args.options));
+  ipcMain.handle(FileChannel.readline, async (event, args) => readLine(args.path, args.index));
+  ipcMain.handle(FileChannel.writefile, async (event, args) =>
     writeFile(args.path, args.data, args.options)
   );
-  ipcMain.handle('file-appendfile', async (event, args) =>
+  ipcMain.handle(FileChannel.appendfile, async (event, args) =>
     appendFile(args.path, args.data, args.options)
   );
 }

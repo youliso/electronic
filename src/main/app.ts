@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { logError } from './log';
 import { shortcutInstance } from './shortcut';
 import { windowInstance } from './window';
+import { AppChannel } from '../preload/channel';
 
 export interface AppBeforeOptions {
   /**
@@ -105,26 +106,26 @@ export const appOn = () => {
     shortcutInstance.unregister('CommandOrControl+R');
   });
   //app常用信息
-  ipcMain.handle('app-info-get', (event, args) => {
+  ipcMain.handle(AppChannel.InfoGet, (event, args) => {
     return {
       name: app.name,
       version: app.getVersion()
     };
   });
   //app常用获取路径
-  ipcMain.handle('app-path-get', (event, args) => {
+  ipcMain.handle(AppChannel.PathGet, (event, args) => {
     return app.getPath(args);
   });
   //app打开外部url
-  ipcMain.handle('app-open-url', async (event, args) => {
+  ipcMain.handle(AppChannel.OpenUrl, async (event, args) => {
     return await shell.openExternal(args);
   });
   //app退出
-  ipcMain.on('app-quit', (event, args) => {
+  ipcMain.on(AppChannel.Quit, (event, args) => {
     app.quit();
   });
   //app重启
-  ipcMain.on('app-relaunch', (event, args) => {
+  ipcMain.on(AppChannel.Relaunch, (event, args) => {
     app.relaunch({ args: process.argv.slice(1) });
     if (args) app.exit(0);
   });

@@ -7,6 +7,7 @@ import { delDir } from './file';
 import { ipcMain, app } from 'electron';
 import { windowInstance } from './window';
 import { logInfo, logWarn, logError } from './log';
+import { UpdateChannel } from '../preload/channel';
 
 /**
  * 更新模块 https://www.electron.build/auto-update
@@ -109,12 +110,12 @@ export class Update {
     //开启更新监听
     this.open((data: { key: string; value: any }) => windowInstance.send('update-back', data));
     //检查更新
-    ipcMain.on('update-check', (event, args) =>
+    ipcMain.on(UpdateChannel.check, (event, args) =>
       this.checkUpdate(args.isDel, args.autoDownload, args.url)
     );
     //手动下载更新
-    ipcMain.on('update-download', (event, args) => this.downloadUpdate());
+    ipcMain.on(UpdateChannel.download, (event, args) => this.downloadUpdate());
     // 关闭程序安装新的软件 isSilent 是否静默更新
-    ipcMain.on('update-install', (event, isSilent) => this.updateQuitInstall(isSilent));
+    ipcMain.on(UpdateChannel.install, (event, isSilent) => this.updateQuitInstall(isSilent));
   }
 }

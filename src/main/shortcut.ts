@@ -2,6 +2,7 @@ import type { Accelerator } from '../types';
 import { globalShortcut, ipcMain } from 'electron';
 import { windowInstance } from './window';
 import { deepCopy } from './utils';
+import { ShortcutChannel } from '../preload/channel';
 
 export class Shortcut {
   private static instance: Shortcut;
@@ -13,8 +14,7 @@ export class Shortcut {
     return Shortcut.instance;
   }
 
-  constructor() {
-  }
+  constructor() {}
 
   /**
    * 添加已注册快捷键
@@ -117,21 +117,25 @@ export class Shortcut {
    * 监听
    */
   on() {
-    ipcMain.handle('shortcut-register', (event, args: { name: string; key: string | string[] }) => {
-      const accelerator: Accelerator = {
-        ...args,
-        callback: () => windowInstance.send(`shortcut-back`, args.key)
-      };
-      return this.register(accelerator);
-    });
-    ipcMain.handle('shortcut-unregister', (event, args) => this.unregister(args));
-    ipcMain.handle('shortcut-unregisterAll', () => this.unregisterAll());
-    ipcMain.handle('shortcut-get', (event, args) => {
-      const accelerator = { ...this.get(args) };
-      delete accelerator.callback;
-      return accelerator;
-    });
-    ipcMain.handle('shortcut-getAll', () => {
+    ipcMain.handle(
+      ShortcutChannel.register,
+      (event, args: { name: string; key: string | string[] }) => {
+        const accelerator: Accelerator = {
+          ...args,
+          callback: () => windowInstance.send(`shortcut-back`, args.key)
+        };
+        return this.register(accelerator);
+      }
+    );
+    ipcMain.handle(ShortcutChannel.unregister, (event, args) =>
+      args ? this.unregister(args) : this.unregisterAll()
+    );
+    ipcMain.handle(ShortcutChannel.get, (event, args) => {
+      if (args) {
+        const accelerator = { ...this.get(args) };
+        delete accelerator.callback;
+        return accelerator;
+      }
       const acceleratorAll = this.getAll();
       // @ts-ignore
       acceleratorAll.map((e) => delete e.callback);
