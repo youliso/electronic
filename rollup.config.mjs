@@ -41,7 +41,6 @@ const external = [
   '../types',
   './update',
   './utils',
-  './view',
   './window',
   'electron',
   'electron-updater',

@@ -1,10 +1,9 @@
-import type { IpcRendererEvent } from 'electron';
 import type { UpdateMessage } from '../types';
 import { UpdateChannel } from '../preload/channel';
 /**
  * 更新监听
  */
-export function updateOn(listener: (event: IpcRendererEvent, args: UpdateMessage) => void) {
+export function updateOn(listener: (args: UpdateMessage) => void) {
   window.ipc.on('update-back', listener);
 }
 

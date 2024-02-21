@@ -1,4 +1,3 @@
-import type { IpcRendererEvent } from 'electron';
 import { contextBridge, ipcRenderer } from 'electron';
 import { Customize } from '../types';
 import { getChannels } from './channel';
@@ -6,14 +5,8 @@ import { getChannels } from './channel';
 export interface Ipc {
   send: (channel: string, args?: any) => void;
   sendSync: (channel: string, args?: any) => any;
-  on: (
-    channel: string,
-    listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void
-  ) => void;
-  once: (
-    channel: string,
-    listener: (event: Electron.IpcRendererEvent, ...args: any[]) => void
-  ) => void;
+  on: (channel: string, listener: (...args: any[]) => void) => void;
+  once: (channel: string, listener: (...args: any[]) => void) => void;
   invoke: (channel: string, args?: any) => Promise<any>;
   removeAllListeners: (channel: string) => this;
 }
@@ -55,10 +48,10 @@ export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
       }
       return ipcRenderer.invoke(channel, args);
     },
-    on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) =>
-      ipcRenderer.on(channel, listener),
-    once: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) =>
-      ipcRenderer.once(channel, listener),
+    on: (channel: string, listener: (...args: any[]) => void) =>
+      ipcRenderer.on(channel, (_, ...args) => listener(...args)),
+    once: (channel: string, listener: (...args: any[]) => void) =>
+      ipcRenderer.once(channel, (_, ...args) => listener(...args)),
     removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
   });
 

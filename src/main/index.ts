@@ -10,5 +10,4 @@ export * from './session';
 export * from './shortcut';
 export * from './tray';
 export * from './utils';
-export * from './view';
 export * from './window';

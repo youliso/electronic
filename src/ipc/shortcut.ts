@@ -1,4 +1,3 @@
-import type { IpcRendererEvent } from 'electron';
 import type { Accelerator } from '../types';
 import { ShortcutChannel } from '../preload/channel';
 
@@ -6,7 +5,7 @@ import { ShortcutChannel } from '../preload/channel';
  * 快捷键监听
  * @param listener
  */
-export function shortcutOn(listener: (event: IpcRendererEvent, args: any) => void) {
+export function shortcutOn(listener: (args: any) => void) {
   window.ipc.on(`shortcut-back`, listener);
 }
 

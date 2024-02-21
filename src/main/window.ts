@@ -273,7 +273,7 @@ export class Window {
     // 窗口usb插拔消息监听
     process.platform === 'win32' &&
       win.hookWindowMessage(0x0219, (wParam, lParam) =>
-        win.webContents.send('window-hook-message', { wParam, lParam })
+        win.webContents.send('window-hook-message', wParam, lParam)
       );
     win.webContents.on('did-attach-webview', (_, webContents) =>
       windowOpenHandler(webContents, win.id)

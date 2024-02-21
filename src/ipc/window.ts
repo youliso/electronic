@@ -1,11 +1,11 @@
-import type { IpcRendererEvent, BrowserWindowConstructorOptions } from 'electron';
+import type { BrowserWindowConstructorOptions } from 'electron';
 import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
 import { WindowChannel } from '../preload/channel';
 
 /**
  * 窗口初始化 (i)
  * */
-export function windowLoad(listener: (event: IpcRendererEvent, args: Customize) => void) {
+export function windowLoad(listener: (args: Customize) => void) {
   window.ipc.once('window-load', listener);
 }
 
@@ -19,18 +19,14 @@ export function windowUpdateCustomize(customize: Customize) {
 /**
  * usb插拔消息监听
  */
-export function windowHookMessageUSB(
-  listener: (event: IpcRendererEvent, args: { wParam: any; lParam: any }) => void
-) {
+export function windowHookMessageUSB(listener: (wParam: any, lParam: any) => void) {
   window.ipc.on('window-hook-message', listener);
 }
 
 /**
  * 窗口聚焦失焦监听
  */
-export function windowBlurFocusOn(
-  listener: (event: IpcRendererEvent, args: 'blur' | 'focus') => void
-) {
+export function windowBlurFocusOn(listener: (args: 'blur' | 'focus') => void) {
   window.ipc.on('window-blur-focus', listener);
 }
 
@@ -44,9 +40,7 @@ export function windowBlurFocusRemove() {
 /**
  * 窗口大小化监听
  */
-export function windowMaximizeOn(
-  listener: (event: IpcRendererEvent, args: 'maximize' | 'unmaximize') => void
-) {
+export function windowMaximizeOn(listener: (args: 'maximize' | 'unmaximize') => void) {
   window.ipc.on('window-maximize-status', listener);
 }
 
@@ -60,10 +54,7 @@ export function windowMaximizeRemove() {
 /**
  * 窗口消息监听
  */
-export function windowMessageOnce(
-  channel: string,
-  listener: (event: IpcRendererEvent, args: any) => void
-) {
+export function windowMessageOnce(channel: string, listener: (args: any) => void) {
   if (!channel) {
     throw new Error('not channel');
   }
@@ -73,10 +64,7 @@ export function windowMessageOnce(
 /**
  * 窗口消息监听
  */
-export function windowMessageOn(
-  channel: string,
-  listener: (event: IpcRendererEvent, args: any) => void
-) {
+export function windowMessageOn(channel: string, listener: (args: any) => void) {
   if (!channel) {
     throw new Error('not channel');
   }
@@ -117,10 +105,7 @@ export function windowMessageSend(
 /**
  * 消息监听
  */
-export function windowMessageContentsOnce(
-  channel: string,
-  listener: (event: IpcRendererEvent, args: any) => void
-) {
+export function windowMessageContentsOnce(channel: string, listener: (args: any) => void) {
   if (!channel) {
     throw new Error('not channel');
   }
@@ -130,10 +115,7 @@ export function windowMessageContentsOnce(
 /**
  * 消息监听
  */
-export function windowMessageContentsOn(
-  channel: string,
-  listener: (event: IpcRendererEvent, args: any) => void
-) {
+export function windowMessageContentsOn(channel: string, listener: (args: any) => void) {
   if (!channel) {
     throw new Error('not channel');
   }
