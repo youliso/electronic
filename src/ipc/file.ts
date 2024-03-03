@@ -56,7 +56,7 @@ export async function readFile(
   path: string,
   options?: { encoding?: BufferEncoding; flag?: string }
 ) {
-  return await window.ipc.invoke(FileChannel.readfile, { path, options });
+  return await window.ipc.invoke(FileChannel.readFile, { path, options });
 }
 
 /**
@@ -65,7 +65,7 @@ export async function readFile(
  * @param index
  */
 export async function readLine(path: string, index?: number): Promise<string | any[]> {
-  return await window.ipc.invoke(FileChannel.readline, { path, index });
+  return await window.ipc.invoke(FileChannel.readLine, { path, index });
 }
 
 /**
@@ -77,7 +77,7 @@ export async function writeFile(
   data: string | Buffer,
   options?: { encoding?: BufferEncoding; mode?: number | string; flag?: string }
 ) {
-  return await window.ipc.invoke(FileChannel.writefile, { path, data, options });
+  return await window.ipc.invoke(FileChannel.writeFile, { path, data, options });
 }
 
 /**
@@ -89,5 +89,5 @@ export async function appendFile(
   data: string | Uint8Array,
   options?: { encoding?: BufferEncoding; mode?: number | string; flag?: string }
 ) {
-  return await window.ipc.invoke(FileChannel.appendfile, { path, data, options });
+  return await window.ipc.invoke(FileChannel.appendFile, { path, data, options });
 }

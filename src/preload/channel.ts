@@ -1,9 +1,9 @@
 export enum AppChannel {
-  InfoGet = 'app-info-get',
-  PathGet = 'app-path-get',
-  OpenUrl = 'app-open-url',
-  Quit = 'quit',
-  Relaunch = 'app-relaunch'
+  getInfo = 'app-info-get',
+  getPath = 'app-path-get',
+  openUrl = 'app-open-url',
+  quit = 'app-quit',
+  relaunch = 'app-relaunch'
 }
 
 export enum ClipboardChannel {
@@ -18,10 +18,10 @@ export enum FileChannel {
   unlink = 'file-unlink',
   access = 'file-access',
   rename = 'file-rename',
-  readfile = 'file-readfile',
-  readline = 'file-readline',
-  writefile = 'file-writefile',
-  appendfile = 'file-appendfile'
+  readFile = 'file-readFile',
+  readLine = 'file-readLine',
+  writeFile = 'file-writeFile',
+  appendFile = 'file-appendFile'
 }
 
 export enum StoreChannel {

@@ -19,7 +19,7 @@ export function windowUpdateCustomize(customize: Customize) {
 /**
  * usb插拔消息监听
  */
-export function windowHookMessageUSB(listener: (wParam: any, lParam: any) => void) {
+export function windowHookMessageUSB(listener: (wParam: Buffer, lParam: Buffer) => void) {
   window.ipc.on('window-hook-message', listener);
 }
 

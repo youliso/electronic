@@ -202,12 +202,12 @@ export function fileOn() {
   ipcMain.handle(FileChannel.unlink, async (event, args) => unlink(args.path));
   ipcMain.handle(FileChannel.access, async (event, args) => access(args.path));
   ipcMain.handle(FileChannel.rename, async (event, args) => rename(args.path, args.newPath));
-  ipcMain.handle(FileChannel.readfile, async (event, args) => readFile(args.path, args.options));
-  ipcMain.handle(FileChannel.readline, async (event, args) => readLine(args.path, args.index));
-  ipcMain.handle(FileChannel.writefile, async (event, args) =>
+  ipcMain.handle(FileChannel.readFile, async (event, args) => readFile(args.path, args.options));
+  ipcMain.handle(FileChannel.readLine, async (event, args) => readLine(args.path, args.index));
+  ipcMain.handle(FileChannel.writeFile, async (event, args) =>
     writeFile(args.path, args.data, args.options)
   );
-  ipcMain.handle(FileChannel.appendfile, async (event, args) =>
+  ipcMain.handle(FileChannel.appendFile, async (event, args) =>
     appendFile(args.path, args.data, args.options)
   );
 }

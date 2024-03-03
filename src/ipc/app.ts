@@ -41,7 +41,7 @@ export async function getGlobal<T>(key: string): Promise<T> {
  * app退出
  */
 export function quit() {
-  window.ipc.send(AppChannel.Quit);
+  window.ipc.send(AppChannel.quit);
 }
 
 /**
@@ -49,7 +49,7 @@ export function quit() {
  * @param once 是否立即重启
  */
 export function relaunch(once: boolean): void {
-  return window.ipc.send(AppChannel.Relaunch, once);
+  return window.ipc.send(AppChannel.relaunch, once);
 }
 
 /**
@@ -57,21 +57,21 @@ export function relaunch(once: boolean): void {
  * @returns
  */
 export async function getAppInfo(): Promise<AppInfo> {
-  return await window.ipc.invoke(AppChannel.InfoGet);
+  return await window.ipc.invoke(AppChannel.getInfo);
 }
 
 /**
  * app常用获取路径
  */
 export async function getAppPath(key: AppPathKey): Promise<string> {
-  return await window.ipc.invoke(AppChannel.PathGet, key);
+  return await window.ipc.invoke(AppChannel.getPath, key);
 }
 
 /**
  * app打开url
  */
 export async function openUrl(url: string): Promise<void> {
-  return await window.ipc.invoke(AppChannel.OpenUrl, url);
+  return await window.ipc.invoke(AppChannel.openUrl, url);
 }
 
 /**
