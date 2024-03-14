@@ -4,21 +4,23 @@ import { windowInstance } from './window';
 
 export interface TrayOptions {
   name: string;
-  iconPath: string,
-  menuTemplate?: Array<(MenuItemConstructorOptions) | (MenuItem)>
+  iconPath: string;
+  menuTemplate?: Array<MenuItemConstructorOptions | MenuItem>;
 }
 
-export function getMenuTemplate(items?: Array<(MenuItemConstructorOptions) | (MenuItem)>) {
-  return Menu.buildFromTemplate(items || [
-    {
-      label: '显示',
-      click: () => windowInstance.func('show')
-    },
-    {
-      label: '退出',
-      click: () => app.quit()
-    }
-  ]);
+export function getMenuTemplate(items?: Array<MenuItemConstructorOptions | MenuItem>) {
+  return Menu.buildFromTemplate(
+    items || [
+      {
+        label: '显示',
+        click: () => windowInstance.func('show')
+      },
+      {
+        label: '退出',
+        click: () => app.quit()
+      }
+    ]
+  );
 }
 
 export function createTray(opt: TrayOptions) {
