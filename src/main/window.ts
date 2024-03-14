@@ -119,27 +119,37 @@ export interface WindowDefaultCfg {
   /**
    * 默认html加载方式
    */
-  defaultLoadType?: 'file' | 'url';
+  defaultLoadType: 'file' | 'url';
+
   /**
    * 默认html加载路径
    */
-  defaultUrl?: string;
+  defaultUrl: string;
+
   /**
    * 默认Preload加载路径
    */
-  defaultPreload?: string;
-  /**
-   * 窗口默认参数
-   */
-  defaultCustomize?: Customize;
-  /**
-   * 窗口默认参数
-   */
-  defaultBrowserWindowOptions?: Electron.BrowserWindowConstructorOptions;
+  defaultPreload: string;
 }
 
 export class Window {
   private static instance: Window;
+
+  /**
+   * 默认html加载方式
+   */
+  defaultLoadType?: 'file' | 'url';
+
+  /**
+   * 默认html加载路径
+   */
+  defaultUrl?: string;
+
+  /**
+   * 默认Preload加载路径
+   */
+  defaultPreload?: string;
+
   /**
    * 创建拦截器
    */
@@ -148,26 +158,6 @@ export class Window {
     | ((
         opt: Electron.BrowserWindowConstructorOptions
       ) => Electron.BrowserWindowConstructorOptions) = undefined;
-  /**
-   * 默认html加载方式
-   */
-  public defaultLoadType: 'file' | 'url' = 'file';
-  /**
-   * 默认html加载路径
-   */
-  public defaultUrl: string = '';
-  /**
-   * 默认加载路径
-   */
-  public defaultPreload: string = '';
-  /**
-   * 窗口默认参数
-   */
-  public defaultCustomize: Customize = {};
-  /**
-   * 窗口默认参数
-   */
-  public defaultBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {};
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
@@ -180,8 +170,6 @@ export class Window {
     cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
     cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
     cfg.defaultPreload && (this.defaultPreload = cfg.defaultPreload);
-    this.defaultCustomize = cfg.defaultCustomize || {};
-    this.defaultBrowserWindowOptions = cfg.defaultBrowserWindowOptions || {};
   }
 
   /**

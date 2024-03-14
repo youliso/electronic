@@ -26,7 +26,7 @@ export interface Customize {
   /**
    * 加载方式（默认url）
    */
-  loadType?: string;
+  loadType?: 'url' | 'file';
   /**
    * 基于父/主窗口位置默认（center）
    */

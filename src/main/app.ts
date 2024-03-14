@@ -1,3 +1,5 @@
+import type { BrowserWindowConstructorOptions } from 'electron';
+import type { Customize } from '../types';
 import { app, ipcMain, shell } from 'electron';
 import { resolve } from 'path';
 import { logError } from './log';
@@ -14,7 +16,52 @@ export interface AppBeforeOptions {
    * 后续实例启动时是否聚焦到第一实例
    */
   isFocusMainWin?: boolean;
+
+  /**
+   * isFocusMainWin为否时需穿如新窗口参数
+   */
+  customize?: Customize;
+
+  /**
+   * isFocusMainWin为否时需穿如新窗口参数
+   */
+  browserWindowOptions?: BrowserWindowConstructorOptions;
 }
+
+/**
+ * appReday之前监听
+ * 单例锁定
+ * @param options
+ */
+export const appSingleInstanceLock = (options: AppBeforeOptions) => {
+  // 默认单例根据自己需要改
+  if (!app.requestSingleInstanceLock(options?.additionalData)) app.quit();
+  else {
+    app.on('second-instance', (event, argv) => {
+      //是否多窗口聚焦到第一实例
+      if (options?.isFocusMainWin) {
+        const main = windowInstance.getMain();
+        if (main) {
+          if (main.isMinimized()) main.restore();
+          main.show();
+          main.focus();
+        }
+        return;
+      }
+      if (!options?.customize || !options?.browserWindowOptions) {
+        throw new Error('not [second-instance] options?customize || options?.browserWindowOptions');
+      }
+      const win = windowInstance.create(
+        {
+          ...options.customize,
+          argv
+        },
+        options.browserWindowOptions
+      );
+      win && windowInstance.load(win).catch(logError);
+    });
+  }
+};
 
 /**
  * 协议注册 (需appReday之前)
@@ -30,33 +77,9 @@ export const appProtocolRegister = (appName?: string) => {
 
 /**
  * appReday之前监听
- * @param options
+ * 监听渲染进程&子进程崩溃
  */
-export const appBeforeOn = (options: AppBeforeOptions) => {
-  // 默认单例根据自己需要改
-  if (!app.requestSingleInstanceLock(options?.additionalData)) app.quit();
-  else {
-    app.on('second-instance', (event, argv) => {
-      //是否多窗口聚焦到第一实例
-      if (options?.isFocusMainWin) {
-        const main = windowInstance.getMain();
-        if (main) {
-          if (main.isMinimized()) main.restore();
-          main.show();
-          main.focus();
-        }
-        return;
-      }
-      const win = windowInstance.create(
-        {
-          ...windowInstance.defaultCustomize,
-          argv
-        },
-        windowInstance.defaultBrowserWindowOptions
-      );
-      win && windowInstance.load(win).catch(logError);
-    });
-  }
+export const appErrorOn = () => {
   // 渲染进程崩溃监听
   app.on('render-process-gone', (event, webContents, details) =>
     logError(
@@ -70,27 +93,13 @@ export const appBeforeOn = (options: AppBeforeOptions) => {
   app.on('child-process-gone', (event, details) =>
     logError('[child-process-gone]', JSON.stringify(details))
   );
-  // 关闭所有窗口退出
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
-  });
 };
 
 /**
  * appReday之后监听
  * @param options
  */
-export const appOn = () => {
-  // darwin
-  app.on('activate', () => {
-    if (windowInstance.getAll().length === 0) {
-      const win = windowInstance.create(
-        windowInstance.defaultCustomize,
-        windowInstance.defaultBrowserWindowOptions
-      );
-      win && windowInstance.load(win).catch(logError);
-    }
-  });
+export const appAfterOn = () => {
   // 获得焦点时发出
   app.on('browser-window-focus', () => {
     // 关闭刷新
