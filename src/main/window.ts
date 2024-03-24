@@ -11,6 +11,7 @@ import type {
   WindowFuncOpt,
   WindowStatusOpt
 } from '../types';
+import { endianness } from 'os';
 import { app, screen, ipcMain, BrowserWindow, webContents } from 'electron';
 import { logError } from './log';
 import { WindowChannel } from '../preload/channel';
@@ -115,6 +116,10 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
   });
 }
 
+function readBufferByOS(buf: Buffer) {
+  return endianness() == 'LE' ? buf.readInt32LE() : buf.readInt32BE();
+}
+
 export interface WindowDefaultCfg {
   /**
    * 默认html加载方式
@@ -203,6 +208,21 @@ export class Window {
       }
     }
     return win;
+  }
+
+  /**
+   * 获取窗口hwnd
+   * @param id
+   * @returns
+   */
+  getHWnd(id?: number) {
+    let win;
+    id ? (win = this.get(id)) : (win = this.getMain());
+    if (!win) {
+      console.error('Invalid id, the id can not be a empty');
+      return;
+    }
+    return readBufferByOS(win.getNativeWindowHandle());
   }
 
   /**
