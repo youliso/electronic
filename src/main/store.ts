@@ -39,7 +39,7 @@ export class Store {
         const c = conf[index];
         try {
           const cfg = (await readFile(c.path, c.opt || { encoding: 'utf-8' })) as any;
-          if (cfg) this.sendGlobal(c.seat, c.parse ? JSON.parse(cfg) : cfg);
+          if (cfg) this.set(c.seat, c.parse ? JSON.parse(cfg) : cfg);
         } catch (e) {
           logError(`[cfg ${c.path}]`, e);
         }
@@ -47,14 +47,14 @@ export class Store {
     } else {
       try {
         const cfg = (await readFile(conf.path, conf.opt || { encoding: 'utf-8' })) as any;
-        if (cfg) this.sendGlobal(conf.seat, conf.parse ? JSON.parse(cfg) : cfg);
+        if (cfg) this.set(conf.seat, conf.parse ? JSON.parse(cfg) : cfg);
       } catch (e) {
         logError(`[cfg ${conf.path}]`, e);
       }
     }
   }
 
-  getGlobal<Value>(key: string): Value | undefined {
+  get<Value>(key: string): Value | undefined {
     if (key === '') {
       console.error('Invalid key, the key can not be a empty string');
       return;
@@ -77,7 +77,7 @@ export class Store {
     return cur as unknown as Value;
   }
 
-  sendGlobal<Value>(key: string, value: Value, exists: boolean = false): void {
+  set<Value>(key: string, value: Value, exists: boolean = false): void {
     if (key === '') {
       console.error('Invalid key, the key can not be a empty string');
       return;
@@ -118,12 +118,12 @@ export class Store {
    */
   on() {
     //赋值(sharedObject)
-    ipcMain.handle(StoreChannel.set, (event, args) => {
-      return this.sendGlobal(args.key, args.value);
+    ipcMain.handle(StoreChannel.set, (event, { key, value }) => {
+      return this.set(key, value);
     });
     //获取(sharedObject)
-    ipcMain.handle(StoreChannel.get, (event, key) => {
-      return this.getGlobal(key);
+    ipcMain.handle(StoreChannel.get, (event, { key }) => {
+      return this.get(key);
     });
   }
 }

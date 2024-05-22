@@ -100,27 +100,28 @@ export enum WindowChannel {
 }
 
 export function getChannels() {
-  let keys = {
-    ...AppChannel,
-    ...ClipboardChannel,
-    ...FileChannel,
-    ...StoreChannel,
-    ...LogChannel,
-    ...MachineChannel,
-    ...PathChannel,
-    ...SessionChannel,
-    ...ShortcutChannel,
-    ...UpdateChannel,
-    ...ViewChannel,
-    ...WindowChannel
+  let channels = {
+    AppChannel,
+    ClipboardChannel,
+    FileChannel,
+    StoreChannel,
+    LogChannel,
+    MachineChannel,
+    PathChannel,
+    SessionChannel,
+    ShortcutChannel,
+    UpdateChannel,
+    ViewChannel,
+    WindowChannel
   };
-  let channels: string[] = [];
-  for (let key in keys) {
+  let channelValue: string[] = [];
+  for (let channel in channels) {
     // @ts-ignore
-    if (isNaN(key)) {
+    const keys = channels[channel];
+    for (let key in keys) {
       // @ts-ignore
-      channels.push(keys[key]);
+      isNaN(key) && channelValue.push(keys[key]);
     }
   }
-  return channels;
+  return channelValue;
 }

@@ -5,7 +5,7 @@ import { StoreChannel } from '../preload/channel';
  * @param key 键
  * @param value 值
  */
-export function sendStore(key: string, value: unknown): Promise<void> {
+export function setStore(key: string, value: unknown): Promise<void> {
   return window.ipc.invoke(StoreChannel.set, {
     key,
     value
@@ -17,5 +17,5 @@ export function sendStore(key: string, value: unknown): Promise<void> {
  * @param key 键
  */
 export function getStore<T>(key: string): Promise<T> {
-  return window.ipc.invoke(StoreChannel.get, key);
+  return window.ipc.invoke(StoreChannel.get, { key });
 }
