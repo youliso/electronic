@@ -11,6 +11,9 @@
       window.ipc.once('window-load', (args) => {
         console.log(args);
         window.customize = args;
+
+        window.ipc.invoke('store-set', { key: 'test', value: 'test' }).then(console.log);
+        window.ipc.invoke('store-get', 'test').then(console.log);
       });
 
       document.getElementById('new').addEventListener('click', () => {

@@ -1,5 +1,5 @@
 import type { AppInfo, AppPathKey } from '../types';
-import { AppChannel, LogChannel, MachineChannel, StoreChannel } from '../preload/channel';
+import { AppChannel, LogChannel, MachineChannel } from '../preload/channel';
 
 /**
  * 日志(info)
@@ -15,26 +15,6 @@ export function logInfo(...args: any): void {
  */
 export function logError(...args: any): void {
   window.ipc.send(LogChannel.error, args);
-}
-
-/**
- * 设置全局参数
- * @param key 键
- * @param value 值
- */
-export async function sendGlobal(key: string, value: unknown): Promise<void> {
-  return await window.ipc.invoke(StoreChannel.set, {
-    key,
-    value
-  });
-}
-
-/**
- * 获取全局参数
- * @param key 键
- */
-export async function getGlobal<T>(key: string): Promise<T> {
-  return await window.ipc.invoke(StoreChannel.get, key);
 }
 
 /**

@@ -58,6 +58,7 @@ export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
   contextBridge.exposeInMainWorld('environment', {
     systemVersion: process.getSystemVersion(),
     platform: process.platform,
-    ...defaultEnv
+    ...defaultEnv,
+    channels
   });
 }

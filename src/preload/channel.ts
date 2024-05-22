@@ -25,8 +25,8 @@ export enum FileChannel {
 }
 
 export enum StoreChannel {
-  set = 'store-sharedObject-set',
-  get = 'store-sharedObject-get'
+  set = 'store-set',
+  get = 'store-get'
 }
 
 export enum LogChannel {

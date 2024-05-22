@@ -5,6 +5,7 @@ const {
   appErrorOn,
   appAfterOn,
   windowInstance,
+  storeInstance,
   logError
 } = require('../dist/main');
 
@@ -62,6 +63,8 @@ app
 
     // 窗口模块监听
     windowInstance.on();
+
+    storeInstance.on();
 
     // 创建窗口
     const win = windowInstance.create(customize, browserWindowOptions);
