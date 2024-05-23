@@ -226,6 +226,22 @@ export class Window {
   }
 
   /**
+   * 创建并加载窗口
+   */
+  async new(
+    customize: Customize,
+    bwOptions: BrowserWindowConstructorOptions = {},
+    loadOptions?: LoadOptions
+  ) {
+    const newWin = this.create(customize, bwOptions);
+    if (newWin) {
+      await this.load(newWin, loadOptions);
+      return newWin;
+    }
+    return null;
+  }
+
+  /**
    * 创建窗口
    * */
   create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
@@ -482,9 +498,8 @@ export class Window {
     ipcMain.handle(WindowChannel.status, async (event, args) => this.getStatus(args.type, args.id));
     // 创建窗口
     ipcMain.handle(WindowChannel.new, async (event, args) => {
-      const newWin = this.create(args.customize, args.windowOptions);
+      const newWin = await this.new(args.customize, args.windowOptions, args.loadOptions);
       if (newWin) {
-        await this.load(newWin, args.loadOptions);
         return {
           id: newWin.id,
           webContentsId: newWin.webContents.id

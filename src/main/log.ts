@@ -38,6 +38,7 @@ export function logInfo(...val: any): void {
       data += e;
     }
   });
+  !app.isPackaged && console.info(data);
   write('info', data);
 }
 
@@ -55,6 +56,7 @@ export function logWarn(...val: any): void {
       data += e;
     }
   });
+  !app.isPackaged && console.warn(data);
   write('warn', data);
 }
 
@@ -72,6 +74,7 @@ export function logError(...val: any): void {
       data += e;
     }
   });
+  !app.isPackaged && console.error(data);
   write('error', data);
 }
 
