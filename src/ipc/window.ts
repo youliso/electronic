@@ -3,10 +3,13 @@ import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } 
 import { WindowChannel } from '../preload/channel';
 
 /**
- * 窗口初始化 (i)
+ * 窗口初始化
  * */
-export function windowLoad(listener: (args: Customize) => void) {
-  window.electronic.once('window-load', listener);
+export function windowLoad(listener: () => void) {
+  window.electronic.once('window-load', (args) => {
+    window.customize = args;
+    listener();
+  });
 }
 
 /**
