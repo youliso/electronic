@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { Customize } from '../types';
-import { getChannels } from './channel';
+import { channels } from './channel';
 
 export interface Ipc {
   send: (channel: string, args?: any) => void;
@@ -25,8 +25,6 @@ declare global {
     environment: Environment;
   }
 }
-
-const channels = getChannels();
 
 export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
   contextBridge.exposeInMainWorld('ipc', {
@@ -58,7 +56,6 @@ export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
   contextBridge.exposeInMainWorld('environment', {
     systemVersion: process.getSystemVersion(),
     platform: process.platform,
-    ...defaultEnv,
-    channels
+    ...defaultEnv
   });
 }

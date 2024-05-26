@@ -99,7 +99,7 @@ export enum WindowChannel {
   getWinId = 'window-id-get'
 }
 
-export function getChannels() {
+const getChannels = () => {
   let channels = {
     AppChannel,
     ClipboardChannel,
@@ -124,4 +124,6 @@ export function getChannels() {
     }
   }
   return channelValue;
-}
+};
+
+export const channels = getChannels();

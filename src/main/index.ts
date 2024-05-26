@@ -4,7 +4,6 @@ export * from './file';
 export * from './store';
 export * from './log';
 export * from './machine';
-export * from './net';
 export * from './path';
 export * from './session';
 export * from './shortcut';
