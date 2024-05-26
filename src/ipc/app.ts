@@ -6,7 +6,7 @@ import { AppChannel, LogChannel, MachineChannel } from '../preload/channel';
  * @param args
  */
 export function logInfo(...args: any): void {
-  window.ipc.send(LogChannel.info, args);
+  window.electronic.send(LogChannel.info, args);
 }
 
 /**
@@ -14,14 +14,14 @@ export function logInfo(...args: any): void {
  * @param args
  */
 export function logError(...args: any): void {
-  window.ipc.send(LogChannel.error, args);
+  window.electronic.send(LogChannel.error, args);
 }
 
 /**
  * app退出
  */
 export function quit() {
-  window.ipc.send(AppChannel.quit);
+  window.electronic.send(AppChannel.quit);
 }
 
 /**
@@ -29,7 +29,7 @@ export function quit() {
  * @param once 是否立即重启
  */
 export function relaunch(once: boolean): void {
-  return window.ipc.send(AppChannel.relaunch, once);
+  return window.electronic.send(AppChannel.relaunch, once);
 }
 
 /**
@@ -37,26 +37,26 @@ export function relaunch(once: boolean): void {
  * @returns
  */
 export async function getAppInfo(): Promise<AppInfo> {
-  return await window.ipc.invoke(AppChannel.getInfo);
+  return await window.electronic.invoke(AppChannel.getInfo);
 }
 
 /**
  * app常用获取路径
  */
 export async function getAppPath(key: AppPathKey): Promise<string> {
-  return await window.ipc.invoke(AppChannel.getPath, key);
+  return await window.electronic.invoke(AppChannel.getPath, key);
 }
 
 /**
  * app打开url
  */
 export async function openUrl(url: string): Promise<void> {
-  return await window.ipc.invoke(AppChannel.openUrl, url);
+  return await window.electronic.invoke(AppChannel.openUrl, url);
 }
 
 /**
  * 获取设备唯一吗
  */
 export async function getMachineGuid(): Promise<string> {
-  return await window.ipc.invoke(MachineChannel.get);
+  return await window.electronic.invoke(MachineChannel.get);
 }

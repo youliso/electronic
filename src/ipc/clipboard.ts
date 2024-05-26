@@ -5,7 +5,7 @@ import { ClipboardChannel } from '../preload/channel';
  * @param type
  */
 export async function clipboardReadText(type?: 'selection' | 'clipboard'): Promise<string> {
-  return await window.ipc.invoke(ClipboardChannel.readText, { type });
+  return await window.electronic.invoke(ClipboardChannel.readText, { type });
 }
 
 /**
@@ -13,5 +13,5 @@ export async function clipboardReadText(type?: 'selection' | 'clipboard'): Promi
  * @param text
  */
 export async function clipboardWriteText(text: string): Promise<void> {
-  return await window.ipc.invoke(ClipboardChannel.writeText, { text });
+  return await window.electronic.invoke(ClipboardChannel.writeText, { text });
 }

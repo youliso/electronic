@@ -6,49 +6,49 @@ import { WindowChannel } from '../preload/channel';
  * 窗口初始化 (i)
  * */
 export function windowLoad(listener: (args: Customize) => void) {
-  window.ipc.once('window-load', listener);
+  window.electronic.once('window-load', listener);
 }
 
 /**
  * 窗口数据更新
  */
 export function windowUpdateCustomize(customize: Customize) {
-  window.ipc.send(WindowChannel.update, customize);
+  window.electronic.send(WindowChannel.update, customize);
 }
 
 /**
  * usb插拔消息监听
  */
 export function windowHookMessageUSB(listener: (wParam: Buffer, lParam: Buffer) => void) {
-  window.ipc.on('window-hook-message', listener);
+  window.electronic.on('window-hook-message', listener);
 }
 
 /**
  * 窗口聚焦失焦监听
  */
 export function windowBlurFocusOn(listener: (args: 'blur' | 'focus') => void) {
-  window.ipc.on('window-blur-focus', listener);
+  window.electronic.on('window-blur-focus', listener);
 }
 
 /**
  * 关闭窗口聚焦失焦监听
  */
 export function windowBlurFocusRemove() {
-  window.ipc.removeAllListeners('window-blur-focus');
+  window.electronic.removeAllListeners('window-blur-focus');
 }
 
 /**
  * 窗口大小化监听
  */
 export function windowMaximizeOn(listener: (args: 'maximize' | 'unmaximize') => void) {
-  window.ipc.on('window-maximize-status', listener);
+  window.electronic.on('window-maximize-status', listener);
 }
 
 /**
  * 关闭窗口大小化监听
  */
 export function windowMaximizeRemove() {
-  window.ipc.removeAllListeners('window-maximize-status');
+  window.electronic.removeAllListeners('window-maximize-status');
 }
 
 /**
@@ -58,7 +58,7 @@ export function windowMessageOnce(channel: string, listener: (args: any) => void
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.once(`window-message-${channel}-back`, listener);
+  window.electronic.once(`window-message-${channel}-back`, listener);
 }
 
 /**
@@ -68,7 +68,7 @@ export function windowMessageOn(channel: string, listener: (args: any) => void) 
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.on(`window-message-${channel}-back`, listener);
+  window.electronic.on(`window-message-${channel}-back`, listener);
 }
 
 /**
@@ -78,7 +78,7 @@ export function windowMessageRemove(channel: string) {
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.removeAllListeners(`window-message-${channel}-back`);
+  window.electronic.removeAllListeners(`window-message-${channel}-back`);
 }
 
 /**
@@ -93,7 +93,7 @@ export function windowMessageSend(
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.send(WindowChannel.sendMessage, {
+  window.electronic.send(WindowChannel.sendMessage, {
     channel,
     value,
     acceptIds,
@@ -109,7 +109,7 @@ export function windowMessageContentsOnce(channel: string, listener: (args: any)
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.once(`window-message-contents-${channel}-back`, listener);
+  window.electronic.once(`window-message-contents-${channel}-back`, listener);
 }
 
 /**
@@ -119,7 +119,7 @@ export function windowMessageContentsOn(channel: string, listener: (args: any) =
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.on(`window-message-contents-${channel}-back`, listener);
+  window.electronic.on(`window-message-contents-${channel}-back`, listener);
 }
 
 /**
@@ -129,7 +129,7 @@ export function windowMessageContentsRemove(channel: string) {
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.removeAllListeners(`window-message-contents-${channel}-back`);
+  window.electronic.removeAllListeners(`window-message-contents-${channel}-back`);
 }
 
 /**
@@ -144,7 +144,7 @@ export function windowMessageContentsSend(
   if (!channel) {
     throw new Error('not channel');
   }
-  window.ipc.send(WindowChannel.sendMessageContents, {
+  window.electronic.send(WindowChannel.sendMessageContents, {
     channel,
     value,
     acceptIds,
@@ -165,7 +165,7 @@ export function windowCreate(
   windowOptions?: BrowserWindowConstructorOptions,
   loadOptions?: LoadOptions
 ): Promise<{ id: number; webContentsId: number } | undefined> {
-  return window.ipc.invoke(WindowChannel.new, { customize, windowOptions, loadOptions });
+  return window.electronic.invoke(WindowChannel.new, { customize, windowOptions, loadOptions });
 }
 
 /**
@@ -173,9 +173,9 @@ export function windowCreate(
  */
 export async function windowStatus(
   type: WindowStatusOpt,
-  id: number = window.customize.winId!
+  id: number = window.customize.winId
 ): Promise<boolean> {
-  return await window.ipc.invoke(WindowChannel.status, { type, id });
+  return await window.electronic.invoke(WindowChannel.status, { type, id });
 }
 
 /**
@@ -184,9 +184,9 @@ export async function windowStatus(
 export function windowAlwaysOnTop(
   is: boolean,
   type?: WindowAlwaysOnTopOpt,
-  id: number = window.customize.winId!
+  id: number = window.customize.winId
 ) {
-  window.ipc.send(WindowChannel.setAlwaysTop, { id, is, type });
+  window.electronic.send(WindowChannel.setAlwaysTop, { id, is, type });
 }
 
 /**
@@ -196,9 +196,9 @@ export function windowSetSize(
   size: number[],
   resizable: boolean = true,
   center: boolean = false,
-  id: number = window.customize.winId!
+  id: number = window.customize.winId
 ) {
-  window.ipc.send(WindowChannel.setSize, { id, size, resizable, center });
+  window.electronic.send(WindowChannel.setSize, { id, size, resizable, center });
 }
 
 /**
@@ -207,30 +207,30 @@ export function windowSetSize(
 export function windowSetMaxMinSize(
   type: 'max' | 'min',
   size: number[],
-  id: number = window.customize.winId!
+  id: number = window.customize.winId
 ) {
-  window.ipc.send(WindowChannel.setMinMaxSize, { type, id, size });
+  window.electronic.send(WindowChannel.setMinMaxSize, { type, id, size });
 }
 
 /**
  * 设置窗口背景颜色
  */
-export function windowSetBackgroundColor(color: string, id: number = window.customize.winId!) {
-  window.ipc.send(WindowChannel.setBackgroundColor, { id, color });
+export function windowSetBackgroundColor(color: string, id: number = window.customize.winId) {
+  window.electronic.send(WindowChannel.setBackgroundColor, { id, color });
 }
 
 /**
  * 最大化&最小化当前窗口
  */
-export function windowMaxMin(id: number = window.customize.winId!) {
-  window.ipc.send(WindowChannel.maxMinSize, id);
+export function windowMaxMin(id: number = window.customize.winId) {
+  window.electronic.send(WindowChannel.maxMinSize, id);
 }
 
 /**
  * 关闭窗口 (传id则对应窗口否则全部窗口)
  */
-export function windowClose(id: number = window.customize.winId!) {
-  window.ipc.send(WindowChannel.func, { type: 'close', id });
+export function windowClose(id: number = window.customize.winId) {
+  window.electronic.send(WindowChannel.func, { type: 'close', id });
 }
 
 /**
@@ -238,45 +238,41 @@ export function windowClose(id: number = window.customize.winId!) {
  * @param id 窗口id
  * @param time 延迟显示时间
  */
-export function windowShow(time: number = 0, id: number = window.customize.winId!) {
-  setTimeout(() => window.ipc.send(WindowChannel.func, { type: 'show', id }), time);
+export function windowShow(time: number = 0, id: number = window.customize.winId) {
+  setTimeout(() => window.electronic.send(WindowChannel.func, { type: 'show', id }), time);
 }
 
 /**
  * 窗口隐藏
  */
-export function windowHide(id: number = window.customize.winId!) {
-  window.ipc.send(WindowChannel.func, { type: 'hide', id });
+export function windowHide(id: number = window.customize.winId) {
+  window.electronic.send(WindowChannel.func, { type: 'hide', id });
 }
 
 /**
  * 最小化窗口 (传id则对应窗口否则全部窗口)
  */
-export function windowMin(id: number = window.customize.winId!) {
-  window.ipc.send(WindowChannel.func, { type: 'minimize', id });
+export function windowMin(id: number = window.customize.winId) {
+  window.electronic.send(WindowChannel.func, { type: 'minimize', id });
 }
 
 /**
  * 最大化窗口 (传id则对应窗口否则全部窗口)
  */
-export function windowMax(id: number = window.customize.winId!) {
-  window.ipc.send(WindowChannel.func, { type: 'maximize', id });
+export function windowMax(id: number = window.customize.winId) {
+  window.electronic.send(WindowChannel.func, { type: 'maximize', id });
 }
 
 /**
  * window函数
  */
-export function windowFunc(
-  type: WindowFuncOpt,
-  data?: any[],
-  id: number = window.customize.winId!
-) {
-  window.ipc.send(WindowChannel.func, { type, data, id });
+export function windowFunc(type: WindowFuncOpt, data?: any[], id: number = window.customize.winId) {
+  window.electronic.send(WindowChannel.func, { type, data, id });
 }
 
 /**
  * 通过路由获取窗口id (不传route查全部)
  */
 export async function windowIdGet(route?: string): Promise<number[]> {
-  return await window.ipc.invoke(WindowChannel.getWinId, { route });
+  return await window.electronic.invoke(WindowChannel.getWinId, { route });
 }

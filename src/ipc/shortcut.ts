@@ -6,7 +6,7 @@ import { ShortcutChannel } from '../preload/channel';
  * @param listener
  */
 export function shortcutOn(listener: (args: any) => void) {
-  window.ipc.on(`shortcut-back`, listener);
+  window.electronic.on(`shortcut-back`, listener);
 }
 
 /**
@@ -15,7 +15,7 @@ export function shortcutOn(listener: (args: any) => void) {
  * @param key
  */
 export async function shortcut(name: string, key: string | string[]): Promise<void> {
-  return await window.ipc.invoke(ShortcutChannel.register, { name, key });
+  return await window.electronic.invoke(ShortcutChannel.register, { name, key });
 }
 
 /**
@@ -23,7 +23,7 @@ export async function shortcut(name: string, key: string | string[]): Promise<vo
  * @param key
  */
 export async function shortcutUn(key?: string): Promise<void> {
-  return await window.ipc.invoke(ShortcutChannel.unregister, key);
+  return await window.electronic.invoke(ShortcutChannel.unregister, key);
 }
 
 /**
@@ -31,7 +31,7 @@ export async function shortcutUn(key?: string): Promise<void> {
  * @param key
  */
 export async function shortcutGet(key?: string): Promise<Accelerator> {
-  return await window.ipc.invoke(ShortcutChannel.get, key);
+  return await window.electronic.invoke(ShortcutChannel.get, key);
 }
 
 /**

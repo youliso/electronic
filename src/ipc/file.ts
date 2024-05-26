@@ -7,28 +7,28 @@ import { FileChannel } from '../preload/channel';
  * @param fileName
  */
 export async function fileBySuffix(path: string, fileName: string) {
-  return await window.ipc.invoke(FileChannel.suffix, { path, fileName });
+  return await window.electronic.invoke(FileChannel.suffix, { path, fileName });
 }
 
 /**
  * 创建目录和内部文件
  * */
 export async function mkdir(path: string, options?: MakeDirectoryOptions) {
-  return await window.ipc.invoke(FileChannel.mkdir, { path, options });
+  return await window.electronic.invoke(FileChannel.mkdir, { path, options });
 }
 
 /**
  * 删除目录和内部文件
  * */
 export async function delDir(path: string) {
-  return await window.ipc.invoke(FileChannel.deldir, { path });
+  return await window.electronic.invoke(FileChannel.deldir, { path });
 }
 
 /**
  * 删除文件
  * */
 export async function unlink(path: string) {
-  return await window.ipc.invoke(FileChannel.unlink, { path });
+  return await window.electronic.invoke(FileChannel.unlink, { path });
 }
 
 /**
@@ -36,7 +36,7 @@ export async function unlink(path: string) {
  * @return 0 不存在 1 只可读 2 存在可读写
  */
 export async function access(path: string) {
-  return await window.ipc.invoke(FileChannel.access, { path });
+  return await window.electronic.invoke(FileChannel.access, { path });
 }
 
 /**
@@ -44,7 +44,7 @@ export async function access(path: string) {
  * @return 0 失败 1 成功
  */
 export async function rename(path: string, newPath: string) {
-  return await window.ipc.invoke(FileChannel.rename, { path, newPath });
+  return await window.electronic.invoke(FileChannel.rename, { path, newPath });
 }
 
 /**
@@ -56,7 +56,7 @@ export async function readFile(
   path: string,
   options?: { encoding?: BufferEncoding; flag?: string }
 ) {
-  return await window.ipc.invoke(FileChannel.readFile, { path, options });
+  return await window.electronic.invoke(FileChannel.readFile, { path, options });
 }
 
 /**
@@ -65,7 +65,7 @@ export async function readFile(
  * @param index
  */
 export async function readLine(path: string, index?: number): Promise<string | any[]> {
-  return await window.ipc.invoke(FileChannel.readLine, { path, index });
+  return await window.electronic.invoke(FileChannel.readLine, { path, index });
 }
 
 /**
@@ -77,7 +77,7 @@ export async function writeFile(
   data: string | Buffer,
   options?: { encoding?: BufferEncoding; mode?: number | string; flag?: string }
 ) {
-  return await window.ipc.invoke(FileChannel.writeFile, { path, data, options });
+  return await window.electronic.invoke(FileChannel.writeFile, { path, data, options });
 }
 
 /**
@@ -89,5 +89,5 @@ export async function appendFile(
   data: string | Uint8Array,
   options?: { encoding?: BufferEncoding; mode?: number | string; flag?: string }
 ) {
-  return await window.ipc.invoke(FileChannel.appendFile, { path, data, options });
+  return await window.electronic.invoke(FileChannel.appendFile, { path, data, options });
 }

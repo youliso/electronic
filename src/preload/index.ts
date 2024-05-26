@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { Customize } from '../types';
 import { channels } from './channel';
 
-export interface Ipc {
+export interface Electronic {
   send: (channel: string, args?: any) => void;
   sendSync: (channel: string, args?: any) => any;
   on: (channel: string, listener: (...args: any[]) => void) => void;
@@ -13,21 +13,22 @@ export interface Ipc {
 
 export interface Environment {
   [key: string]: any;
-
-  systemVersion: string;
   platform: NodeJS.Platform;
 }
 
 declare global {
   interface Window {
-    ipc: Ipc;
-    customize: Customize;
+    electronic: Electronic;
+    customize: Omit<Customize, 'winId' | 'webContentsId'> & {
+      winId: number;
+      webContentsId: number;
+    };
     environment: Environment;
   }
 }
 
 export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
-  contextBridge.exposeInMainWorld('ipc', {
+  contextBridge.exposeInMainWorld('electronic', {
     send: (channel: string, args?: any) => {
       if (!channels.includes(channel)) {
         throw new Error('not func: ' + channel);
@@ -54,7 +55,6 @@ export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
   });
 
   contextBridge.exposeInMainWorld('environment', {
-    systemVersion: process.getSystemVersion(),
     platform: process.platform,
     ...defaultEnv
   });

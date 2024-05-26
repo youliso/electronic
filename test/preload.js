@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('ipc', {
+contextBridge.exposeInMainWorld('electronic', {
   send: (channel, args) => ipcRenderer.send(channel, args),
   sendSync: (channel, args) => ipcRenderer.sendSync(channel, args),
   on: (channel, listener) => ipcRenderer.on(channel, (_, ...args) => listener(...args)),
@@ -10,6 +10,5 @@ contextBridge.exposeInMainWorld('ipc', {
 });
 
 contextBridge.exposeInMainWorld('environment', {
-  systemVersion: process.getSystemVersion(),
   platform: process.platform
 });

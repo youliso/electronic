@@ -9,7 +9,7 @@ export function sessionHeadersSet(
   url: string,
   value: { [key: string]: string }
 ) {
-  window.ipc.send(SessionChannel.setHeaders, { type, url, value });
+  window.electronic.send(SessionChannel.setHeaders, { type, url, value });
 }
 
 /**
@@ -17,7 +17,7 @@ export function sessionHeadersSet(
  * @param args
  */
 export function sessionCookiesGet(args: CookiesGetFilter) {
-  return window.ipc.invoke(SessionChannel.getCookies, args);
+  return window.electronic.invoke(SessionChannel.getCookies, args);
 }
 
 /**
@@ -25,7 +25,7 @@ export function sessionCookiesGet(args: CookiesGetFilter) {
  * @param args
  */
 export async function sessionCookiesSet(args: CookiesSetDetails) {
-  return window.ipc.invoke(SessionChannel.setCookies, args);
+  return window.electronic.invoke(SessionChannel.setCookies, args);
 }
 
 /**
@@ -34,5 +34,5 @@ export async function sessionCookiesSet(args: CookiesSetDetails) {
  * @param name
  */
 export async function sessionCookiesRemove(url: string, name: string) {
-  return window.ipc.invoke(SessionChannel.unCookies, { url, name });
+  return window.electronic.invoke(SessionChannel.unCookies, { url, name });
 }
