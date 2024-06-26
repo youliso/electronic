@@ -13,6 +13,15 @@ export function windowLoad(listener: () => void) {
 }
 
 /**
+ * 窗口再次创建后触发
+ */
+export function windowSingleCustomizeOn<T>(listener: (data: T) => void) {
+  window.electronic.on('window-single-customize', (data) => {
+    listener(data);
+  });
+}
+
+/**
  * 窗口数据更新
  */
 export function windowUpdateCustomize(customize: Customize) {

@@ -161,15 +161,15 @@ export class Window {
   public interceptor:
     | undefined
     | ((
-        opt: Electron.BrowserWindowConstructorOptions
-      ) => Electron.BrowserWindowConstructorOptions) = undefined;
+      opt: Electron.BrowserWindowConstructorOptions
+    ) => Electron.BrowserWindowConstructorOptions) = undefined;
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
     return Window.instance;
   }
 
-  constructor() {}
+  constructor() { }
 
   setDefaultCfg(cfg: WindowDefaultCfg) {
     cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
@@ -248,7 +248,7 @@ export class Window {
     if (customize.isOneWindow && !customize.url) {
       for (const i of this.getAll()) {
         if (customize?.route && customize.route === i.customize?.route) {
-          i.focus();
+          i.webContents.send('window-single-customize', customize.data)
           return;
         }
       }
