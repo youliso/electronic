@@ -3,7 +3,7 @@
   "version": "2.4.3",
   "description": "electron modules",
   "scripts": {
-    "build": "rollup -c rollup.config.mjs && node build.mjs --max-old-space-size=8092",
+    "build": "rollup -c rollup.config.mjs && node build.mjs",
     "fix:prettier": "prettier \"./src\" --write --config .prettierrc",
     "test:prettier": "prettier \"./src\" --list-different --config .prettierrc",
     "test": "npx electron ./test/main.js"
