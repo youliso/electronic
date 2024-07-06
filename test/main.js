@@ -2,11 +2,9 @@ const { join } = require('path');
 const { app } = require('electron');
 const {
   appSingleInstanceLock,
-  appErrorOn,
   appAfterOn,
   windowInstance,
-  storeInstance,
-  logError
+  storeInstance
 } = require('../dist/main');
 
 // 设置窗口管理默认参数
@@ -31,9 +29,6 @@ let browserWindowOptions = {
   }
 };
 
-// 崩溃监听
-appErrorOn();
-
 // 单例锁定
 appSingleInstanceLock({
   isFocusMainWin: false,
@@ -45,29 +40,26 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-app
-  .whenReady()
-  .then(() => {
-    app.on('activate', () => {
-      if (windowInstance.getAll().length === 0) {
-        const win = windowInstance.create(
-          windowInstance.defaultCustomize,
-          windowInstance.defaultBrowserWindowOptions
-        );
-        win && windowInstance.load(win).catch(logError);
-      }
-    });
+app.whenReady().then(() => {
+  app.on('activate', () => {
+    if (windowInstance.getAll().length === 0) {
+      const win = windowInstance.create(
+        windowInstance.defaultCustomize,
+        windowInstance.defaultBrowserWindowOptions
+      );
+      win && windowInstance.load(win).catch(logError);
+    }
+  });
 
-    // 基础模块监听
-    appAfterOn();
+  // 基础模块监听
+  appAfterOn();
 
-    // 窗口模块监听
-    windowInstance.on();
+  // 窗口模块监听
+  windowInstance.on();
 
-    storeInstance.on();
+  storeInstance.on();
 
-    // 创建窗口
-    const win = windowInstance.create(customize, browserWindowOptions);
-    win && windowInstance.load(win, { openDevTools: true }).catch(logError);
-  })
-  .catch(logError);
+  // 创建窗口
+  const win = windowInstance.create(customize, browserWindowOptions);
+  win && windowInstance.load(win, { openDevTools: true });
+});
