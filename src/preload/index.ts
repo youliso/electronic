@@ -15,7 +15,6 @@ declare global {
     customize: Omit<Customize, 'winId' | 'webContentsId'> & {
       winId: number;
       webContentsId: number;
-      platform: NodeJS.Platform;
     };
   }
 }
