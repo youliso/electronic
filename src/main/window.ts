@@ -13,7 +13,6 @@ import type {
 } from '../types';
 import { endianness } from 'os';
 import { app, screen, ipcMain, BrowserWindow, webContents } from 'electron';
-import { logError } from './log';
 import { WindowChannel } from '../preload/channel';
 
 declare global {
@@ -111,7 +110,7 @@ function windowOpenHandler(webContents: WebContents, parentId?: number) {
       url,
       parentId
     });
-    win && windowInstance.load(win).catch(logError);
+    win && windowInstance.load(win);
     return { action: 'deny' };
   });
 }
@@ -161,15 +160,15 @@ export class Window {
   public interceptor:
     | undefined
     | ((
-      opt: Electron.BrowserWindowConstructorOptions
-    ) => Electron.BrowserWindowConstructorOptions) = undefined;
+        opt: Electron.BrowserWindowConstructorOptions
+      ) => Electron.BrowserWindowConstructorOptions) = undefined;
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
     return Window.instance;
   }
 
-  constructor() { }
+  constructor() {}
 
   setDefaultCfg(cfg: WindowDefaultCfg) {
     cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
@@ -248,7 +247,7 @@ export class Window {
     if (customize.isOneWindow && !customize.url) {
       for (const i of this.getAll()) {
         if (customize?.route && customize.route === i.customize?.route) {
-          i.webContents.send('window-single-customize', customize.data)
+          i.webContents.send('window-single-customize', customize.data);
           return;
         }
       }
@@ -281,7 +280,7 @@ export class Window {
   /**
    * 窗口加载
    */
-  async load(win: BrowserWindow, loadOptions?: LoadOptions) {
+  load(win: BrowserWindow, loadOptions?: LoadOptions) {
     if (!win.customize.loadType) {
       throw new Error('[load] not loadType');
     }
@@ -318,16 +317,10 @@ export class Window {
 
     switch (win.customize.loadType) {
       case 'file':
-        await win
-          .loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions)
-          .catch(logError);
-        break;
+        return win.loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions);
       case 'url':
       default:
-        await win
-          .loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions)
-          .catch(logError);
-        break;
+        return win.loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions);
     }
   }
 
@@ -470,7 +463,7 @@ export class Window {
    */
   on() {
     // 窗口数据更新
-    ipcMain.on(WindowChannel.update, (event, args) => {
+    ipcMain.handle(WindowChannel.update, (event, args) => {
       if (args?.id) {
         const win = this.get(args.id);
         if (!win) {
@@ -481,7 +474,7 @@ export class Window {
       }
     });
     // 最大化最小化窗口
-    ipcMain.on(WindowChannel.maxMinSize, (event, id) => {
+    ipcMain.handle(WindowChannel.maxMinSize, (event, id) => {
       if (id !== null && id !== undefined) {
         const win = this.get(id);
         if (!win) {
@@ -493,7 +486,7 @@ export class Window {
       }
     });
     // 窗口消息
-    ipcMain.on(WindowChannel.func, (event, args) => this.func(args.type, args.id, args.data));
+    ipcMain.handle(WindowChannel.func, (event, args) => this.func(args.type, args.id, args.data));
     // 窗口状态
     ipcMain.handle(WindowChannel.status, async (event, args) => this.getStatus(args.type, args.id));
     // 创建窗口
@@ -508,17 +501,19 @@ export class Window {
       return null;
     });
     // 设置窗口是否置顶
-    ipcMain.on(WindowChannel.setAlwaysTop, (event, args) => this.setAlwaysOnTop(args));
+    ipcMain.handle(WindowChannel.setAlwaysTop, (event, args) => this.setAlwaysOnTop(args));
     // 设置窗口大小
-    ipcMain.on(WindowChannel.setSize, (event, args) => this.setSize(args));
+    ipcMain.handle(WindowChannel.setSize, (event, args) => this.setSize(args));
     // 设置窗口(最小/最大)大小
-    ipcMain.on(WindowChannel.setMinMaxSize, (event, args) =>
+    ipcMain.handle(WindowChannel.setMinMaxSize, (event, args) =>
       args.type === 'min' ? this.setMinSize(args) : this.setMaxSize(args)
     );
     // 设置窗口背景颜色
-    ipcMain.on(WindowChannel.setBackgroundColor, (event, args) => this.setBackgroundColor(args));
+    ipcMain.handle(WindowChannel.setBackgroundColor, (event, args) =>
+      this.setBackgroundColor(args)
+    );
     // 窗口消息
-    ipcMain.on(WindowChannel.sendMessage, (event, args) => {
+    ipcMain.handle(WindowChannel.sendMessage, (event, args) => {
       const channel = `window-message-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         for (const i of args.acceptIds) this.send(channel, args.value, i);
@@ -532,7 +527,7 @@ export class Window {
         }
       }
     });
-    ipcMain.on(WindowChannel.sendMessageContents, (event, args) => {
+    ipcMain.handle(WindowChannel.sendMessageContents, (event, args) => {
       const channel = `window-message-contents-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         for (const i of args.acceptIds) {

@@ -3,17 +3,10 @@ import { Customize } from '../types';
 import { channels } from './channel';
 
 export interface Electronic {
-  send: (channel: string, args?: any) => void;
-  sendSync: (channel: string, args?: any) => any;
   on: (channel: string, listener: (...args: any[]) => void) => void;
   once: (channel: string, listener: (...args: any[]) => void) => void;
   invoke: (channel: string, args?: any) => Promise<any>;
   removeAllListeners: (channel: string) => this;
-}
-
-export interface Environment {
-  [key: string]: any;
-  platform: NodeJS.Platform;
 }
 
 declare global {
@@ -22,12 +15,12 @@ declare global {
     customize: Omit<Customize, 'winId' | 'webContentsId'> & {
       winId: number;
       webContentsId: number;
+      platform: NodeJS.Platform;
     };
-    environment: Environment;
   }
 }
 
-export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
+export function preloadDefaultInit() {
   contextBridge.exposeInMainWorld('electronic', {
     send: (channel: string, args?: any) => {
       if (!channels.includes(channel)) {
@@ -52,10 +45,5 @@ export function preloadDefaultInit(defaultEnv?: { [key: string]: any }) {
     once: (channel: string, listener: (...args: any[]) => void) =>
       ipcRenderer.once(channel, (_, ...args) => listener(...args)),
     removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
-  });
-
-  contextBridge.exposeInMainWorld('environment', {
-    platform: process.platform,
-    ...defaultEnv
   });
 }

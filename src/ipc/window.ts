@@ -25,7 +25,7 @@ export function windowSingleCustomizeOn<T>(listener: (data: T) => void) {
  * 窗口数据更新
  */
 export function windowUpdateCustomize(customize: Customize) {
-  window.electronic.send(WindowChannel.update, customize);
+  return window.electronic.invoke(WindowChannel.update, customize);
 }
 
 /**
@@ -105,7 +105,7 @@ export function windowMessageSend(
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.send(WindowChannel.sendMessage, {
+  return window.electronic.invoke(WindowChannel.sendMessage, {
     channel,
     value,
     acceptIds,
@@ -156,7 +156,7 @@ export function windowMessageContentsSend(
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.send(WindowChannel.sendMessageContents, {
+  return window.electronic.invoke(WindowChannel.sendMessageContents, {
     channel,
     value,
     acceptIds,
@@ -183,11 +183,11 @@ export function windowCreate(
 /**
  * 窗口状态
  */
-export async function windowStatus(
+export function windowStatus(
   type: WindowStatusOpt,
   id: number = window.customize.winId
 ): Promise<boolean> {
-  return await window.electronic.invoke(WindowChannel.status, { type, id });
+  return window.electronic.invoke(WindowChannel.status, { type, id });
 }
 
 /**
@@ -198,7 +198,7 @@ export function windowAlwaysOnTop(
   type?: WindowAlwaysOnTopOpt,
   id: number = window.customize.winId
 ) {
-  window.electronic.send(WindowChannel.setAlwaysTop, { id, is, type });
+  return window.electronic.invoke(WindowChannel.setAlwaysTop, { id, is, type });
 }
 
 /**
@@ -210,7 +210,7 @@ export function windowSetSize(
   center: boolean = false,
   id: number = window.customize.winId
 ) {
-  window.electronic.send(WindowChannel.setSize, { id, size, resizable, center });
+  return window.electronic.invoke(WindowChannel.setSize, { id, size, resizable, center });
 }
 
 /**
@@ -221,28 +221,28 @@ export function windowSetMaxMinSize(
   size: number[],
   id: number = window.customize.winId
 ) {
-  window.electronic.send(WindowChannel.setMinMaxSize, { type, id, size });
+  return window.electronic.invoke(WindowChannel.setMinMaxSize, { type, id, size });
 }
 
 /**
  * 设置窗口背景颜色
  */
 export function windowSetBackgroundColor(color: string, id: number = window.customize.winId) {
-  window.electronic.send(WindowChannel.setBackgroundColor, { id, color });
+  return window.electronic.invoke(WindowChannel.setBackgroundColor, { id, color });
 }
 
 /**
  * 最大化&最小化当前窗口
  */
 export function windowMaxMin(id: number = window.customize.winId) {
-  window.electronic.send(WindowChannel.maxMinSize, id);
+  return window.electronic.invoke(WindowChannel.maxMinSize, id);
 }
 
 /**
  * 关闭窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowClose(id: number = window.customize.winId) {
-  window.electronic.send(WindowChannel.func, { type: 'close', id });
+  return window.electronic.invoke(WindowChannel.func, { type: 'close', id });
 }
 
 /**
@@ -250,41 +250,41 @@ export function windowClose(id: number = window.customize.winId) {
  * @param id 窗口id
  * @param time 延迟显示时间
  */
-export function windowShow(time: number = 0, id: number = window.customize.winId) {
-  setTimeout(() => window.electronic.send(WindowChannel.func, { type: 'show', id }), time);
+export function windowShow(id: number = window.customize.winId) {
+  return window.electronic.invoke(WindowChannel.func, { type: 'show', id });
 }
 
 /**
  * 窗口隐藏
  */
 export function windowHide(id: number = window.customize.winId) {
-  window.electronic.send(WindowChannel.func, { type: 'hide', id });
+  return window.electronic.invoke(WindowChannel.func, { type: 'hide', id });
 }
 
 /**
  * 最小化窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowMin(id: number = window.customize.winId) {
-  window.electronic.send(WindowChannel.func, { type: 'minimize', id });
+  return window.electronic.invoke(WindowChannel.func, { type: 'minimize', id });
 }
 
 /**
  * 最大化窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowMax(id: number = window.customize.winId) {
-  window.electronic.send(WindowChannel.func, { type: 'maximize', id });
+  return window.electronic.invoke(WindowChannel.func, { type: 'maximize', id });
 }
 
 /**
  * window函数
  */
 export function windowFunc(type: WindowFuncOpt, data?: any[], id: number = window.customize.winId) {
-  window.electronic.send(WindowChannel.func, { type, data, id });
+  return window.electronic.invoke(WindowChannel.func, { type, data, id });
 }
 
 /**
  * 通过路由获取窗口id (不传route查全部)
  */
-export async function windowIdGet(route?: string): Promise<number[]> {
-  return await window.electronic.invoke(WindowChannel.getWinId, { route });
+export function windowIdGet(route?: string): Promise<number[]> {
+  return window.electronic.invoke(WindowChannel.getWinId, { route });
 }

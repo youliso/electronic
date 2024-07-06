@@ -2,7 +2,6 @@ import type { BrowserWindowConstructorOptions } from 'electron';
 import type { Customize } from '../types';
 import { app, ipcMain, shell } from 'electron';
 import { resolve } from 'path';
-import { logError } from './log';
 import { shortcutInstance } from './shortcut';
 import { windowInstance } from './window';
 import { AppChannel } from '../preload/channel';
@@ -58,7 +57,7 @@ export const appSingleInstanceLock = (options: AppBeforeOptions) => {
         },
         options.browserWindowOptions
       );
-      win && windowInstance.load(win).catch(logError);
+      win && windowInstance.load(win);
     });
   }
 };
@@ -73,26 +72,6 @@ export const appProtocolRegister = (appName?: string) => {
   argv.push('--');
   if (!app.isDefaultProtocolClient(appName || app.name, process.execPath, argv))
     app.setAsDefaultProtocolClient(appName || app.name, process.execPath, argv);
-};
-
-/**
- * appReday之前监听
- * 监听渲染进程&子进程崩溃
- */
-export const appErrorOn = () => {
-  // 渲染进程崩溃监听
-  app.on('render-process-gone', (event, webContents, details) =>
-    logError(
-      '[render-process-gone]',
-      webContents.getTitle(),
-      webContents.getURL(),
-      JSON.stringify(details)
-    )
-  );
-  // 子进程崩溃监听
-  app.on('child-process-gone', (event, details) =>
-    logError('[child-process-gone]', JSON.stringify(details))
-  );
 };
 
 /**
@@ -130,11 +109,11 @@ export const appAfterOn = () => {
     return await shell.openExternal(args);
   });
   //app退出
-  ipcMain.on(AppChannel.quit, (event, args) => {
+  ipcMain.handle(AppChannel.quit, (event, args) => {
     app.quit();
   });
   //app重启
-  ipcMain.on(AppChannel.relaunch, (event, args) => {
+  ipcMain.handle(AppChannel.relaunch, (event, args) => {
     app.relaunch({ args: process.argv.slice(1) });
     if (args) app.exit(0);
   });

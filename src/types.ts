@@ -88,6 +88,8 @@ export type WindowAlwaysOnTopOpt =
   | 'screen-saver';
 
 export type WindowFuncOpt =
+  | 'focus'
+  | 'blur'
   | 'close'
   | 'hide'
   | 'show'

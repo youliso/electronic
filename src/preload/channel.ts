@@ -6,44 +6,13 @@ export enum AppChannel {
   relaunch = 'app-relaunch'
 }
 
-export enum ClipboardChannel {
-  readText = 'app-clipboard-read-text',
-  writeText = 'app-clipboard-write-text'
-}
-
-export enum FileChannel {
-  suffix = 'file-filebysuffix',
-  mkdir = 'file-mkdir',
-  deldir = 'file-deldir',
-  unlink = 'file-unlink',
-  access = 'file-access',
-  rename = 'file-rename',
-  readFile = 'file-readFile',
-  readLine = 'file-readLine',
-  writeFile = 'file-writeFile',
-  appendFile = 'file-appendFile'
-}
-
 export enum StoreChannel {
   set = 'store-set',
   get = 'store-get'
 }
 
-export enum LogChannel {
-  info = 'log-info',
-  error = 'log-error'
-}
-
 export enum MachineChannel {
   get = 'machineguid-get'
-}
-
-export enum PathChannel {
-  sep = 'path-sep',
-  isAbsolute = 'path-isAbsolute',
-  dirname = 'path-dirname',
-  normalize = 'path-normalize',
-  basename = 'path-basename'
 }
 
 export enum SessionChannel {
@@ -65,25 +34,6 @@ export enum UpdateChannel {
   install = 'update-install'
 }
 
-export enum ViewChannel {
-  new = 'view-new',
-  exist = 'view-exist',
-  alone = 'view-alone',
-  hide = 'view-hide',
-  hideAll = 'view-hide-all',
-  remove = 'view-remove',
-  removeAll = 'view-remove-all',
-  show = 'view-show',
-  stop = 'view-stop',
-  reload = 'view-reload',
-  setBounds = 'view-set-bounds',
-  openDevTools = 'view-open-dev-tools',
-  canGoBack = 'view-can-go-back',
-  goBack = 'view-go-back',
-  canGoForward = 'view-can-go-forward',
-  goForward = 'view-go-forward'
-}
-
 export enum WindowChannel {
   update = 'window-update',
   maxMinSize = 'window-max-min-size',
@@ -102,16 +52,11 @@ export enum WindowChannel {
 const getChannels = () => {
   let channels = {
     AppChannel,
-    ClipboardChannel,
-    FileChannel,
     StoreChannel,
-    LogChannel,
     MachineChannel,
-    PathChannel,
     SessionChannel,
     ShortcutChannel,
     UpdateChannel,
-    ViewChannel,
     WindowChannel
   };
   let channelValue: string[] = [];

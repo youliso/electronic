@@ -1,6 +1,5 @@
+import { readFileSync } from 'fs';
 import { ipcMain } from 'electron';
-import { logError } from './log';
-import { readFile } from './file';
 import { StoreChannel } from '../preload/channel';
 
 type Obj<Value> = {} & {
@@ -33,23 +32,14 @@ export class Store {
    * @param parse 是否parse
    * @param opt
    */
-  async use(conf: Config | Config[]) {
-    if (Array.isArray(conf)) {
-      for (let index = 0; index < conf.length; index++) {
-        const c = conf[index];
-        try {
-          const cfg = (await readFile(c.path, c.opt || { encoding: 'utf-8' })) as any;
-          if (cfg) this.set(c.seat, c.parse ? JSON.parse(cfg) : cfg);
-        } catch (e) {
-          logError(`[cfg ${c.path}]`, e);
-        }
-      }
-    } else {
+  use(conf: Config[]) {
+    for (let index = 0; index < conf.length; index++) {
+      const c = conf[index];
       try {
-        const cfg = (await readFile(conf.path, conf.opt || { encoding: 'utf-8' })) as any;
-        if (cfg) this.set(conf.seat, conf.parse ? JSON.parse(cfg) : cfg);
-      } catch (e) {
-        logError(`[cfg ${conf.path}]`, e);
+        const data = readFileSync(c.path, { encoding: 'utf-8' });
+        this.set(c.seat, c.parse ? JSON.parse(data) : data);
+      } catch (error) {
+        throw error;
       }
     }
   }

@@ -9,7 +9,7 @@ export function sessionHeadersSet(
   url: string,
   value: { [key: string]: string }
 ) {
-  window.electronic.send(SessionChannel.setHeaders, { type, url, value });
+  return window.electronic.invoke(SessionChannel.setHeaders, { type, url, value });
 }
 
 /**

@@ -97,7 +97,7 @@ export class Session {
   on() {
     this.webRequest();
     //设置url请求头
-    ipcMain.on(SessionChannel.setHeaders, async (event, args) => {
+    ipcMain.handle(SessionChannel.setHeaders, async (event, args) => {
       switch (args.type) {
         case 'all':
           this.AllHeaders = Object.assign(this.AllHeaders, { [args.url]: args.value });

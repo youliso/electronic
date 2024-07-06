@@ -21,14 +21,14 @@ export function updateListenersRemove() {
  * @param url 更新地址（不传用默认地址）
  */
 export function updateCheck(isDel: boolean = true, autoDownload: boolean = false, url?: string) {
-  window.electronic.send(UpdateChannel.check, { isDel, autoDownload, url });
+  return window.electronic.invoke(UpdateChannel.check, { isDel, autoDownload, url });
 }
 
 /**
  * 下载更新 (如果autoDownload选项设置为 false，则可以使用此方法
  */
 export function updateDownload() {
-  window.electronic.send(UpdateChannel.download);
+  return window.electronic.invoke(UpdateChannel.download);
 }
 
 /**
@@ -36,5 +36,5 @@ export function updateDownload() {
  * @param isSilent 是否静默更新
  */
 export function updateInstall(isSilent: boolean) {
-  window.electronic.send(UpdateChannel.install, isSilent);
+  return window.electronic.invoke(UpdateChannel.install, isSilent);
 }

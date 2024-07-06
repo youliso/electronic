@@ -1,3 +1,5 @@
+import { existsSync, readdirSync, rmdirSync, statSync, unlinkSync } from 'fs';
+
 /**
  * 深拷贝
  * @param obj
@@ -21,4 +23,23 @@ export function deepCopy<T>(obj: any): T {
     }
   });
   return result;
+}
+
+/**
+ * 删除目录和内部文件
+ * */
+export function delDir(path: string): void {
+  let files = [];
+  if (existsSync(path)) {
+    files = readdirSync(path);
+    files.forEach((file) => {
+      let curPath = path + '/' + file;
+      if (statSync(curPath).isDirectory()) {
+        delDir(curPath); //递归删除文件夹
+      } else {
+        unlinkSync(curPath); //删除文件
+      }
+    });
+    rmdirSync(path);
+  }
 }

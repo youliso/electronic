@@ -1,13 +1,12 @@
 import type { AllPublishOptions } from 'builder-util-runtime';
-import type { AppUpdater } from 'electron-updater';
+import type { AppUpdater, Logger } from 'electron-updater';
 import type { UpdateMessage } from '../types';
 import { join } from 'path';
 import { AppImageUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
-import { delDir } from './file';
 import { ipcMain, app } from 'electron';
 import { windowInstance } from './window';
-import { logInfo, logWarn, logError } from './log';
 import { UpdateChannel } from '../preload/channel';
+import { delDir } from './utils';
 
 /**
  * 更新模块 https://www.electron.build/auto-update
@@ -18,7 +17,12 @@ export class Update {
   public options: AllPublishOptions;
   public dirname: string;
 
-  constructor(options: AllPublishOptions, defaultConfigPath: string, dirname: string) {
+  constructor(
+    options: AllPublishOptions,
+    defaultConfigPath: string,
+    dirname: string,
+    logger?: Logger
+  ) {
     this.options = options;
     this.dirname = dirname;
     if (process.platform === 'win32') this.autoUpdater = new NsisUpdater(this.options);
@@ -28,11 +32,7 @@ export class Update {
     if (!app.isPackaged && !(process.platform === 'darwin')) {
       this.autoUpdater.updateConfigPath = join(defaultConfigPath);
     }
-    this.autoUpdater.logger = {
-      info: logInfo,
-      warn: logWarn,
-      error: logError
-    };
+    logger && (this.autoUpdater.logger = logger);
   }
 
   /**
@@ -85,14 +85,14 @@ export class Update {
     if (isDel) this.handleUpdate();
     url && this.autoUpdater.setFeedURL(url);
     this.autoUpdater.autoDownload = autoDownload;
-    this.autoUpdater.checkForUpdates().catch(logError);
+    return this.autoUpdater.checkForUpdates();
   }
 
   /**
    * 下载更新 (如果autoDownload选项设置为 false，则可以使用此方法
    */
   downloadUpdate() {
-    this.autoUpdater.downloadUpdate().catch(logError); //TODO待完善
+    return this.autoUpdater.downloadUpdate(); //TODO待完善
   }
 
   /**
@@ -110,12 +110,12 @@ export class Update {
     //开启更新监听
     this.open((data: { key: string; value: any }) => windowInstance.send('update-back', data));
     //检查更新
-    ipcMain.on(UpdateChannel.check, (event, args) =>
+    ipcMain.handle(UpdateChannel.check, (event, args) =>
       this.checkUpdate(args.isDel, args.autoDownload, args.url)
     );
     //手动下载更新
-    ipcMain.on(UpdateChannel.download, (event, args) => this.downloadUpdate());
+    ipcMain.handle(UpdateChannel.download, (event, args) => this.downloadUpdate());
     // 关闭程序安装新的软件 isSilent 是否静默更新
-    ipcMain.on(UpdateChannel.install, (event, isSilent) => this.updateQuitInstall(isSilent));
+    ipcMain.handle(UpdateChannel.install, (event, isSilent) => this.updateQuitInstall(isSilent));
   }
 }
