@@ -30,7 +30,6 @@ const external = [
   './preload',
   './channel',
   '../preload/channel',
-  './session',
   './shortcut',
   '../types',
   './update',

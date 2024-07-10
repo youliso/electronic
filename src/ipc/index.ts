@@ -1,8 +1,8 @@
 export * from './app';
-export * from './session';
 export * from './shortcut';
 export * from './store';
 export * from './window';
+export * from './machine';
 
 /**
  * 主进程消息监听

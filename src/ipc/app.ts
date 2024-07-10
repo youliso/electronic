@@ -1,5 +1,5 @@
 import type { AppInfo, AppPathKey } from '../types';
-import { AppChannel, MachineChannel } from '../preload/channel';
+import { AppChannel } from '../preload/channel';
 
 /**
  * app退出
@@ -36,11 +36,4 @@ export function getAppPath(key: AppPathKey): Promise<string> {
  */
 export function openUrl(url: string): Promise<void> {
   return window.electronic.invoke(AppChannel.openUrl, url);
-}
-
-/**
- * 获取设备唯一吗
- */
-export function getMachineGuid(): Promise<string> {
-  return window.electronic.invoke(MachineChannel.get);
 }

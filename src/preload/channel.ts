@@ -15,13 +15,6 @@ export enum MachineChannel {
   get = 'machineguid-get'
 }
 
-export enum SessionChannel {
-  setHeaders = 'session-headers-set',
-  setCookies = 'session-cookies-set',
-  getCookies = 'session-cookies-get',
-  unCookies = 'session-cookies-remove'
-}
-
 export enum ShortcutChannel {
   register = 'shortcut-register',
   unregister = 'shortcut-unregister',
@@ -54,7 +47,6 @@ const getChannels = () => {
     AppChannel,
     StoreChannel,
     MachineChannel,
-    SessionChannel,
     ShortcutChannel,
     UpdateChannel,
     WindowChannel
