@@ -15,21 +15,21 @@ export class Update {
   public autoUpdater: AppUpdater;
 
   public options: AllPublishOptions;
-  public dirname: string;
+  public dirname: string | undefined;
 
   constructor(
     options: AllPublishOptions,
-    defaultConfigPath: string,
-    dirname: string,
+    dirname?: string,
+    defaultConfigPath?: string,
     logger?: Logger
   ) {
     this.options = options;
-    this.dirname = dirname;
+    dirname && (this.dirname = dirname);
     if (process.platform === 'win32') this.autoUpdater = new NsisUpdater(this.options);
     else if (process.platform === 'darwin') this.autoUpdater = new MacUpdater(this.options);
     else this.autoUpdater = new AppImageUpdater(this.options);
     //本地开发环境，使用调试app-update.yml地址
-    if (!app.isPackaged && !(process.platform === 'darwin')) {
+    if (defaultConfigPath && !app.isPackaged && !(process.platform === 'darwin')) {
       this.autoUpdater.updateConfigPath = join(defaultConfigPath);
     }
     logger && (this.autoUpdater.logger = logger);
@@ -39,6 +39,7 @@ export class Update {
    * 删除更新包文件
    */
   handleUpdate() {
+    if (!this.dirname) throw new Error('not dirname');
     const updatePendingPath = join(
       // @ts-ignore
       this.autoUpdater.app.baseCachePath,
