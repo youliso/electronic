@@ -327,7 +327,7 @@ export class Window {
   /**
    * 窗口关闭、隐藏、显示等常用方法
    */
-  func(type: WindowFuncOpt, id?: number, data?: any[]) {
+  func(type: WindowFuncOpt, id: number, data?: any[]) {
     if (id !== null && id !== undefined) {
       const win = this.get(id as number);
       if (!win) {
@@ -338,13 +338,6 @@ export class Window {
       data ? win[type](...data) : win[type]();
       return;
     }
-    // @ts-ignore
-    if (data)
-      for (const i of this.getAll()) {
-        // @ts-ignore
-        !i.customize.silenceFunc && i[type](...data);
-      }
-    else for (const i of this.getAll()) !i.customize.silenceFunc && i[type]();
   }
 
   /**

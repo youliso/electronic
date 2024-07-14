@@ -96,7 +96,8 @@ export type WindowFuncOpt =
   | 'minimize'
   | 'maximize'
   | 'restore'
-  | 'reload';
+  | 'reload'
+  | 'setPosition';
 
 export type WindowStatusOpt =
   | 'isMaximized'
