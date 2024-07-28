@@ -97,6 +97,7 @@ export type WindowFuncOpt =
   | 'maximize'
   | 'restore'
   | 'reload'
+  | 'flashFrame'
   | 'setPosition';
 
 export type WindowStatusOpt =
