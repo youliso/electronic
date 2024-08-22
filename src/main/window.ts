@@ -247,7 +247,7 @@ export class Window {
     if (customize.isOneWindow && !customize.url) {
       for (const i of this.getAll()) {
         if (customize?.route && customize.route === i.customize?.route) {
-          i.webContents.send('window-single-customize', customize.data);
+          i.webContents.send('window-single-data', customize?.data);
           return;
         }
       }

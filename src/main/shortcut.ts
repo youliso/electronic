@@ -85,8 +85,8 @@ export class Shortcut {
   register(accelerator: Accelerator) {
     this.unregister(accelerator.key);
     if (typeof accelerator.key === 'string')
-      globalShortcut.register(accelerator.key, accelerator.callback);
-    else globalShortcut.registerAll(accelerator.key, accelerator.callback);
+      globalShortcut.register(accelerator.key, accelerator.callback || (() => void 0));
+    else globalShortcut.registerAll(accelerator.key, accelerator.callback || (() => void 0));
     this.set(accelerator);
   }
 

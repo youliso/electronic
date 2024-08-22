@@ -116,10 +116,9 @@ export interface UpdateMessage {
 }
 
 export type Accelerator = {
-  // 名称
   name: string;
   key: string | string[];
-  callback: () => void;
+  callback?: () => void;
 };
 
 export interface Window {

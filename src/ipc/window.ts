@@ -13,12 +13,17 @@ export function windowLoad(listener: () => void) {
 }
 
 /**
- * 窗口再次创建后触发
+ * 单例模式后协议再开触发
  */
-export function windowSingleCustomizeOn<T>(listener: (data: T) => void) {
-  window.electronic.on('window-single-customize', (data) => {
-    listener(data);
-  });
+export function windowSingleInstanceOn(listener: (argv?: string[]) => void) {
+  window.electronic.on('window-single-instance', (argv) => listener(argv));
+}
+
+/**
+ * 窗口再次创建触发
+ */
+export function windowSingleDataOn<T>(listener: (data?: T) => void) {
+  window.electronic.on('window-single-data', (data) => listener(data));
 }
 
 /**

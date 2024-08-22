@@ -2,7 +2,6 @@ import type { BrowserWindowConstructorOptions } from 'electron';
 import type { Customize } from '../types';
 import { app, ipcMain, shell } from 'electron';
 import { resolve } from 'path';
-import { shortcutInstance } from './shortcut';
 import { windowInstance } from './window';
 import { AppChannel } from '../preload/channel';
 
@@ -41,9 +40,7 @@ export const appSingleInstanceLock = (options: AppBeforeOptions) => {
       if (options?.isFocusMainWin) {
         const main = windowInstance.getMain();
         if (main) {
-          if (main.isMinimized()) main.restore();
-          main.show();
-          main.focus();
+          main.webContents.send('window-single-instance', argv);
         }
         return;
       }
@@ -79,20 +76,6 @@ export const appProtocolRegister = (appName?: string) => {
  * @param options
  */
 export const appAfterOn = () => {
-  // 获得焦点时发出
-  app.on('browser-window-focus', () => {
-    // 关闭刷新
-    shortcutInstance.register({
-      name: '关闭刷新',
-      key: 'CommandOrControl+R',
-      callback: () => {}
-    });
-  });
-  // 失去焦点时发出
-  app.on('browser-window-blur', () => {
-    // 注销关闭刷新
-    shortcutInstance.unregister('CommandOrControl+R');
-  });
   //app常用信息
   ipcMain.handle(AppChannel.getInfo, (event, args) => {
     return {

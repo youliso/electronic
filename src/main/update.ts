@@ -28,9 +28,12 @@ export class Update {
     if (process.platform === 'win32') this.autoUpdater = new NsisUpdater(this.options);
     else if (process.platform === 'darwin') this.autoUpdater = new MacUpdater(this.options);
     else this.autoUpdater = new AppImageUpdater(this.options);
-    //本地开发环境，使用调试app-update.yml地址
-    if (defaultConfigPath && !app.isPackaged && !(process.platform === 'darwin')) {
-      this.autoUpdater.updateConfigPath = join(defaultConfigPath);
+    // 本地开发环境，使用调试app-update.yml地址
+    if (defaultConfigPath && !app.isPackaged) {
+      // 开启调试更新
+      this.autoUpdater.forceDevUpdateConfig = true;
+      !(process.platform === 'darwin') &&
+        (this.autoUpdater.updateConfigPath = join(defaultConfigPath));
     }
     logger && (this.autoUpdater.logger = logger);
   }
@@ -39,7 +42,7 @@ export class Update {
    * 删除更新包文件
    */
   handleUpdate() {
-    if (!this.dirname) throw new Error('not dirname');
+    if (!this.dirname) return;
     const updatePendingPath = join(
       // @ts-ignore
       this.autoUpdater.app.baseCachePath,
