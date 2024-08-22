@@ -325,19 +325,22 @@ export class Window {
   }
 
   /**
-   * 窗口关闭、隐藏、显示等常用方法
+   * 窗口关闭、隐藏、显示等常用方法（如果不传id则获取主窗口）
    */
-  func(type: WindowFuncOpt, id: number, data?: any[]) {
+  func(type: WindowFuncOpt, id?: number, data?: any[]) {
+    let win: BrowserWindow | null = null;
     if (id !== null && id !== undefined) {
-      const win = this.get(id as number);
-      if (!win) {
-        console.error(`not found win -> ${id}`);
-        return;
-      }
-      // @ts-ignore
-      data ? win[type](...data) : win[type]();
+      win = this.get(id);
+    } else {
+      win = this.getMain();
+    }
+    if (!win) {
+      console.error(`not found win -> ${id}`);
       return;
     }
+    // @ts-ignore
+    data ? win[type](...data) : win[type]();
+    return;
   }
 
   /**

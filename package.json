@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "electron modules",
   "scripts": {
     "build": "rollup -c rollup.config.mjs && node build.mjs",
