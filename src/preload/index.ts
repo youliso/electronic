@@ -3,9 +3,9 @@ import { Customize } from '../types';
 import { channels } from './channel';
 
 export interface Electronic {
-  on: (channel: string, listener: (...args: any[]) => void) => void;
-  once: (channel: string, listener: (...args: any[]) => void) => void;
-  invoke: (channel: string, args?: any) => Promise<any>;
+  on: <T extends any>(channel: string, listener: (...args: T[]) => void) => void;
+  once: <T extends any>(channel: string, listener: (...args: T[]) => void) => void;
+  invoke: <T extends any, R extends any>(channel: string, args?: T) => Promise<R>;
   removeAllListeners: (channel: string) => this;
 }
 

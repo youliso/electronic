@@ -6,24 +6,29 @@ import { WindowChannel } from '../preload/channel';
  * 窗口初始化
  * */
 export function windowLoad(listener: () => void) {
-  window.electronic.once('window-load', (args) => {
-    window.customize = args;
-    listener();
-  });
+  window.electronic
+    .invoke<void, typeof window.customize>(WindowChannel.load)
+    .then((customize) => {
+      window.customize = customize;
+      listener();
+    })
+    .catch((error) => {
+      throw error;
+    });
 }
 
 /**
  * 单例模式后协议再开触发
  */
 export function windowSingleInstanceOn(listener: (argv?: string[]) => void) {
-  window.electronic.on('window-single-instance', (argv) => listener(argv));
+  window.electronic.on<string[]>('window-single-instance', (argv) => listener(argv));
 }
 
 /**
  * 窗口再次创建触发
  */
 export function windowSingleDataOn<T>(listener: (data?: T) => void) {
-  window.electronic.on('window-single-data', (data) => listener(data));
+  window.electronic.on<T>('window-single-data', (data) => listener(data));
 }
 
 /**

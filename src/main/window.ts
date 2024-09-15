@@ -301,20 +301,12 @@ export class Window {
     win.webContents.on('did-attach-webview', (_, webContents) =>
       windowOpenHandler(webContents, win.id)
     );
-    win.webContents.on('did-finish-load', () =>
-      win.webContents.send('window-load', {
-        winId: win.id,
-        webContentsId: win.webContents.id,
-        ...win.customize
-      })
-    );
     // 窗口最大最小监听
     win.on('maximize', () => win.webContents.send('window-maximize-status', 'maximize'));
     win.on('unmaximize', () => win.webContents.send('window-maximize-status', 'unmaximize'));
     // 聚焦失焦监听
     win.on('blur', () => win.webContents.send('window-blur-focus', 'blur'));
     win.on('focus', () => win.webContents.send('window-blur-focus', 'focus'));
-
     switch (win.customize.loadType) {
       case 'file':
         return win.loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions);
@@ -495,6 +487,16 @@ export class Window {
         };
       }
       return null;
+    });
+    // 窗口初始化加载
+    ipcMain.handle(WindowChannel.load, async (event) => {
+      const win = BrowserWindow.fromWebContents(event.sender);
+      if (!win) throw new Error('fromWebContents not');
+      return {
+        winId: win.id,
+        webContentsId: win.webContents.id,
+        ...win.customize
+      };
     });
     // 设置窗口是否置顶
     ipcMain.handle(WindowChannel.setAlwaysTop, (event, args) => this.setAlwaysOnTop(args));
