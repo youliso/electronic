@@ -94,11 +94,6 @@ flies.forEach((path, index) => {
       external,
       plugins: plugins()
     };
-    if (path === 'preload') cfg.output.push({
-      file: `./dist/${path}.mjs`,
-      format: 'es',
-      sourcemap: false
-    })
   }
 
   config.push(cfg);
