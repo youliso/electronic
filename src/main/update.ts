@@ -1,12 +1,13 @@
 import type { AllPublishOptions } from 'builder-util-runtime';
 import type { AppUpdater, Logger } from 'electron-updater';
-import type { UpdateMessage } from '../types';
+import type { UpdateMessage } from '../types/index';
 import { join } from 'path';
 import { AppImageUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
-import { ipcMain, app } from 'electron';
+import { app } from 'electron';
 import { windowInstance } from './window';
-import { UpdateChannel } from '../preload/channel';
+import { UpdateChannel } from '../types/channel';
 import { delDir } from './utils';
+import preload from '../preload';
 
 /**
  * 更新模块 https://www.electron.build/auto-update
@@ -114,12 +115,14 @@ export class Update {
     //开启更新监听
     this.open((data: { key: string; value: any }) => windowInstance.send('update-back', data));
     //检查更新
-    ipcMain.handle(UpdateChannel.check, (event, args) =>
+    preload.handle(UpdateChannel.check, ({ event, args }) =>
       this.checkUpdate(args.isDel, args.autoDownload, args.url)
     );
     //手动下载更新
-    ipcMain.handle(UpdateChannel.download, (event, args) => this.downloadUpdate());
+    preload.handle(UpdateChannel.download, ({ event, args }) => this.downloadUpdate());
     // 关闭程序安装新的软件 isSilent 是否静默更新
-    ipcMain.handle(UpdateChannel.install, (event, isSilent) => this.updateQuitInstall(isSilent));
+    preload.handle<boolean>(UpdateChannel.install, ({ event, args }) =>
+      this.updateQuitInstall(args)
+    );
   }
 }

@@ -1,9 +1,8 @@
-import { ipcMain } from 'electron';
 import preload from '../preload';
 export * from './app';
-export * from './store';
-export * from './machine';
 export * from './shortcut';
+export * from './store';
 export * from './window';
+export * from './machine';
 
-preload.main(ipcMain);
+preload.render();

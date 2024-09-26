@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
-import { ipcMain } from 'electron';
-import { StoreChannel } from '../preload/channel';
+import { StoreChannel } from '../types/channel';
+import preload from '../preload';
 
 type Obj<Value> = {} & {
   [key: string]: Value | Obj<Value>;
@@ -108,12 +108,12 @@ export class Store {
    */
   on() {
     //赋值(sharedObject)
-    ipcMain.handle(StoreChannel.set, (event, { key, value }) => {
-      return this.set(key, value);
+    preload.handle<{ key: string; value: any }>(StoreChannel.set, ({ event, args }) => {
+      return this.set(args.key, args.value);
     });
     //获取(sharedObject)
-    ipcMain.handle(StoreChannel.get, (event, { key }) => {
-      return this.get(key);
+    preload.handle<{ key: string }>(StoreChannel.get, ({ event, args }) => {
+      return this.get(args.key);
     });
   }
 }

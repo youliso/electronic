@@ -10,12 +10,20 @@ import type {
   WindowAlwaysOnTopOpt,
   WindowFuncOpt,
   WindowStatusOpt
-} from '../types';
+} from '../types/index';
+import { WindowChannel } from '../types/channel';
 import { endianness } from 'os';
-import { app, screen, ipcMain, BrowserWindow, webContents } from 'electron';
-import { WindowChannel } from '../preload/channel';
+import { app, screen, BrowserWindow, webContents } from 'electron';
+import preload from '../preload';
 
 declare global {
+  interface Window {
+    customize: Omit<Customize, 'winId' | 'webContentsId'> & {
+      winId: number;
+      webContentsId: number;
+    };
+  }
+
   module Electron {
     interface BrowserWindow {
       customize: Customize;
@@ -451,7 +459,7 @@ export class Window {
    */
   on() {
     // 窗口数据更新
-    ipcMain.handle(WindowChannel.update, (event, args) => {
+    preload.handle(WindowChannel.update, ({ args }) => {
       if (args?.id) {
         const win = this.get(args.id);
         if (!win) {
@@ -462,9 +470,9 @@ export class Window {
       }
     });
     // 最大化最小化窗口
-    ipcMain.handle(WindowChannel.maxMinSize, (event, id) => {
-      if (id !== null && id !== undefined) {
-        const win = this.get(id);
+    preload.handle<number>(WindowChannel.maxMinSize, ({ args }) => {
+      if (args !== null && args !== undefined) {
+        const win = this.get(args);
         if (!win) {
           console.error('Invalid id, the id can not be a empty');
           return;
@@ -474,11 +482,15 @@ export class Window {
       }
     });
     // 窗口消息
-    ipcMain.handle(WindowChannel.func, (event, args) => this.func(args.type, args.id, args.data));
+    preload.handle(WindowChannel.func, ({ event, args }) =>
+      this.func(args.type, args.id, args.data)
+    );
     // 窗口状态
-    ipcMain.handle(WindowChannel.status, async (event, args) => this.getStatus(args.type, args.id));
+    preload.handle(WindowChannel.status, async ({ event, args }) =>
+      this.getStatus(args.type, args.id)
+    );
     // 创建窗口
-    ipcMain.handle(WindowChannel.new, async (event, args) => {
+    preload.handle(WindowChannel.new, async ({ event, args }) => {
       const newWin = await this.new(args.customize, args.windowOptions, args.loadOptions);
       if (newWin) {
         return {
@@ -489,7 +501,7 @@ export class Window {
       return null;
     });
     // 窗口初始化加载
-    ipcMain.handle(WindowChannel.load, async (event) => {
+    preload.handle(WindowChannel.load, async ({ event }) => {
       const win = BrowserWindow.fromWebContents(event.sender);
       if (!win) throw new Error('fromWebContents not');
       return {
@@ -499,19 +511,19 @@ export class Window {
       };
     });
     // 设置窗口是否置顶
-    ipcMain.handle(WindowChannel.setAlwaysTop, (event, args) => this.setAlwaysOnTop(args));
+    preload.handle(WindowChannel.setAlwaysTop, ({ event, args }) => this.setAlwaysOnTop(args));
     // 设置窗口大小
-    ipcMain.handle(WindowChannel.setSize, (event, args) => this.setSize(args));
+    preload.handle(WindowChannel.setSize, ({ event, args }) => this.setSize(args));
     // 设置窗口(最小/最大)大小
-    ipcMain.handle(WindowChannel.setMinMaxSize, (event, args) =>
+    preload.handle(WindowChannel.setMinMaxSize, ({ event, args }) =>
       args.type === 'min' ? this.setMinSize(args) : this.setMaxSize(args)
     );
     // 设置窗口背景颜色
-    ipcMain.handle(WindowChannel.setBackgroundColor, (event, args) =>
+    preload.handle(WindowChannel.setBackgroundColor, ({ event, args }) =>
       this.setBackgroundColor(args)
     );
     // 窗口消息
-    ipcMain.handle(WindowChannel.sendMessage, (event, args) => {
+    preload.handle(WindowChannel.sendMessage, ({ event, args }) => {
       const channel = `window-message-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         for (const i of args.acceptIds) this.send(channel, args.value, i);
@@ -525,7 +537,7 @@ export class Window {
         }
       }
     });
-    ipcMain.handle(WindowChannel.sendMessageContents, (event, args) => {
+    preload.handle(WindowChannel.sendMessageContents, ({ event, args }) => {
       const channel = `window-message-contents-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         for (const i of args.acceptIds) {
@@ -543,7 +555,7 @@ export class Window {
       }
     });
     //通过路由获取窗口id (不传route查全部)
-    ipcMain.handle(WindowChannel.getWinId, async (event, args) => {
+    preload.handle(WindowChannel.getWinId, async ({ event, args }) => {
       return this.getAll()
         .filter((win) => (args.route ? win.customize?.route === args.route : true))
         .map((win) => win.id);

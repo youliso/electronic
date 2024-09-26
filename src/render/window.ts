@@ -1,13 +1,14 @@
 import type { BrowserWindowConstructorOptions } from 'electron';
 import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
-import { WindowChannel } from '../preload/channel';
+import { WindowChannel } from '../types/channel';
+import preload from '../preload';
 
 /**
  * 窗口初始化
  * */
 export function windowLoad(listener: () => void) {
-  window.electronic
-    .invoke<void, typeof window.customize>(WindowChannel.load)
+  preload
+    .invoke<typeof window.customize>(WindowChannel.load)
     .then((customize) => {
       window.customize = customize;
       listener();
@@ -21,56 +22,56 @@ export function windowLoad(listener: () => void) {
  * 单例模式后协议再开触发
  */
 export function windowSingleInstanceOn(listener: (argv?: string[]) => void) {
-  window.electronic.on<string[]>('window-single-instance', (argv) => listener(argv));
+  preload.on<string[]>('window-single-instance', (argv) => listener(argv));
 }
 
 /**
  * 窗口再次创建触发
  */
 export function windowSingleDataOn<T>(listener: (data?: T) => void) {
-  window.electronic.on<T>('window-single-data', (data) => listener(data));
+  preload.on<T>('window-single-data', (data) => listener(data));
 }
 
 /**
  * 窗口数据更新
  */
 export function windowUpdateCustomize(customize: Customize) {
-  return window.electronic.invoke(WindowChannel.update, customize);
+  return preload.invoke(WindowChannel.update, customize);
 }
 
 /**
  * usb插拔消息监听
  */
-export function windowHookMessageUSB(listener: (wParam: Buffer, lParam: Buffer) => void) {
-  window.electronic.on('window-hook-message', listener);
+export function windowHookMessageUSB(listener: (args: { wParam: Buffer; lParam: Buffer }) => void) {
+  preload.on('window-hook-message', listener);
 }
 
 /**
  * 窗口聚焦失焦监听
  */
 export function windowBlurFocusOn(listener: (args: 'blur' | 'focus') => void) {
-  window.electronic.on('window-blur-focus', listener);
+  preload.on('window-blur-focus', listener);
 }
 
 /**
  * 关闭窗口聚焦失焦监听
  */
 export function windowBlurFocusRemove() {
-  window.electronic.removeAllListeners('window-blur-focus');
+  preload.removeOn('window-blur-focus');
 }
 
 /**
  * 窗口大小化监听
  */
 export function windowMaximizeOn(listener: (args: 'maximize' | 'unmaximize') => void) {
-  window.electronic.on('window-maximize-status', listener);
+  preload.on('window-maximize-status', listener);
 }
 
 /**
  * 关闭窗口大小化监听
  */
 export function windowMaximizeRemove() {
-  window.electronic.removeAllListeners('window-maximize-status');
+  preload.removeOn('window-maximize-status');
 }
 
 /**
@@ -80,7 +81,7 @@ export function windowMessageOnce(channel: string, listener: (args: any) => void
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.once(`window-message-${channel}-back`, listener);
+  preload.once(`window-message-${channel}-back`, listener);
 }
 
 /**
@@ -90,7 +91,7 @@ export function windowMessageOn(channel: string, listener: (args: any) => void) 
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.on(`window-message-${channel}-back`, listener);
+  preload.on(`window-message-${channel}-back`, listener);
 }
 
 /**
@@ -100,7 +101,7 @@ export function windowMessageRemove(channel: string) {
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.removeAllListeners(`window-message-${channel}-back`);
+  preload.removeOn(`window-message-${channel}-back`);
 }
 
 /**
@@ -115,7 +116,7 @@ export function windowMessageSend(
   if (!channel) {
     throw new Error('not channel');
   }
-  return window.electronic.invoke(WindowChannel.sendMessage, {
+  return preload.invoke(WindowChannel.sendMessage, {
     channel,
     value,
     acceptIds,
@@ -131,7 +132,7 @@ export function windowMessageContentsOnce(channel: string, listener: (args: any)
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.once(`window-message-contents-${channel}-back`, listener);
+  preload.once(`window-message-contents-${channel}-back`, listener);
 }
 
 /**
@@ -141,7 +142,7 @@ export function windowMessageContentsOn(channel: string, listener: (args: any) =
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.on(`window-message-contents-${channel}-back`, listener);
+  preload.on(`window-message-contents-${channel}-back`, listener);
 }
 
 /**
@@ -151,7 +152,7 @@ export function windowMessageContentsRemove(channel: string) {
   if (!channel) {
     throw new Error('not channel');
   }
-  window.electronic.removeAllListeners(`window-message-contents-${channel}-back`);
+  preload.removeOn(`window-message-contents-${channel}-back`);
 }
 
 /**
@@ -166,7 +167,7 @@ export function windowMessageContentsSend(
   if (!channel) {
     throw new Error('not channel');
   }
-  return window.electronic.invoke(WindowChannel.sendMessageContents, {
+  return preload.invoke(WindowChannel.sendMessageContents, {
     channel,
     value,
     acceptIds,
@@ -187,7 +188,7 @@ export function windowCreate(
   windowOptions?: BrowserWindowConstructorOptions,
   loadOptions?: LoadOptions
 ): Promise<{ id: number; webContentsId: number } | undefined> {
-  return window.electronic.invoke(WindowChannel.new, { customize, windowOptions, loadOptions });
+  return preload.invoke(WindowChannel.new, { customize, windowOptions, loadOptions });
 }
 
 /**
@@ -197,7 +198,7 @@ export function windowStatus(
   type: WindowStatusOpt,
   id: number = window.customize.winId
 ): Promise<boolean> {
-  return window.electronic.invoke(WindowChannel.status, { type, id });
+  return preload.invoke(WindowChannel.status, { type, id });
 }
 
 /**
@@ -208,7 +209,7 @@ export function windowAlwaysOnTop(
   type?: WindowAlwaysOnTopOpt,
   id: number = window.customize.winId
 ) {
-  return window.electronic.invoke(WindowChannel.setAlwaysTop, { id, is, type });
+  return preload.invoke(WindowChannel.setAlwaysTop, { id, is, type });
 }
 
 /**
@@ -220,7 +221,7 @@ export function windowSetSize(
   center: boolean = false,
   id: number = window.customize.winId
 ) {
-  return window.electronic.invoke(WindowChannel.setSize, { id, size, resizable, center });
+  return preload.invoke(WindowChannel.setSize, { id, size, resizable, center });
 }
 
 /**
@@ -231,28 +232,28 @@ export function windowSetMaxMinSize(
   size: number[],
   id: number = window.customize.winId
 ) {
-  return window.electronic.invoke(WindowChannel.setMinMaxSize, { type, id, size });
+  return preload.invoke(WindowChannel.setMinMaxSize, { type, id, size });
 }
 
 /**
  * 设置窗口背景颜色
  */
 export function windowSetBackgroundColor(color: string, id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.setBackgroundColor, { id, color });
+  return preload.invoke(WindowChannel.setBackgroundColor, { id, color });
 }
 
 /**
  * 最大化&最小化当前窗口
  */
 export function windowMaxMin(id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.maxMinSize, id);
+  return preload.invoke(WindowChannel.maxMinSize, id);
 }
 
 /**
  * 关闭窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowClose(id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.func, { type: 'close', id });
+  return preload.invoke(WindowChannel.func, { type: 'close', id });
 }
 
 /**
@@ -261,40 +262,40 @@ export function windowClose(id: number = window.customize.winId) {
  * @param time 延迟显示时间
  */
 export function windowShow(id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.func, { type: 'show', id });
+  return preload.invoke(WindowChannel.func, { type: 'show', id });
 }
 
 /**
  * 窗口隐藏
  */
 export function windowHide(id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.func, { type: 'hide', id });
+  return preload.invoke(WindowChannel.func, { type: 'hide', id });
 }
 
 /**
  * 最小化窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowMin(id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.func, { type: 'minimize', id });
+  return preload.invoke(WindowChannel.func, { type: 'minimize', id });
 }
 
 /**
  * 最大化窗口 (传id则对应窗口否则全部窗口)
  */
 export function windowMax(id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.func, { type: 'maximize', id });
+  return preload.invoke(WindowChannel.func, { type: 'maximize', id });
 }
 
 /**
  * window函数
  */
 export function windowFunc(type: WindowFuncOpt, data?: any[], id: number = window.customize.winId) {
-  return window.electronic.invoke(WindowChannel.func, { type, data, id });
+  return preload.invoke(WindowChannel.func, { type, data, id });
 }
 
 /**
  * 通过路由获取窗口id (不传route查全部)
  */
 export function windowIdGet(route?: string): Promise<number[]> {
-  return window.electronic.invoke(WindowChannel.getWinId, { route });
+  return preload.invoke(WindowChannel.getWinId, { route });
 }

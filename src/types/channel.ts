@@ -42,26 +42,3 @@ export enum WindowChannel {
   sendMessageContents = 'window-message-contents-send',
   getWinId = 'window-id-get'
 }
-
-const getChannels = () => {
-  let channels = {
-    AppChannel,
-    StoreChannel,
-    MachineChannel,
-    ShortcutChannel,
-    UpdateChannel,
-    WindowChannel
-  };
-  let channelValue: string[] = [];
-  for (let channel in channels) {
-    // @ts-ignore
-    const keys = channels[channel];
-    for (let key in keys) {
-      // @ts-ignore
-      isNaN(key) && channelValue.push(keys[key]);
-    }
-  }
-  return channelValue;
-};
-
-export const channels = getChannels();

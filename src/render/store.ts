@@ -1,4 +1,5 @@
-import { StoreChannel } from '../preload/channel';
+import preload from '../preload';
+import { StoreChannel } from '../types/channel';
 
 /**
  * 设置全局参数
@@ -6,7 +7,7 @@ import { StoreChannel } from '../preload/channel';
  * @param value 值
  */
 export function setStore(key: string, value: unknown): Promise<void> {
-  return window.electronic.invoke(StoreChannel.set, {
+  return preload.invoke(StoreChannel.set, {
     key,
     value
   });
@@ -17,5 +18,5 @@ export function setStore(key: string, value: unknown): Promise<void> {
  * @param key 键
  */
 export function getStore<T>(key: string): Promise<T> {
-  return window.electronic.invoke(StoreChannel.get, { key });
+  return preload.invoke(StoreChannel.get, { key });
 }

@@ -1,9 +1,10 @@
 import type { BrowserWindowConstructorOptions } from 'electron';
-import type { Customize } from '../types';
-import { app, ipcMain, shell } from 'electron';
+import type { Customize } from '../types/index';
+import { app, shell } from 'electron';
 import { resolve } from 'path';
 import { windowInstance } from './window';
-import { AppChannel } from '../preload/channel';
+import { AppChannel } from '../types/channel';
+import preload from '../preload';
 
 export interface AppBeforeOptions {
   /**
@@ -77,26 +78,26 @@ export const appProtocolRegister = (appName?: string) => {
  */
 export const appAfterOn = () => {
   //app常用信息
-  ipcMain.handle(AppChannel.getInfo, (event, args) => {
+  preload.handle(AppChannel.getInfo, ({ event, args }) => {
     return {
       name: app.name,
       version: app.getVersion()
     };
   });
   //app常用获取路径
-  ipcMain.handle(AppChannel.getPath, (event, args) => {
+  preload.handle(AppChannel.getPath, ({ event, args }) => {
     return app.getPath(args);
   });
   //app打开外部url
-  ipcMain.handle(AppChannel.openUrl, async (event, args) => {
+  preload.handle(AppChannel.openUrl, async ({ event, args }) => {
     return await shell.openExternal(args);
   });
   //app退出
-  ipcMain.handle(AppChannel.quit, (event, args) => {
+  preload.handle(AppChannel.quit, ({ event, args }) => {
     app.quit();
   });
   //app重启
-  ipcMain.handle(AppChannel.relaunch, (event, args) => {
+  preload.handle(AppChannel.relaunch, ({ event, args }) => {
     app.relaunch({ args: process.argv.slice(1) });
     if (args) app.exit(0);
   });

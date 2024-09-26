@@ -1,12 +1,13 @@
 import type { Accelerator } from '../types';
-import { ShortcutChannel } from '../preload/channel';
+import { ShortcutChannel } from '../types/channel';
+import preload from '../preload';
 
 /**
  * 快捷键监听
  * @param listener
  */
 export function shortcutOn(listener: (args: any) => void) {
-  window.electronic.on(`shortcut-back`, listener);
+  preload.on(`shortcut-back`, listener);
 }
 
 /**
@@ -15,7 +16,7 @@ export function shortcutOn(listener: (args: any) => void) {
  * @param key
  */
 export async function shortcut(name: string, key: string | string[]): Promise<void> {
-  return await window.electronic.invoke(ShortcutChannel.register, { name, key });
+  return await preload.invoke(ShortcutChannel.register, { name, key });
 }
 
 /**
@@ -23,7 +24,7 @@ export async function shortcut(name: string, key: string | string[]): Promise<vo
  * @param key
  */
 export async function shortcutUn(key?: string): Promise<void> {
-  return await window.electronic.invoke(ShortcutChannel.unregister, key);
+  return await preload.invoke(ShortcutChannel.unregister, key);
 }
 
 /**
@@ -31,7 +32,7 @@ export async function shortcutUn(key?: string): Promise<void> {
  * @param key
  */
 export async function shortcutGet(key?: string): Promise<Accelerator> {
-  return await window.electronic.invoke(ShortcutChannel.get, key);
+  return await preload.invoke(ShortcutChannel.get, key);
 }
 
 /**

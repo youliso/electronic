@@ -27,14 +27,13 @@ const external = [
   './app',
   './store',
   './machine',
-  './preload',
+  '../preload',
   './channel',
-  '../preload/channel',
   './shortcut',
-  '../types',
   './update',
   './utils',
   './window',
+  '../types/index',
   'electron',
   'electron-updater',
   'builder-util-runtime'
@@ -68,7 +67,7 @@ flies.forEach((path, index) => {
   if (path.startsWith('types')) return;
   tss += `src/${path}.ts `;
   let cfg;
-  if (path.startsWith('ipc')) {
+  if (path.startsWith('render')) {
     cfg = {
       input: `./src/${path}.ts`,
       output: [
@@ -95,9 +94,13 @@ flies.forEach((path, index) => {
       external,
       plugins: plugins()
     };
-
-    if (path === 'preload\\channel') cfg.output[0].exports = 'named';
+    if (path === 'preload') cfg.output.push({
+      file: `./dist/${path}.mjs`,
+      format: 'es',
+      sourcemap: false
+    })
   }
+
   config.push(cfg);
 });
 

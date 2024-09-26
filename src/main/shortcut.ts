@@ -1,8 +1,9 @@
-import type { Accelerator } from '../types';
-import { globalShortcut, ipcMain } from 'electron';
+import type { Accelerator } from '../types/index';
+import { globalShortcut } from 'electron';
 import { windowInstance } from './window';
 import { deepCopy } from './utils';
-import { ShortcutChannel } from '../preload/channel';
+import { ShortcutChannel } from '../types/channel';
+import preload from '../preload';
 
 export class Shortcut {
   private static instance: Shortcut;
@@ -117,9 +118,9 @@ export class Shortcut {
    * 监听
    */
   on() {
-    ipcMain.handle(
+    preload.handle<{ name: string; key: string | string[] }>(
       ShortcutChannel.register,
-      (event, args: { name: string; key: string | string[] }) => {
+      ({ args }) => {
         const accelerator: Accelerator = {
           ...args,
           callback: () => windowInstance.send(`shortcut-back`, args.key)
@@ -127,10 +128,10 @@ export class Shortcut {
         return this.register(accelerator);
       }
     );
-    ipcMain.handle(ShortcutChannel.unregister, (event, args) =>
+    preload.handle(ShortcutChannel.unregister, ({ args }) =>
       args ? this.unregister(args) : this.unregisterAll()
     );
-    ipcMain.handle(ShortcutChannel.get, (event, args) => {
+    preload.handle(ShortcutChannel.get, ({ args }) => {
       if (args) {
         const accelerator = { ...this.get(args) };
         delete accelerator.callback;

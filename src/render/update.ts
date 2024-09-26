@@ -1,17 +1,19 @@
+import preload from '../preload';
 import type { UpdateMessage } from '../types';
-import { UpdateChannel } from '../preload/channel';
+import { UpdateChannel } from '../types/channel';
+
 /**
  * 更新监听
  */
 export function updateOn(listener: (args: UpdateMessage) => void) {
-  window.electronic.on('update-back', listener);
+  preload.on('update-back', listener);
 }
 
 /**
  * 关闭监听
  */
 export function updateListenersRemove() {
-  window.electronic.removeAllListeners('update-back');
+  preload.removeOn('update-back');
 }
 
 /**
@@ -21,14 +23,14 @@ export function updateListenersRemove() {
  * @param url 更新地址（不传用默认地址）
  */
 export function updateCheck(isDel: boolean = true, autoDownload: boolean = false, url?: string) {
-  return window.electronic.invoke(UpdateChannel.check, { isDel, autoDownload, url });
+  return preload.invoke(UpdateChannel.check, { isDel, autoDownload, url });
 }
 
 /**
  * 下载更新 (如果autoDownload选项设置为 false，则可以使用此方法
  */
 export function updateDownload() {
-  return window.electronic.invoke(UpdateChannel.download);
+  return preload.invoke(UpdateChannel.download);
 }
 
 /**
@@ -36,5 +38,5 @@ export function updateDownload() {
  * @param isSilent 是否静默更新
  */
 export function updateInstall(isSilent: boolean) {
-  return window.electronic.invoke(UpdateChannel.install, isSilent);
+  return preload.invoke(UpdateChannel.install, isSilent);
 }

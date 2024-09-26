@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
-import { ipcMain } from 'electron';
-import { MachineChannel } from '../preload/channel';
+import { MachineChannel } from '../types/channel';
+import preload from '../preload';
 
 // win
 const WinRegBinPath =
@@ -66,5 +66,5 @@ export function getMachineGuid() {
  * 监听
  */
 export function machineOn() {
-  ipcMain.handle(MachineChannel.get, async () => getMachineGuid());
+  preload.handle(MachineChannel.get, () => getMachineGuid());
 }
