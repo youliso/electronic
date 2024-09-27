@@ -169,7 +169,7 @@ class PreloadInterface {
     this.onceHandler(channel, listener);
   }
 
-  async send<T = any>(webContentss: WebContents | WebContents[], channel: string, args?: T) {
+  send<T = any>(webContentss: WebContents | WebContents[], channel: string, args?: T) {
     if (this.type !== 'main') {
       throw new Error('only available in main process');
     }
@@ -209,4 +209,3 @@ class PreloadInterface {
 }
 
 export default PreloadInterface.getInstance();
-
