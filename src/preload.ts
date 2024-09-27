@@ -101,6 +101,9 @@ class PreloadInterface {
     }
   }
 
+  /**
+   * 主进程初始化
+   */
   main(ipcMain: IpcMain, config?: PreloadInterfaceConfig) {
     if (config) this.config = Object.assign(this.config, config);
     ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
@@ -123,6 +126,9 @@ class PreloadInterface {
     });
   }
 
+  /**
+   * 预载初始化
+   */
   preload(contextBridge: ContextBridge, ipcRenderer: IpcRenderer, config?: PreloadInterfaceConfig) {
     if (config) this.config = Object.assign(this.config, config);
     contextBridge.exposeInMainWorld(this.config.key, {
@@ -134,6 +140,9 @@ class PreloadInterface {
     });
   }
 
+  /**
+   * 渲染进程初始化
+   */
   render(config?: PreloadInterfaceConfig) {
     if (config) this.config = Object.assign(this.config, config);
     // @ts-ignore
@@ -199,14 +208,5 @@ class PreloadInterface {
   }
 }
 
-const preload = PreloadInterface.getInstance();
+export default PreloadInterface.getInstance();
 
-export const init = (
-  contextBridge: ContextBridge,
-  ipcRenderer: IpcRenderer,
-  config?: PreloadInterfaceConfig
-) => {
-  preload.preload(contextBridge, ipcRenderer, config);
-};
-
-export default preload;

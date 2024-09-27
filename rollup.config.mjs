@@ -94,9 +94,6 @@ flies.forEach((path, index) => {
       external,
       plugins: plugins()
     };
-    if (path === 'preload') {
-      cfg.output[0].exports = 'named';
-    }
   }
 
   config.push(cfg);
