@@ -148,8 +148,8 @@ class PreloadInterface {
   /**
    * 渲染进程初始化
    */
-  render(args: { config?: PreloadInterfaceConfig }) {
-    if (args.config) this.config = Object.assign(this.config, args.config);
+  render(args?: { config?: PreloadInterfaceConfig }) {
+    if (args?.config) this.config = Object.assign(this.config, args.config);
     // @ts-ignore
     window[this.config.key].on((args: ProtocolHeader) =>
       this.routeHandler(args.channel, args.args)
