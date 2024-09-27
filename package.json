@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "electron modules",
   "scripts": {
     "build": "rollup -c rollup.config.mjs && node build.mjs",
@@ -24,8 +24,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "electron": ">=30",
-    "node": ">=20"
+    "electron": ">=28",
+    "node": ">=18"
   },
   "files": [
     "**/*"

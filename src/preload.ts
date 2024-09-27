@@ -6,10 +6,6 @@ import type {
   WebContents
 } from 'electron';
 
-interface PreloadInterfaceConfig {
-  key: string;
-}
-
 interface ProtocolHeader {
   channel: string;
   args: any;
@@ -21,6 +17,10 @@ interface ManiProtocolHeader<T = any> {
 }
 
 type Handler = (args?: any) => any | Promise<any>;
+
+export interface PreloadInterfaceConfig {
+  key: string;
+}
 
 class PreloadInterface {
   private static instance: PreloadInterface;
@@ -199,4 +199,14 @@ class PreloadInterface {
   }
 }
 
-export default PreloadInterface.getInstance();
+const preload = PreloadInterface.getInstance();
+
+export const init = (
+  contextBridge: ContextBridge,
+  ipcRenderer: IpcRenderer,
+  config?: PreloadInterfaceConfig
+) => {
+  preload.preload(contextBridge, ipcRenderer, config);
+};
+
+export default preload;

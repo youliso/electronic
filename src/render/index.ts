@@ -1,8 +1,10 @@
-import preload from '../preload';
+import preload, { type PreloadInterfaceConfig } from '../preload';
 export * from './app';
 export * from './shortcut';
 export * from './store';
 export * from './window';
 export * from './machine';
 
-preload.render();
+export const init = (config?: PreloadInterfaceConfig) => {
+  preload.render(config);
+};
