@@ -11,6 +11,7 @@
   "types": "mian/index.d.ts",
   "keywords": [
     "electron",
+    "multiple windows",
     "electron-updater"
   ],
   "author": "youliso",
