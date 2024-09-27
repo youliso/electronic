@@ -1,4 +1,5 @@
 import type {
+  BrowserWindow,
   ContextBridge,
   IpcMain,
   IpcMainInvokeEvent,
@@ -24,6 +25,7 @@ export interface PreloadInterfaceConfig {
 
 class PreloadInterface {
   private static instance: PreloadInterface;
+  private browserWindow: typeof BrowserWindow | undefined;
   private type: 'main' | 'preload' | 'render' | undefined;
   private listeners: Map<string, { once: boolean; handler: Handler }[]> = new Map();
   private config: PreloadInterfaceConfig = {
@@ -104,7 +106,8 @@ class PreloadInterface {
   /**
    * 主进程初始化
    */
-  main(ipcMain: IpcMain, config?: PreloadInterfaceConfig) {
+  main(browserWindow: typeof BrowserWindow, ipcMain: IpcMain, config?: PreloadInterfaceConfig) {
+    this.browserWindow = browserWindow;
     if (config) this.config = Object.assign(this.config, config);
     ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
       const params = {
@@ -169,16 +172,20 @@ class PreloadInterface {
     this.onceHandler(channel, listener);
   }
 
-  send<T = any>(webContentss: WebContents | WebContents[], channel: string, args?: T) {
+  send<T = any>(channel: string, args?: T, ids?: number[]) {
     if (this.type !== 'main') {
       throw new Error('only available in main process');
     }
-    if (Array.isArray(webContentss)) {
-      webContentss.forEach((webContents) => {
-        webContents.send(`${this.config.key}:on`, { channel, args });
-      });
+    if (!this.browserWindow) {
+      throw new Error('browserWindow is undefined');
+    }
+    const key = `${this.config.key}:on`;
+    const value = { channel, args };
+    if (ids) {
+      ids.forEach((id) => this.browserWindow!.fromId(id)?.webContents.send(key, value));
     } else {
-      webContentss.send(`${this.config.key}:on`, { channel, args });
+      const wins = this.browserWindow!.getAllWindows();
+      wins.forEach((win) => win.webContents.send(key, value));
     }
   }
 
