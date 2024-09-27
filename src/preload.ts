@@ -1,4 +1,10 @@
-import type { ContextBridge, IpcMain, IpcMainInvokeEvent, IpcRenderer } from 'electron';
+import type {
+  ContextBridge,
+  IpcMain,
+  IpcMainInvokeEvent,
+  IpcRenderer,
+  WebContents
+} from 'electron';
 
 interface PreloadInterfaceConfig {
   key: string;
@@ -95,7 +101,8 @@ class PreloadInterface {
     }
   }
 
-  main(ipcMain: IpcMain) {
+  main(ipcMain: IpcMain, config?: PreloadInterfaceConfig) {
+    if (config) this.config = Object.assign(this.config, config);
     ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
       const params = {
         event,
@@ -116,7 +123,8 @@ class PreloadInterface {
     });
   }
 
-  preload(contextBridge: ContextBridge, ipcRenderer: IpcRenderer) {
+  preload(contextBridge: ContextBridge, ipcRenderer: IpcRenderer, config?: PreloadInterfaceConfig) {
+    if (config) this.config = Object.assign(this.config, config);
     contextBridge.exposeInMainWorld(this.config.key, {
       invoke: (args: any) => {
         return ipcRenderer.invoke(`${this.config.key}:invoke`, args);
@@ -126,7 +134,8 @@ class PreloadInterface {
     });
   }
 
-  render() {
+  render(config?: PreloadInterfaceConfig) {
+    if (config) this.config = Object.assign(this.config, config);
     // @ts-ignore
     window[this.config.key].on((args: ProtocolHeader) =>
       this.routeHandler(args.channel, args.args)
@@ -151,17 +160,16 @@ class PreloadInterface {
     this.onceHandler(channel, listener);
   }
 
-  async send(args: any, id?: number) {
+  async send<T = any>(webContentss: WebContents | WebContents[], channel: string, args?: T) {
     if (this.type !== 'main') {
       throw new Error('only available in main process');
     }
-    const { BrowserWindow } = await import('electron');
-    if (id) {
-      BrowserWindow.fromId(id)?.webContents.send(`${this.config.key}:on`, args);
-    } else {
-      BrowserWindow.getAllWindows().forEach((win) => {
-        win.webContents.send(`${this.config.key}:on`, args);
+    if (Array.isArray(webContentss)) {
+      webContentss.forEach((webContents) => {
+        webContents.send(`${this.config.key}:on`, { channel, args });
       });
+    } else {
+      webContentss.send(`${this.config.key}:on`, { channel, args });
     }
   }
 
