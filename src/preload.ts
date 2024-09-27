@@ -98,16 +98,16 @@ class PreloadInterface {
   /**
    * 主进程初始化
    */
-  main(args: {
-    browserWindow: typeof Electron.BrowserWindow;
-    ipcMain: Electron.IpcMain;
-    webContents?: typeof Electron.WebContents;
-    config?: PreloadInterfaceConfig;
-  }) {
-    this.browserWindow = args.browserWindow;
-    this.webContents = args.webContents;
-    if (args.config) this.config = Object.assign(this.config, args.config);
-    args.ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
+  main(
+    browserWindow: typeof Electron.BrowserWindow,
+    ipcMain: Electron.IpcMain,
+    webContents?: typeof Electron.WebContents,
+    config?: PreloadInterfaceConfig
+  ) {
+    this.browserWindow = browserWindow;
+    this.webContents = webContents;
+    if (config) this.config = Object.assign(this.config, config);
+    ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
       const params = {
         event,
         args: args.args
@@ -130,26 +130,26 @@ class PreloadInterface {
   /**
    * 预载初始化
    */
-  preload(args: {
-    contextBridge: Electron.ContextBridge;
-    ipcRenderer: Electron.IpcRenderer;
-    config?: PreloadInterfaceConfig;
-  }) {
-    if (args.config) this.config = Object.assign(this.config, args.config);
-    args.contextBridge.exposeInMainWorld(this.config.key, {
+  preload(
+    contextBridge: Electron.ContextBridge,
+    ipcRenderer: Electron.IpcRenderer,
+    config?: PreloadInterfaceConfig
+  ) {
+    if (config) this.config = Object.assign(this.config, config);
+    contextBridge.exposeInMainWorld(this.config.key, {
       invoke: (args: any) => {
-        return args.ipcRenderer.invoke(`${this.config.key}:invoke`, args);
+        return ipcRenderer.invoke(`${this.config.key}:invoke`, args);
       },
       on: (listener: (args: any) => void) =>
-        args.ipcRenderer.on(`${this.config.key}:on`, (_, args) => listener(args))
+        ipcRenderer.on(`${this.config.key}:on`, (_, args) => listener(args))
     });
   }
 
   /**
    * 渲染进程初始化
    */
-  render(args?: { config?: PreloadInterfaceConfig }) {
-    if (args?.config) this.config = Object.assign(this.config, args.config);
+  render(config?: PreloadInterfaceConfig) {
+    if (config) this.config = Object.assign(this.config, config);
     // @ts-ignore
     window[this.config.key].on((args: ProtocolHeader) =>
       this.routeHandler(args.channel, args.args)
