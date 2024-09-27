@@ -6,7 +6,7 @@ import preload from '../preload';
  * 快捷键监听
  * @param listener
  */
-export function shortcutOn(listener: (args: any) => void) {
+export function shortcutOn(listener: (args: string | string[]) => void) {
   preload.on(`shortcut-back`, listener);
 }
 

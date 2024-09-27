@@ -1,19 +1,10 @@
-import type {
-  BrowserWindow,
-  ContextBridge,
-  IpcMain,
-  IpcMainInvokeEvent,
-  IpcRenderer,
-  WebContents
-} from 'electron';
-
 interface ProtocolHeader {
   channel: string;
   args: any;
 }
 
 interface ManiProtocolHeader<T = any> {
-  event: IpcMainInvokeEvent;
+  event: Electron.IpcMainInvokeEvent;
   args: T;
 }
 
@@ -25,7 +16,8 @@ export interface PreloadInterfaceConfig {
 
 class PreloadInterface {
   private static instance: PreloadInterface;
-  private browserWindow: typeof BrowserWindow | undefined;
+  private browserWindow: typeof Electron.BrowserWindow | undefined;
+  private webContents: typeof Electron.WebContents | undefined;
   private type: 'main' | 'preload' | 'render' | undefined;
   private listeners: Map<string, { once: boolean; handler: Handler }[]> = new Map();
   private config: PreloadInterfaceConfig = {
@@ -106,10 +98,16 @@ class PreloadInterface {
   /**
    * 主进程初始化
    */
-  main(browserWindow: typeof BrowserWindow, ipcMain: IpcMain, config?: PreloadInterfaceConfig) {
-    this.browserWindow = browserWindow;
-    if (config) this.config = Object.assign(this.config, config);
-    ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
+  main(args: {
+    browserWindow: typeof Electron.BrowserWindow;
+    ipcMain: Electron.IpcMain;
+    webContents?: typeof Electron.WebContents;
+    config?: PreloadInterfaceConfig;
+  }) {
+    this.browserWindow = args.browserWindow;
+    this.webContents = args.webContents;
+    if (args.config) this.config = Object.assign(this.config, args.config);
+    args.ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
       const params = {
         event,
         args: args.args
@@ -132,22 +130,26 @@ class PreloadInterface {
   /**
    * 预载初始化
    */
-  preload(contextBridge: ContextBridge, ipcRenderer: IpcRenderer, config?: PreloadInterfaceConfig) {
-    if (config) this.config = Object.assign(this.config, config);
-    contextBridge.exposeInMainWorld(this.config.key, {
+  preload(args: {
+    contextBridge: Electron.ContextBridge;
+    ipcRenderer: Electron.IpcRenderer;
+    config?: PreloadInterfaceConfig;
+  }) {
+    if (args.config) this.config = Object.assign(this.config, args.config);
+    args.contextBridge.exposeInMainWorld(this.config.key, {
       invoke: (args: any) => {
-        return ipcRenderer.invoke(`${this.config.key}:invoke`, args);
+        return args.ipcRenderer.invoke(`${this.config.key}:invoke`, args);
       },
       on: (listener: (args: any) => void) =>
-        ipcRenderer.on(`${this.config.key}:on`, (_, args) => listener(args))
+        args.ipcRenderer.on(`${this.config.key}:on`, (_, args) => listener(args))
     });
   }
 
   /**
    * 渲染进程初始化
    */
-  render(config?: PreloadInterfaceConfig) {
-    if (config) this.config = Object.assign(this.config, config);
+  render(args: { config?: PreloadInterfaceConfig }) {
+    if (args.config) this.config = Object.assign(this.config, args.config);
     // @ts-ignore
     window[this.config.key].on((args: ProtocolHeader) =>
       this.routeHandler(args.channel, args.args)
@@ -184,8 +186,23 @@ class PreloadInterface {
     if (ids) {
       ids.forEach((id) => this.browserWindow!.fromId(id)?.webContents.send(key, value));
     } else {
-      const wins = this.browserWindow!.getAllWindows();
-      wins.forEach((win) => win.webContents.send(key, value));
+      this.browserWindow.getAllWindows().forEach((win) => win.webContents.send(key, value));
+    }
+  }
+
+  sendByWebContents<T = any>(channel: string, args?: T, ids?: number[]) {
+    if (this.type !== 'main') {
+      throw new Error('only available in main process');
+    }
+    if (!this.webContents) {
+      throw new Error('webContents is undefined');
+    }
+    const key = `${this.config.key}:on`;
+    const value = { channel, args };
+    if (ids) {
+      ids.forEach((id) => this.webContents!.fromId(id)?.send(key, value));
+    } else {
+      this.webContents.getAllWebContents().forEach((webContent) => webContent.send(key, value));
     }
   }
 

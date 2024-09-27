@@ -123,7 +123,7 @@ export class Shortcut {
       ({ args }) => {
         const accelerator: Accelerator = {
           ...args,
-          callback: () => windowInstance.send(`shortcut-back`, args.key)
+          callback: () => preload.send(`shortcut-back`, args.key)
         };
         return this.register(accelerator);
       }

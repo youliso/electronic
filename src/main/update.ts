@@ -113,7 +113,7 @@ export class Update {
    */
   on() {
     //开启更新监听
-    this.open((data: { key: string; value: any }) => windowInstance.send('update-back', data));
+    this.open((data: { key: string; value: any }) => preload.send('update-back', data));
     //检查更新
     preload.handle(UpdateChannel.check, ({ event, args }) =>
       this.checkUpdate(args.isDel, args.autoDownload, args.url)

@@ -255,7 +255,7 @@ export class Window {
     if (customize.isOneWindow && !customize.url) {
       for (const i of this.getAll()) {
         if (customize?.route && customize.route === i.customize?.route) {
-          i.webContents.send('window-single-data', customize?.data);
+          preload.send('window-single-data', customize?.data, [i.id]);
           return;
         }
       }
@@ -304,17 +304,17 @@ export class Window {
     // 窗口usb插拔消息监听
     process.platform === 'win32' &&
       win.hookWindowMessage(0x0219, (wParam, lParam) =>
-        win.webContents.send('window-hook-message', wParam, lParam)
+        preload.send('window-hook-message', { wParam, lParam }, [win.id])
       );
     win.webContents.on('did-attach-webview', (_, webContents) =>
       windowOpenHandler(webContents, win.id)
     );
     // 窗口最大最小监听
-    win.on('maximize', () => win.webContents.send('window-maximize-status', 'maximize'));
-    win.on('unmaximize', () => win.webContents.send('window-maximize-status', 'unmaximize'));
+    win.on('maximize', () => preload.send('window-maximize-status', 'maximize', [win.id]));
+    win.on('unmaximize', () => preload.send('window-maximize-status', 'unmaximize', [win.id]));
     // 聚焦失焦监听
-    win.on('blur', () => win.webContents.send('window-blur-focus', 'blur'));
-    win.on('focus', () => win.webContents.send('window-blur-focus', 'focus'));
+    win.on('blur', () => preload.send('window-blur-focus', 'blur', [win.id]));
+    win.on('focus', () => preload.send('window-blur-focus', 'focus', [win.id]));
     switch (win.customize.loadType) {
       case 'file':
         return win.loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions);
@@ -341,26 +341,6 @@ export class Window {
     // @ts-ignore
     data ? win[type](...data) : win[type]();
     return;
-  }
-
-  /**
-   * 窗口发送消息
-   */
-  send(key: string, value: any, id?: number) {
-    if (id !== null && id !== undefined) {
-      const win = this.get(id as number);
-      if (win) win.webContents.send(key, value);
-    } else for (const i of this.getAll()) i.webContents.send(key, value);
-  }
-
-  /**
-   * 窗口发送消息
-   */
-  sendByWebContents(key: string, value: any, id?: number) {
-    if (id !== null && id !== undefined) {
-      const webContent = webContents.fromId(id);
-      if (webContent) webContent.send(key, value);
-    } else for (const webContent of webContents.getAllWebContents()) webContent.send(key, value);
   }
 
   /**
@@ -523,36 +503,41 @@ export class Window {
       this.setBackgroundColor(args)
     );
     // 窗口消息
-    preload.handle(WindowChannel.sendMessage, ({ event, args }) => {
+    preload.handle<{
+      id: number;
+      channel: string;
+      value: any;
+      isback: boolean;
+      acceptIds?: number[];
+    }>(WindowChannel.sendMessage, ({ event, args }) => {
       const channel = `window-message-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
-        for (const i of args.acceptIds) this.send(channel, args.value, i);
-        return;
-      }
-      for (const win of this.getAll()) {
-        if (!args.isback && win.id === args.id) {
-          win.webContents.send(channel, args.value);
-        } else {
-          win.webContents.send(channel, args.value);
+        preload.send(channel, args.value, args.acceptIds);
+      } else {
+        args.acceptIds = this.getAll().map((win) => win.id);
+        if (!args.isback) {
+          args.acceptIds = args.acceptIds.filter((id) => id !== args.id);
         }
       }
+      preload.send(channel, args.value, args.acceptIds);
     });
-    preload.handle(WindowChannel.sendMessageContents, ({ event, args }) => {
+    preload.handle<{
+      id: number;
+      channel: string;
+      value: any;
+      isback: boolean;
+      acceptIds?: number[];
+    }>(WindowChannel.sendMessageContents, ({ event, args }) => {
       const channel = `window-message-contents-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
-        for (const i of args.acceptIds) {
-          const webContent = webContents.fromId(i);
-          webContent && webContent.send(channel, args.value);
-        }
-        return;
-      }
-      for (const webContent of webContents.getAllWebContents()) {
-        if (!args.isback && webContent.id === args.id) {
-          webContent.send(channel, args.value);
-        } else {
-          webContent.send(channel, args.value);
+        preload.sendByWebContents(channel, args.value, args.acceptIds);
+      } else {
+        args.acceptIds = webContents.getAllWebContents().map((webContent) => webContent.id);
+        if (!args.isback) {
+          args.acceptIds = args.acceptIds.filter((id) => id !== args.id);
         }
       }
+      preload.sendByWebContents(channel, args.value, args.acceptIds);
     });
     //通过路由获取窗口id (不传route查全部)
     preload.handle(WindowChannel.getWinId, async ({ event, args }) => {

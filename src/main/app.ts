@@ -41,7 +41,7 @@ export const appSingleInstanceLock = (options: AppBeforeOptions) => {
       if (options?.isFocusMainWin) {
         const main = windowInstance.getMain();
         if (main) {
-          main.webContents.send('window-single-instance', argv);
+          preload.send('window-single-instance', argv, [main.id]);
         }
         return;
       }
