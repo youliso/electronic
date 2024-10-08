@@ -78,26 +78,26 @@ export const appProtocolRegister = (appName?: string) => {
  */
 export const appAfterOn = () => {
   //app常用信息
-  preload.handle(AppChannel.getInfo, ({ event, args }) => {
+  preload.handle(AppChannel.getInfo, () => {
     return {
       name: app.name,
       version: app.getVersion()
     };
   });
   //app常用获取路径
-  preload.handle(AppChannel.getPath, ({ event, args }) => {
+  preload.handle(AppChannel.getPath, (_, args) => {
     return app.getPath(args);
   });
   //app打开外部url
-  preload.handle(AppChannel.openUrl, async ({ event, args }) => {
+  preload.handle(AppChannel.openUrl, async (_, args) => {
     return await shell.openExternal(args);
   });
   //app退出
-  preload.handle(AppChannel.quit, ({ event, args }) => {
+  preload.handle(AppChannel.quit, () => {
     app.quit();
   });
   //app重启
-  preload.handle(AppChannel.relaunch, ({ event, args }) => {
+  preload.handle(AppChannel.relaunch, (_, args) => {
     app.relaunch({ args: process.argv.slice(1) });
     if (args) app.exit(0);
   });

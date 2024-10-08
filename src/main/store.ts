@@ -108,12 +108,17 @@ export class Store {
    */
   on() {
     //赋值(sharedObject)
-    preload.handle<{ key: string; value: any }>(StoreChannel.set, ({ event, args }) => {
-      return this.set(args.key, args.value);
+    preload.handle<{ key: string; value: any }>(StoreChannel.set, (event, args) => {
+      if (args) {
+        this.set(args.key, args.value);
+      }
     });
     //获取(sharedObject)
-    preload.handle<{ key: string }>(StoreChannel.get, ({ event, args }) => {
-      return this.get(args.key);
+    preload.handle<{ key: string }>(StoreChannel.get, (event, args) => {
+      if (args) {
+        return this.get(args.key);
+      }
+      return;
     });
   }
 }

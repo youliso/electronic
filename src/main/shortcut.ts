@@ -120,18 +120,21 @@ export class Shortcut {
   on() {
     preload.handle<{ name: string; key: string | string[] }>(
       ShortcutChannel.register,
-      ({ args }) => {
-        const accelerator: Accelerator = {
-          ...args,
-          callback: () => preload.send(`shortcut-back`, args.key)
-        };
-        return this.register(accelerator);
+      (_, args) => {
+        if (args) {
+          const accelerator: Accelerator = {
+            ...args,
+            callback: () => preload.send(`shortcut-back`, args.key)
+          };
+          return this.register(accelerator);
+        }
+        return;
       }
     );
-    preload.handle(ShortcutChannel.unregister, ({ args }) =>
+    preload.handle(ShortcutChannel.unregister, (_, args) =>
       args ? this.unregister(args) : this.unregisterAll()
     );
-    preload.handle(ShortcutChannel.get, ({ args }) => {
+    preload.handle(ShortcutChannel.get, (_, args) => {
       if (args) {
         const accelerator = { ...this.get(args) };
         delete accelerator.callback;

@@ -439,7 +439,7 @@ export class Window {
    */
   on() {
     // 窗口数据更新
-    preload.handle(WindowChannel.update, ({ args }) => {
+    preload.handle(WindowChannel.update, (_, args) => {
       if (args?.id) {
         const win = this.get(args.id);
         if (!win) {
@@ -450,7 +450,7 @@ export class Window {
       }
     });
     // 最大化最小化窗口
-    preload.handle<number>(WindowChannel.maxMinSize, ({ args }) => {
+    preload.handle<number>(WindowChannel.maxMinSize, (_, args) => {
       if (args !== null && args !== undefined) {
         const win = this.get(args);
         if (!win) {
@@ -462,15 +462,11 @@ export class Window {
       }
     });
     // 窗口消息
-    preload.handle(WindowChannel.func, ({ event, args }) =>
-      this.func(args.type, args.id, args.data)
-    );
+    preload.handle(WindowChannel.func, (_, args) => this.func(args.type, args.id, args.data));
     // 窗口状态
-    preload.handle(WindowChannel.status, async ({ event, args }) =>
-      this.getStatus(args.type, args.id)
-    );
+    preload.handle(WindowChannel.status, async (_, args) => this.getStatus(args.type, args.id));
     // 创建窗口
-    preload.handle(WindowChannel.new, async ({ event, args }) => {
+    preload.handle(WindowChannel.new, async (_, args) => {
       const newWin = await this.new(args.customize, args.windowOptions, args.loadOptions);
       if (newWin) {
         return {
@@ -481,7 +477,7 @@ export class Window {
       return null;
     });
     // 窗口初始化加载
-    preload.handle(WindowChannel.load, async ({ event }) => {
+    preload.handle(WindowChannel.load, async (event) => {
       const win = BrowserWindow.fromWebContents(event.sender);
       if (!win) throw new Error('fromWebContents not');
       return {
@@ -491,17 +487,15 @@ export class Window {
       };
     });
     // 设置窗口是否置顶
-    preload.handle(WindowChannel.setAlwaysTop, ({ event, args }) => this.setAlwaysOnTop(args));
+    preload.handle(WindowChannel.setAlwaysTop, (_, args) => this.setAlwaysOnTop(args));
     // 设置窗口大小
-    preload.handle(WindowChannel.setSize, ({ event, args }) => this.setSize(args));
+    preload.handle(WindowChannel.setSize, (_, args) => this.setSize(args));
     // 设置窗口(最小/最大)大小
-    preload.handle(WindowChannel.setMinMaxSize, ({ event, args }) =>
+    preload.handle(WindowChannel.setMinMaxSize, (_, args) =>
       args.type === 'min' ? this.setMinSize(args) : this.setMaxSize(args)
     );
     // 设置窗口背景颜色
-    preload.handle(WindowChannel.setBackgroundColor, ({ event, args }) =>
-      this.setBackgroundColor(args)
-    );
+    preload.handle(WindowChannel.setBackgroundColor, (_, args) => this.setBackgroundColor(args));
     // 窗口消息
     preload.handle<{
       id: number;
@@ -509,7 +503,8 @@ export class Window {
       value: any;
       isback: boolean;
       acceptIds?: number[];
-    }>(WindowChannel.sendMessage, ({ event, args }) => {
+    }>(WindowChannel.sendMessage, (_, args) => {
+      if (!args) return;
       const channel = `window-message-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         preload.send(channel, args.value, args.acceptIds);
@@ -527,7 +522,8 @@ export class Window {
       value: any;
       isback: boolean;
       acceptIds?: number[];
-    }>(WindowChannel.sendMessageContents, ({ event, args }) => {
+    }>(WindowChannel.sendMessageContents, (_, args) => {
+      if (!args) return;
       const channel = `window-message-contents-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
         preload.sendByWebContents(channel, args.value, args.acceptIds);
@@ -540,7 +536,7 @@ export class Window {
       preload.sendByWebContents(channel, args.value, args.acceptIds);
     });
     //通过路由获取窗口id (不传route查全部)
-    preload.handle(WindowChannel.getWinId, async ({ event, args }) => {
+    preload.handle(WindowChannel.getWinId, async (_, args) => {
       return this.getAll()
         .filter((win) => (args.route ? win.customize?.route === args.route : true))
         .map((win) => win.id);

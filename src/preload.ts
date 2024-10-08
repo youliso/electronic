@@ -1,14 +1,13 @@
+import type { IpcMainInvokeEvent } from 'electron';
+
 interface ProtocolHeader {
   channel: string;
   args: any;
 }
 
-interface ManiProtocolHeader<T = any> {
-  event: Electron.IpcMainInvokeEvent;
-  args: T;
-}
+type MainHandler<T = any> = (event: IpcMainInvokeEvent, args: T) => T | Promise<T> | void;
 
-type Handler = (args?: any) => any | Promise<any>;
+type RenderHandler<T = any> = (args: T) => void;
 
 export interface PreloadInterfaceConfig {
   key: string;
@@ -19,7 +18,8 @@ class PreloadInterface {
   private browserWindow: typeof Electron.BrowserWindow | undefined;
   private webContents: typeof Electron.WebContents | undefined;
   private type: 'main' | 'preload' | 'render' | undefined;
-  private listeners: Map<string, { once: boolean; handler: Handler }[]> = new Map();
+  private listeners: Map<string, { once: boolean; handler: MainHandler | RenderHandler }[]> =
+    new Map();
   private config: PreloadInterfaceConfig = {
     key: 'process-communication'
   };
@@ -44,7 +44,7 @@ class PreloadInterface {
   private routeHandlerByMain(channel: string) {
     const handlers = this.listeners.get(channel);
     if (handlers) {
-      let funcs: Handler[] = [];
+      let funcs: MainHandler[] = [];
       handlers.forEach(({ once, handler }) => {
         funcs.push(handler);
         once && this.listeners.delete(channel);
@@ -54,31 +54,31 @@ class PreloadInterface {
     return;
   }
 
-  private routeHandler(channel: string, message: any) {
+  private routeHandlerByRender(channel: string, message: any) {
     const handlers = this.listeners.get(channel);
     if (handlers) {
       handlers.forEach(({ once, handler }) => {
-        handler(message);
+        (handler as RenderHandler)(message);
         once && this.listeners.delete(channel);
       });
     }
   }
 
-  private onHandler(channel: string, handler: Handler): void {
+  private onHandler(channel: string, handler: MainHandler | RenderHandler): void {
     if (!this.listeners.has(channel)) {
       this.listeners.set(channel, []);
     }
     this.listeners.get(channel)!.push({ once: false, handler });
   }
 
-  private onceHandler(channel: string, handler: Handler): void {
+  private onceHandler(channel: string, handler: MainHandler | RenderHandler): void {
     if (!this.listeners.has(channel)) {
       this.listeners.set(channel, []);
     }
     this.listeners.get(channel)!.push({ once: true, handler });
   }
 
-  private removeOnHandler(channel: string, handler?: Handler): void {
+  private removeOnHandler(channel: string, handler?: MainHandler | RenderHandler): void {
     const handlers = this.listeners.get(channel);
     if (handlers) {
       if (handler) {
@@ -108,18 +108,14 @@ class PreloadInterface {
     this.webContents = webContents;
     if (config) this.config = Object.assign(this.config, config);
     ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
-      const params = {
-        event,
-        args: args.args
-      };
       const funcs = this.routeHandlerByMain(args.channel);
       if (funcs) {
         if (funcs.length == 1) {
-          return await funcs[0](params);
+          return await funcs[0](event, args.args);
         }
         let values: any[] = [];
         for (let index = 0; index < funcs.length; index++) {
-          const value = await funcs[index](params);
+          const value = await funcs[index](event, args.args);
           value && values.push(value);
         }
         if (values.length > 0) return values;
@@ -152,22 +148,22 @@ class PreloadInterface {
     if (config) this.config = Object.assign(this.config, config);
     // @ts-ignore
     window[this.config.key].on((args: ProtocolHeader) =>
-      this.routeHandler(args.channel, args.args)
+      this.routeHandlerByRender(args.channel, args.args)
     );
   }
 
-  removeOn(channel: string, listener?: Handler) {
+  removeOn(channel: string, listener?: MainHandler | RenderHandler) {
     this.removeOnHandler(channel, listener);
   }
 
-  handle<T = any>(channel: string, listener: (args: ManiProtocolHeader<T>) => void) {
+  handle<T = any>(channel: string, listener: MainHandler<T>) {
     if (this.type !== 'main') {
       throw new Error('only available in main process');
     }
     this.onHandler(channel, listener);
   }
 
-  handleOnce<T = any>(channel: string, listener: (args: ManiProtocolHeader<T>) => void) {
+  handleOnce<T = any>(channel: string, listener: MainHandler<T>) {
     if (this.type !== 'main') {
       throw new Error('only available in main process');
     }
@@ -206,14 +202,14 @@ class PreloadInterface {
     }
   }
 
-  on<T = any>(channel: string, listener: (args: T) => void) {
+  on<T = any>(channel: string, listener: RenderHandler<T>) {
     if (this.type !== 'render') {
       throw new Error('only available in render process');
     }
     this.onHandler(channel, listener);
   }
 
-  once<T = any>(channel: string, listener: (args: T) => void) {
+  once<T = any>(channel: string, listener: RenderHandler<T>) {
     if (this.type !== 'render') {
       throw new Error('only available in render process');
     }

@@ -115,14 +115,12 @@ export class Update {
     //开启更新监听
     this.open((data: { key: string; value: any }) => preload.send('update-back', data));
     //检查更新
-    preload.handle(UpdateChannel.check, ({ event, args }) =>
+    preload.handle(UpdateChannel.check, (event, args) =>
       this.checkUpdate(args.isDel, args.autoDownload, args.url)
     );
     //手动下载更新
-    preload.handle(UpdateChannel.download, ({ event, args }) => this.downloadUpdate());
+    preload.handle(UpdateChannel.download, (event, args) => this.downloadUpdate());
     // 关闭程序安装新的软件 isSilent 是否静默更新
-    preload.handle<boolean>(UpdateChannel.install, ({ event, args }) =>
-      this.updateQuitInstall(args)
-    );
+    preload.handle<boolean>(UpdateChannel.install, (event, args) => this.updateQuitInstall(args));
   }
 }
