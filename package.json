@@ -24,8 +24,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "electron": ">=28",
-    "node": ">=18"
+    "electron": ">=30",
+    "node": ">=20"
   },
   "files": [
     "**/*"
