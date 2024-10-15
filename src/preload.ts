@@ -7,7 +7,7 @@ interface ProtocolHeader {
 
 type MainHandler<T = any> = (event: IpcMainInvokeEvent, args: T) => T | Promise<T> | void;
 
-type BridgeHandler<T = any> = (args: T) => Promise<T> | void;
+type BridgeHandler<T = any> = (args: T) => T | Promise<T> | void;
 
 type RenderHandler<T = any> = (args: T) => void;
 
