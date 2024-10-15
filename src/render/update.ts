@@ -6,7 +6,7 @@ import { UpdateChannel } from '../types/channel';
  * 更新监听
  */
 export function updateOn(listener: (args: UpdateMessage) => void) {
-  preload.on('update-back', listener);
+  preload.on('update-back', (_, args) => listener(args));
 }
 
 /**

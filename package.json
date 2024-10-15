@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "electron modules",
   "scripts": {
     "build": "rollup -c rollup.config.mjs && node build.mjs",
@@ -35,11 +35,11 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "electron": "^32",
-    "electron-updater": "^6.3.4",
+    "electron-updater": "^6.3.9",
     "prettier": "^3.3.3",
-    "rollup": "^4.22.4",
+    "rollup": "^4.24.0",
     "rollup-plugin-esbuild-minify": "^1.1.2",
     "rollup-plugin-typescript2": "^0.36.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   }
 }

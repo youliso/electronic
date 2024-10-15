@@ -22,14 +22,14 @@ export function windowLoad(listener: () => void) {
  * 单例模式后协议再开触发
  */
 export function windowSingleInstanceOn(listener: (argv?: string[]) => void) {
-  preload.on<string[]>('window-single-instance', (argv) => listener(argv));
+  preload.on<string[]>('window-single-instance', (_, argv) => listener(argv));
 }
 
 /**
  * 窗口再次创建触发
  */
 export function windowSingleDataOn<T>(listener: (data?: T) => void) {
-  preload.on<T>('window-single-data', (data) => listener(data));
+  preload.on<T>('window-single-data', (_, data) => listener(data));
 }
 
 /**
@@ -43,14 +43,14 @@ export function windowUpdateCustomize(customize: Customize) {
  * usb插拔消息监听
  */
 export function windowHookMessageUSB(listener: (args: { wParam: Buffer; lParam: Buffer }) => void) {
-  preload.on('window-hook-message', listener);
+  preload.on('window-hook-message', (_, args) => listener);
 }
 
 /**
  * 窗口聚焦失焦监听
  */
 export function windowBlurFocusOn(listener: (args: 'blur' | 'focus') => void) {
-  preload.on('window-blur-focus', listener);
+  preload.on('window-blur-focus', (_, args) => listener);
 }
 
 /**
@@ -64,7 +64,7 @@ export function windowBlurFocusRemove() {
  * 窗口大小化监听
  */
 export function windowMaximizeOn(listener: (args: 'maximize' | 'unmaximize') => void) {
-  preload.on('window-maximize-status', listener);
+  preload.on('window-maximize-status', (_, args) => listener(args));
 }
 
 /**
