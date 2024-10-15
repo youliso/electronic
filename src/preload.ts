@@ -9,7 +9,7 @@ type MainHandler<T = any> = (event: IpcMainInvokeEvent, args: T) => T | Promise<
 
 type BridgeHandler<T = any> = (args: T) => Promise<T> | void;
 
-type RenderHandler<T = any> = (event: IpcRendererEvent, args: T) => void;
+type RenderHandler<T = any> = (args: T) => void;
 
 export interface PreloadInterfaceConfig {
   key: string;
@@ -69,11 +69,11 @@ class PreloadInterface {
     return;
   }
 
-  private routeHandlerByRender(event: IpcRendererEvent, channel: string, message: any) {
+  private routeHandlerByRender(channel: string, message: any) {
     const handlers = this.listeners.get(channel);
     if (handlers) {
       handlers.forEach(({ once, handler }) => {
-        (handler as RenderHandler)(event, message);
+        (handler as RenderHandler)(message);
         once && this.listeners.delete(channel);
       });
     }
@@ -169,7 +169,7 @@ class PreloadInterface {
         return ipcRenderer.invoke(`${this.config.key}:invoke`, args);
       },
       on: (listener: RenderHandler) =>
-        ipcRenderer.on(`${this.config.key}:on`, (event, args) => listener(event, args))
+        ipcRenderer.on(`${this.config.key}:on`, (_, args) => listener(args))
     });
   }
 
@@ -179,8 +179,8 @@ class PreloadInterface {
   render(config?: PreloadInterfaceConfig) {
     if (config) this.config = Object.assign(this.config, config);
     // @ts-ignore
-    window[this.config.key].on((event, args: ProtocolHeader) =>
-      this.routeHandlerByRender(event, args.channel, args.args)
+    window[this.config.key].on((args: ProtocolHeader) =>
+      this.routeHandlerByRender(args.channel, args.args)
     );
   }
 
