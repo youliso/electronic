@@ -1,4 +1,4 @@
-import type { IpcMainInvokeEvent, IpcRendererEvent } from 'electron';
+import type { IpcMainInvokeEvent } from 'electron';
 
 interface ProtocolHeader {
   channel: string;
