@@ -278,10 +278,7 @@ class PreloadInterface {
       throw new Error('only available in render process');
     }
     //@ts-ignore
-    return window[this.config.key].bridge({
-      channel,
-      args
-    } satisfies ProtocolHeader);
+    return window[this.config.key].bridge(channel, args);
   }
 }
 
