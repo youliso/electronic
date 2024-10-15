@@ -1,3 +1,4 @@
+import type { UpdateCheckResult } from 'electron-updater';
 import preload from '../preload';
 import type { UpdateMessage } from '../types';
 import { UpdateChannel } from '../types/channel';
@@ -23,7 +24,11 @@ export function updateListenersRemove() {
  * @param url 更新地址（不传用默认地址）
  */
 export function updateCheck(isDel: boolean = true, autoDownload: boolean = false, url?: string) {
-  return preload.invoke(UpdateChannel.check, { isDel, autoDownload, url });
+  return preload.invoke<UpdateCheckResult | null>(UpdateChannel.check, {
+    isDel,
+    autoDownload,
+    url
+  });
 }
 
 /**
