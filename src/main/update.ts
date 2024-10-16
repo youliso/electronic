@@ -33,8 +33,7 @@ export class Update {
     if (defaultConfigPath && !app.isPackaged) {
       // 开启调试更新
       this.autoUpdater.forceDevUpdateConfig = true;
-      !(process.platform === 'darwin') &&
-        (this.autoUpdater.updateConfigPath = join(defaultConfigPath));
+      this.autoUpdater.updateConfigPath = join(defaultConfigPath);
     }
     logger && (this.autoUpdater.logger = logger);
   }
