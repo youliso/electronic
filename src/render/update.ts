@@ -1,12 +1,21 @@
-import type { UpdateCheckResult } from 'electron-updater';
+import type {
+  UpdateCheckResult,
+  UpdateInfo,
+  ProgressInfo,
+  UpdateDownloadedEvent
+} from 'electron-updater';
 import preload from '../preload';
-import type { UpdateMessage } from '../types';
 import { UpdateChannel } from '../types/channel';
 
 /**
  * 更新监听
  */
-export function updateOn(listener: (args: UpdateMessage) => void) {
+export function updateOn(
+  listener: (args: {
+    code: number;
+    data: Error | UpdateInfo | ProgressInfo | UpdateDownloadedEvent;
+  }) => void
+) {
   preload.on('update-back', listener);
 }
 

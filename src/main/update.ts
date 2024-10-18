@@ -1,10 +1,8 @@
 import type { AllPublishOptions } from 'builder-util-runtime';
 import type { AppUpdater, Logger } from 'electron-updater';
-import type { UpdateMessage } from '../types/index';
 import { join } from 'path';
 import { AppImageUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
 import { app } from 'electron';
-import { windowInstance } from './window';
 import { UpdateChannel } from '../types/channel';
 import { delDir } from './utils';
 import preload from '../preload';
@@ -57,26 +55,44 @@ export class Update {
   /**
    * 检查更新
    */
-  open(callback: Function) {
-    const message: { [key: string]: UpdateMessage } = {
-      error: { code: 0, msg: '检查更新出错' },
-      checking: { code: 1, msg: '正在检查更新' },
-      updateAva: { code: 2, msg: '检测到新版本' },
-      updateDown: { code: 3, msg: '下载中' },
-      updateDownload: { code: 4, msg: '下载完成' },
-      updateNotAva: { code: 5, msg: '当前为最新版本' }
-    };
-    this.autoUpdater.on('error', () => callback(message.error));
-    this.autoUpdater.on('checking-for-update', () => callback(message.checking));
-    this.autoUpdater.on('update-available', () => callback(message.updateAva));
-    this.autoUpdater.on('update-not-available', () => callback(message.updateNotAva));
+  open(callback: Function) {;
+    this.autoUpdater.on('error', (error) =>
+      callback({
+        code: 0,
+        data: error
+      })
+    );
+    this.autoUpdater.on('checking-for-update', () =>
+      callback({
+        code: 1
+      })
+    );
+    this.autoUpdater.on('update-available', (data) =>
+      callback({
+        code: 2,
+        data
+      })
+    );
+    this.autoUpdater.on('update-not-available', (data) =>
+      callback({
+        code: 5,
+        data
+      })
+    );
     // 更新下载进度事件
-    this.autoUpdater.on('download-progress', (progressObj) => {
-      message.updateDown.value = progressObj;
-      callback(message.updateDown);
-    });
+    this.autoUpdater.on('download-progress', (data) =>
+      callback({
+        code: 3,
+        data
+      })
+    );
     // 下载完成事件
-    this.autoUpdater.on('update-downloaded', () => callback(message.updateDownload));
+    this.autoUpdater.on('update-downloaded', (data) =>
+      callback({
+        code: 4,
+        data
+      })
+    );
   }
 
   /**

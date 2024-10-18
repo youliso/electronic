@@ -108,13 +108,7 @@ export type WindowStatusOpt =
   | 'isVisible'
   | 'isFocused'
   | 'isModal';
-
-export interface UpdateMessage {
-  code: number;
-  msg: string;
-  value?: any;
-}
-
+  
 export type Accelerator = {
   name: string;
   key: string | string[];
@@ -147,9 +141,3 @@ export type AppPathKey =
   | 'recent'
   | 'logs'
   | 'crashDumps';
-
-export interface UpdateMessage {
-  code: number;
-  msg: string;
-  value?: any;
-}
