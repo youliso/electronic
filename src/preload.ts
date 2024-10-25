@@ -20,8 +20,10 @@ class PreloadInterface {
   private browserWindow: typeof Electron.BrowserWindow | undefined;
   private webContents: typeof Electron.WebContents | undefined;
   private type: 'main' | 'preload' | 'render' | undefined;
-  private listeners: Map<string, { once: boolean; handler: MainHandler | RenderHandler }[]> =
-    new Map();
+  private listeners: Map<
+    string,
+    ({ once: boolean; handler: MainHandler | BridgeHandler | RenderHandler } | undefined)[]
+  > = new Map();
   private config: PreloadInterfaceConfig = {
     key: 'process-communication'
   };
@@ -47,10 +49,16 @@ class PreloadInterface {
     const handlers = this.listeners.get(channel);
     if (handlers) {
       let funcs: MainHandler[] = [];
-      handlers.forEach(({ once, handler }) => {
-        funcs.push(handler as MainHandler);
-        once && this.listeners.delete(channel);
+      handlers.forEach((res, index) => {
+        if (res) {
+          funcs.push(res.handler as MainHandler);
+          res.once && (handlers[index] = undefined);
+        }
       });
+      const newHandlers = handlers.filter((handler) => !!handler);
+      newHandlers.length === 0
+        ? this.listeners.delete(channel)
+        : this.listeners.set(channel, newHandlers);
       return funcs;
     }
     return;
@@ -60,10 +68,16 @@ class PreloadInterface {
     const handlers = this.listeners.get(channel);
     if (handlers) {
       let funcs: BridgeHandler[] = [];
-      handlers.forEach(({ once, handler }) => {
-        funcs.push(handler as BridgeHandler);
-        once && this.listeners.delete(channel);
+      handlers.forEach((res, index) => {
+        if (res) {
+          funcs.push(res.handler as BridgeHandler);
+          res.once && (handlers[index] = undefined);
+        }
       });
+      const newHandlers = handlers.filter((handler) => !!handler);
+      newHandlers.length === 0
+        ? this.listeners.delete(channel)
+        : this.listeners.set(channel, newHandlers);
       return funcs;
     }
     return;
@@ -72,10 +86,16 @@ class PreloadInterface {
   private routeHandlerByRender(channel: string, message: any) {
     const handlers = this.listeners.get(channel);
     if (handlers) {
-      handlers.forEach(({ once, handler }) => {
-        (handler as RenderHandler)(message);
-        once && this.listeners.delete(channel);
+      handlers.forEach((res, index) => {
+        if (res) {
+          (res.handler as RenderHandler)(message);
+          res.once && (handlers[index] = undefined);
+        }
       });
+      const newHandlers = handlers.filter((handler) => !!handler);
+      newHandlers.length === 0
+        ? this.listeners.delete(channel)
+        : this.listeners.set(channel, newHandlers);
     }
   }
 
@@ -100,7 +120,7 @@ class PreloadInterface {
     const handlers = this.listeners.get(channel);
     if (handlers) {
       if (handler) {
-        const index = handlers.findIndex((e) => e.handler == handler);
+        const index = handlers.findIndex((e) => e && e.handler == handler);
         if (index !== -1) {
           handlers.splice(index, 1);
         }
