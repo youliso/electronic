@@ -22,7 +22,7 @@ class PreloadInterface {
   private type: 'main' | 'preload' | 'render' | undefined;
   private listeners: Map<
     string,
-    ({ once: boolean; handler: MainHandler | BridgeHandler | RenderHandler } | undefined)[]
+    Array<{ once: boolean; handler: MainHandler | BridgeHandler | RenderHandler } | undefined>
   > = new Map();
   private config: PreloadInterfaceConfig = {
     key: 'process-communication'

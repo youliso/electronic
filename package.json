@@ -37,7 +37,7 @@
     "electron": "^33",
     "electron-updater": "^6.3.9",
     "prettier": "^3.3.3",
-    "rollup": "^4.24.0",
+    "rollup": "^4.24.2",
     "rollup-plugin-esbuild-minify": "^1.1.2",
     "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.6.3"
