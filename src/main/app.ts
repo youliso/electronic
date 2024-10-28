@@ -20,6 +20,24 @@ export interface AppBeforeOptions {
  * appReday之前监听
  * 实例锁设定
  * @param options
+ * app.on('second-instance', (event, argv) => {
+      if (//是否多窗口聚焦到第一实例) {
+        const main = windowInstance.getMain();
+        if (main) {
+          preload.send('window-single-instance', argv, [main.id]);
+        }
+        return;
+      }
+      // 创建窗口
+      const win = windowInstance.create(
+        {
+          ...options.customize,
+          argv
+        },
+        options.browserWindowOptions
+      );
+      win && windowInstance.load(win);
+    });
  */
 export const appSingleInstanceLock = (options: AppBeforeOptions) => {
   // 默认单例根据自己需要改
