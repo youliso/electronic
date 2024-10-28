@@ -1,8 +1,5 @@
-import type { BrowserWindowConstructorOptions } from 'electron';
-import type { Customize } from '../types/index';
 import { app, shell } from 'electron';
 import { resolve } from 'path';
-import { windowInstance } from './window';
 import { AppChannel } from '../types/channel';
 import preload from '../preload';
 
@@ -11,53 +8,23 @@ export interface AppBeforeOptions {
    * 包含要发送到第一实例的附加数据的 JSON 对象
    */
   additionalData?: any;
-  /**
-   * 后续实例启动时是否聚焦到第一实例
-   */
-  isFocusMainWin?: boolean;
-
-  /**
-   * isFocusMainWin为否时需穿如新窗口参数
-   */
-  customize?: Customize;
-
-  /**
-   * isFocusMainWin为否时需穿如新窗口参数
-   */
-  browserWindowOptions?: BrowserWindowConstructorOptions;
+  secondInstanceFunc?: (
+    event: Electron.Event,
+    argv: string[],
+    workingDirectory: string,
+    additionalData: unknown
+  ) => void;
 }
 
 /**
  * appReday之前监听
- * 单例锁定
+ * 实例锁设定
  * @param options
  */
 export const appSingleInstanceLock = (options: AppBeforeOptions) => {
   // 默认单例根据自己需要改
   if (!app.requestSingleInstanceLock(options?.additionalData)) app.quit();
-  else {
-    app.on('second-instance', (event, argv) => {
-      //是否多窗口聚焦到第一实例
-      if (options?.isFocusMainWin) {
-        const main = windowInstance.getMain();
-        if (main) {
-          preload.send('window-single-instance', argv, [main.id]);
-        }
-        return;
-      }
-      if (!options?.customize || !options?.browserWindowOptions) {
-        throw new Error('not [second-instance] options?customize || options?.browserWindowOptions');
-      }
-      const win = windowInstance.create(
-        {
-          ...options.customize,
-          argv
-        },
-        options.browserWindowOptions
-      );
-      win && windowInstance.load(win);
-    });
-  }
+  else if (options.secondInstanceFunc) app.on('second-instance', options.secondInstanceFunc);
 };
 
 /**
