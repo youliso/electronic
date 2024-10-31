@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "description": "electron modules",
   "scripts": {
     "build": "tsup && node build.mjs",
@@ -15,8 +15,8 @@
       "require": "./index.js"
     },
     "./main": {
-      "import": "./mian/index.mjs",
-      "require": "./mian/index.js"
+      "import": "./main/index.mjs",
+      "require": "./main/index.js"
     },
     "./main/update": {
       "import": "./main/update.mjs",
