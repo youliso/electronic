@@ -10,9 +10,7 @@ export default defineConfig(() => ({
   entry: {
     index: 'src/index.ts',
     'main/index': 'src/main/index.ts',
-    'main/update': 'src/main/update.ts',
     'render/index': 'src/render/index.ts',
-    'render/update': 'src/render/update.ts',
     preload: 'src/preload.ts'
   },
   external: [
