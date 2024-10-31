@@ -1,4 +1,4 @@
-import preload from '../preload';
+import { preload } from '../preload';
 import { StoreChannel } from '../channel';
 
 /**

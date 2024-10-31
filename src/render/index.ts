@@ -1,3 +1,4 @@
+export * from '../preload';
 export * from './app';
 export * from './shortcut';
 export * from './store';

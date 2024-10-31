@@ -17,7 +17,6 @@ export default defineConfig(() => ({
   },
   external: [
     ...builtinModules,
-    '../preload',
     '../types',
     'electron',
     'electron-updater',

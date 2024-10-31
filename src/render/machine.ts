@@ -1,5 +1,5 @@
-import preload from "../preload";
-import { MachineChannel } from "../channel";
+import { preload } from '../preload';
+import { MachineChannel } from '../channel';
 
 /**
  * 获取设备唯一吗

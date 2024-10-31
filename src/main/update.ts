@@ -4,7 +4,7 @@ import { join } from 'path';
 import { AppImageUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
 import { app } from 'electron';
 import { delDir } from './utils';
-import preload from '../preload';
+import { preload } from '../preload';
 
 /**
  * 更新模块 https://www.electron.build/auto-update

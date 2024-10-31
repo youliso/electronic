@@ -1,6 +1,6 @@
 import type { Accelerator } from '../types';
 import { ShortcutChannel } from '../channel';
-import preload from '../preload';
+import { preload } from '../preload';
 
 /**
  * 快捷键监听

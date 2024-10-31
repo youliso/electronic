@@ -304,4 +304,4 @@ class PreloadInterface {
   }
 }
 
-export default PreloadInterface.getInstance();
+export const preload = PreloadInterface.getInstance();

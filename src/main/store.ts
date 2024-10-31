@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { StoreChannel } from '../channel';
-import preload from '../preload';
+import { preload } from '../preload';
 
 type Obj<Value> = {} & {
   [key: string]: Value | Obj<Value>;

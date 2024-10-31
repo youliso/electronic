@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process';
 import { MachineChannel } from '../channel';
-import preload from '../preload';
+import { preload } from '../preload';
 
 // win
 const WinRegBinPath =

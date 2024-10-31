@@ -4,7 +4,7 @@ import type {
   ProgressInfo,
   UpdateDownloadedEvent
 } from 'electron-updater';
-import preload from '../preload';
+import { preload } from '../preload';
 
 /**
  * 更新监听
