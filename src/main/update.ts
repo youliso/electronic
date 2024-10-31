@@ -3,7 +3,6 @@ import type { AppUpdater, Logger } from 'electron-updater';
 import { join } from 'path';
 import { AppImageUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
 import { app } from 'electron';
-import { UpdateChannel } from '../types/channel';
 import { delDir } from './utils';
 import preload from '../preload';
 
@@ -55,7 +54,7 @@ export class Update {
   /**
    * 检查更新
    */
-  open(callback: Function) {;
+  open(callback: Function) {
     this.autoUpdater.on('error', (error) =>
       callback({
         code: 0,
@@ -130,12 +129,12 @@ export class Update {
     //开启更新监听
     this.open((data: { key: string; value: any }) => preload.send('update-back', data));
     //检查更新
-    preload.handle(UpdateChannel.check, (event, args) =>
+    preload.handle('update-check', (event, args) =>
       this.checkUpdate(args.isDel, args.autoDownload, args.url)
     );
     //手动下载更新
-    preload.handle(UpdateChannel.download, (event, args) => this.downloadUpdate());
+    preload.handle('update-download', (event, args) => this.downloadUpdate());
     // 关闭程序安装新的软件 isSilent 是否静默更新
-    preload.handle<boolean>(UpdateChannel.install, (event, args) => this.updateQuitInstall(args));
+    preload.handle<boolean>('update-install', (event, args) => this.updateQuitInstall(args));
   }
 }

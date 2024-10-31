@@ -1,5 +1,28 @@
 import type { LoadURLOptions, LoadFileOptions } from 'electron';
 
+declare global {
+  interface Window {
+    customize: Omit<Customize, 'winId' | 'webContentsId'> & {
+      winId: number;
+      webContentsId: number;
+    };
+  }
+
+  namespace Electron {
+    interface BrowserWindow {
+      customize: Customize;
+    }
+
+    interface BrowserWindowConstructorOptions {
+      customize?: Customize;
+    }
+  }
+}
+
+export interface LoadOptions {
+  openDevTools?: boolean;
+}
+
 export type Position = 'center';
 
 export interface Customize {
@@ -108,7 +131,7 @@ export type WindowStatusOpt =
   | 'isVisible'
   | 'isFocused'
   | 'isModal';
-  
+
 export type Accelerator = {
   name: string;
   key: string | string[];

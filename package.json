@@ -1,14 +1,40 @@
 {
   "name": "@youliso/electronic",
-  "version": "4.3.2",
+  "version": "5.1.0",
   "description": "electron modules",
   "scripts": {
-    "build": "rollup -c rollup.config.mjs && node build.mjs",
+    "build": "tsup && node build.mjs",
     "fix:prettier": "prettier \"./src\" --write --config .prettierrc",
     "test:prettier": "prettier \"./src\" --list-different --config .prettierrc"
   },
-  "main": "mian/index.js",
-  "types": "mian/index.d.ts",
+  "main": "index.js",
+  "types": "type.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js"
+    },
+    "./main": {
+      "import": "./mian/index.mjs",
+      "require": "./mian/index.js"
+    },
+    "./main/update": {
+      "import": "./main/update.mjs",
+      "require": "./main/update.js"
+    },
+    "./render": {
+      "import": "./render/index.mjs",
+      "require": "./render/index.js"
+    },
+    "./render/update": {
+      "import": "./render/update.mjs",
+      "require": "./render/update.js"
+    },
+    "./preload": {
+      "import": "./preload.mjs",
+      "require": "./preload.js"
+    }
+  },
   "keywords": [
     "electron",
     "multiple windows",
@@ -31,15 +57,10 @@
     "**/*"
   ],
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.1",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.3.0",
     "electron": "^33",
     "electron-updater": "^6.3.9",
     "prettier": "^3.3.3",
-    "rollup": "^4.24.2",
-    "rollup-plugin-esbuild-minify": "^1.1.2",
-    "rollup-plugin-typescript2": "^0.36.0",
+    "tsup": "^8.3.5",
     "typescript": "^5.6.3"
   }
 }

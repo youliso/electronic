@@ -1,6 +1,6 @@
 import preload from '../preload';
 import type { AppInfo, AppPathKey } from '../types';
-import { AppChannel } from '../types/channel';
+import { AppChannel } from '../channel';
 
 /**
  * app退出

@@ -1,8 +1,7 @@
-import type { Accelerator } from '../types/index';
+import type { Accelerator } from '../types';
 import { globalShortcut } from 'electron';
-import { windowInstance } from './window';
 import { deepCopy } from './utils';
-import { ShortcutChannel } from '../types/channel';
+import { ShortcutChannel } from '../channel';
 import preload from '../preload';
 
 export class Shortcut {

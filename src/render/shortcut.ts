@@ -1,5 +1,5 @@
 import type { Accelerator } from '../types';
-import { ShortcutChannel } from '../types/channel';
+import { ShortcutChannel } from '../channel';
 import preload from '../preload';
 
 /**

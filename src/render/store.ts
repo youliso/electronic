@@ -1,5 +1,5 @@
 import preload from '../preload';
-import { StoreChannel } from '../types/channel';
+import { StoreChannel } from '../channel';
 
 /**
  * 设置全局参数

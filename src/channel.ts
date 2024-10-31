@@ -21,12 +21,6 @@ export enum ShortcutChannel {
   get = 'shortcut-get'
 }
 
-export enum UpdateChannel {
-  check = 'update-check',
-  download = 'update-download',
-  install = 'update-install'
-}
-
 export enum WindowChannel {
   update = 'window-update',
   maxMinSize = 'window-max-min-size',

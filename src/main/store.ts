@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
-import { StoreChannel } from '../types/channel';
+import { readFileSync } from 'node:fs';
+import { StoreChannel } from '../channel';
 import preload from '../preload';
 
 type Obj<Value> = {} & {

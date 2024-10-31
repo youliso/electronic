@@ -5,7 +5,6 @@ import type {
   UpdateDownloadedEvent
 } from 'electron-updater';
 import preload from '../preload';
-import { UpdateChannel } from '../types/channel';
 
 /**
  * 更新监听
@@ -33,7 +32,7 @@ export function updateListenersRemove() {
  * @param url 更新地址（不传用默认地址）
  */
 export function updateCheck(isDel: boolean = true, autoDownload: boolean = false, url?: string) {
-  return preload.invoke<UpdateCheckResult | null>(UpdateChannel.check, {
+  return preload.invoke<UpdateCheckResult | null>('update-check', {
     isDel,
     autoDownload,
     url
@@ -44,7 +43,7 @@ export function updateCheck(isDel: boolean = true, autoDownload: boolean = false
  * 下载更新 (如果autoDownload选项设置为 false，则可以使用此方法
  */
 export function updateDownload() {
-  return preload.invoke(UpdateChannel.download);
+  return preload.invoke('update-download');
 }
 
 /**
@@ -52,5 +51,5 @@ export function updateDownload() {
  * @param isSilent 是否静默更新
  */
 export function updateInstall(isSilent: boolean) {
-  return preload.invoke(UpdateChannel.install, isSilent);
+  return preload.invoke('update-install', isSilent);
 }

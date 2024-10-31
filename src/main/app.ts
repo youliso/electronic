@@ -1,6 +1,6 @@
 import { app, shell } from 'electron';
-import { resolve } from 'path';
-import { AppChannel } from '../types/channel';
+import { resolve } from 'node:path';
+import { AppChannel } from '../channel';
 import preload from '../preload';
 
 export interface AppBeforeOptions {

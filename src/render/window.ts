@@ -1,6 +1,6 @@
 import type { BrowserWindowConstructorOptions } from 'electron';
 import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
-import { WindowChannel } from '../types/channel';
+import { WindowChannel } from '../channel';
 import preload from '../preload';
 
 /**
@@ -8,8 +8,9 @@ import preload from '../preload';
  * */
 export function windowLoad(listener: () => void) {
   preload
-    .invoke<typeof window.customize>(WindowChannel.load)
+    .invoke<Customize>(WindowChannel.load)
     .then((customize) => {
+      // @ts-ignore
       window.customize = customize;
       listener();
     })

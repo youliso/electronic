@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, rmdirSync, statSync, unlinkSync } from 'fs';
+import { existsSync, readdirSync, rmdirSync, statSync, unlinkSync } from 'node:fs';
 
 /**
  * 深拷贝

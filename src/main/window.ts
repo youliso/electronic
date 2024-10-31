@@ -6,38 +6,16 @@ import type {
 } from 'electron';
 import type {
   Customize,
+  LoadOptions,
   Position,
   WindowAlwaysOnTopOpt,
   WindowFuncOpt,
   WindowStatusOpt
-} from '../types/index';
-import { WindowChannel } from '../types/channel';
+} from '../types';
+import { WindowChannel } from '../channel';
 import { endianness } from 'os';
 import { app, screen, BrowserWindow, webContents } from 'electron';
 import preload from '../preload';
-
-declare global {
-  interface Window {
-    customize: Omit<Customize, 'winId' | 'webContentsId'> & {
-      winId: number;
-      webContentsId: number;
-    };
-  }
-
-  module Electron {
-    interface BrowserWindow {
-      customize: Customize;
-    }
-
-    interface BrowserWindowConstructorOptions {
-      customize?: Customize;
-    }
-  }
-}
-
-export interface LoadOptions {
-  openDevTools?: boolean;
-}
 
 /**
  * 计算xy
