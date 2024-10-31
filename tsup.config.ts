@@ -15,5 +15,12 @@ export default defineConfig(() => ({
     'render/update': 'src/render/update.ts',
     preload: 'src/preload.ts'
   },
-  external: [...builtinModules, '../types', 'electron', 'electron-updater', 'builder-util-runtime']
+  external: [
+    ...builtinModules,
+    '../preload',
+    '../types',
+    'electron',
+    'electron-updater',
+    'builder-util-runtime'
+  ]
 }));
