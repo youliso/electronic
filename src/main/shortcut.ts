@@ -2,7 +2,7 @@ import type { Accelerator } from '../types';
 import { globalShortcut } from 'electron';
 import { deepCopy } from './utils';
 import { ShortcutChannel } from '../channel';
-import { preload } from '../preload';
+import { preload } from '../preload/main';
 
 export class Shortcut {
   private static instance: Shortcut;

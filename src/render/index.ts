@@ -1,4 +1,4 @@
-export * from '../preload';
+export * from '../preload/render';
 export * from './app';
 export * from './shortcut';
 export * from './store';

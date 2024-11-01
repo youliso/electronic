@@ -1,4 +1,4 @@
-export * from '../preload';
+export * from '../preload/main';
 export * from './app';
 export * from './store';
 export * from './machine';

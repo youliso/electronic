@@ -1,4 +1,4 @@
-import { preload } from '../preload';
+import { preload } from '../preload/render';
 import type { AppInfo, AppPathKey } from '../types';
 import { AppChannel } from '../channel';
 

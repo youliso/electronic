@@ -15,7 +15,7 @@ import type {
 import { WindowChannel } from '../channel';
 import { endianness } from 'os';
 import { app, screen, BrowserWindow, webContents } from 'electron';
-import { preload } from '../preload';
+import { preload } from '../preload/main';
 
 /**
  * 计算xy

@@ -1,4 +1,4 @@
-import { preload } from '../preload';
+import { preload } from '../preload/render';
 import { MachineChannel } from '../channel';
 
 /**
