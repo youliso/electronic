@@ -19,17 +19,9 @@
       "import": "./main/index.mjs",
       "require": "./main/index.js"
     },
-    "./main/update": {
-      "import": "./main/update.mjs",
-      "require": "./main/update.js"
-    },
     "./render": {
       "import": "./render/index.mjs",
       "require": "./render/index.js"
-    },
-    "./render/update": {
-      "import": "./render/update.mjs",
-      "require": "./render/update.js"
     },
     "./preload": {
       "import": "./preload.mjs",
