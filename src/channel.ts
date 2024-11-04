@@ -33,6 +33,5 @@ export enum WindowChannel {
   setMinMaxSize = 'window-min-max-size-set',
   setBackgroundColor = 'window-bg-color-set',
   sendMessage = 'window-message-send',
-  sendMessageContents = 'window-message-contents-send',
-  getWinId = 'window-id-get'
+  sendMessageContents = 'window-message-contents-send'
 }

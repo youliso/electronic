@@ -293,10 +293,3 @@ export function windowMax(id: number = window.customize.winId) {
 export function windowFunc(type: WindowFuncOpt, data?: any[], id: number = window.customize.winId) {
   return preload.invoke(WindowChannel.func, { type, data, id });
 }
-
-/**
- * 通过路由获取窗口id (不传route查全部)
- */
-export function windowIdGet(route?: string): Promise<number[]> {
-  return preload.invoke(WindowChannel.getWinId, { route });
-}

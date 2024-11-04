@@ -513,12 +513,6 @@ export class Window {
       }
       preload.sendByWebContents(channel, args.value, args.acceptIds);
     });
-    //通过路由获取窗口id (不传route查全部)
-    preload.handle(WindowChannel.getWinId, async (_, args) => {
-      return this.getAll()
-        .filter((win) => (args.route ? win.customize?.route === args.route : true))
-        .map((win) => win.id);
-    });
   }
 }
 
