@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "electron modules",
   "scripts": {
     "build": "tsup && node build.mjs",

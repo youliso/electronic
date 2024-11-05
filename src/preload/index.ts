@@ -43,11 +43,11 @@ class BridgePreloadInterface extends PreloadInterface {
     });
   }
 
-  listen<T = any>(channel: string, listener: BridgeHandler<T>) {
+  on<T = any>(channel: string, listener: BridgeHandler<T>) {
     super.on(channel, listener);
   }
 
-  listenOnce<T = any>(channel: string, listener: BridgeHandler<T>) {
+  once<T = any>(channel: string, listener: BridgeHandler<T>) {
     super.once(channel, listener);
   }
 }
