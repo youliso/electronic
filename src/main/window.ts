@@ -220,7 +220,11 @@ export class Window {
   ) {
     const newWin = this.create(customize, bwOptions);
     if (newWin) {
-      await this.load(newWin, loadOptions);
+      await this.load(newWin);
+      // 开启DevTools
+      if (loadOptions && loadOptions.openDevTools) {
+        newWin.webContents.openDevTools({ mode: 'detach' });
+      }
       return newWin;
     }
     return null;
@@ -266,16 +270,12 @@ export class Window {
   /**
    * 窗口加载
    */
-  load(win: BrowserWindow, loadOptions?: LoadOptions) {
+  load(win: BrowserWindow) {
     if (!win.customize.loadType) {
       throw new Error('[load] not loadType');
     }
     if (!win.customize.url) {
       throw new Error('[load] not url');
-    }
-    // 开启DevTools
-    if (loadOptions && loadOptions.openDevTools) {
-      win.webContents.openDevTools({ mode: 'detach' });
     }
     // 窗口内创建拦截
     windowOpenHandler(win.webContents);
