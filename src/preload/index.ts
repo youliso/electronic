@@ -33,6 +33,8 @@ class BridgePreloadInterface extends PreloadInterface {
             value && values.push(value);
           }
           if (values.length > 0) return values;
+        } else {
+          console.warn(`${args.channel} Unbound callback function`);
         }
       },
       invoke: (args: any) => {
