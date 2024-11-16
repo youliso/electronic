@@ -20,6 +20,8 @@ import { preload } from '../preload/main';
 /**
  * 计算xy
  * @param win
+ * @param bwOpt
+ * @param position
  */
 function countXy(win: BrowserWindow, bwOpt: BrowserWindowConstructorOptions, position?: Position) {
   const currentWH = win.getBounds();
@@ -306,12 +308,7 @@ export class Window {
    * 窗口关闭、隐藏、显示等常用方法（如果不传id则获取主窗口）
    */
   func(type: WindowFuncOpt, id?: number, data?: any[]) {
-    let win: BrowserWindow | null = null;
-    if (id !== null && id !== undefined) {
-      win = this.get(id);
-    } else {
-      win = this.getMain();
-    }
+    let win = id ? this.get(id) : this.getMain();
     if (!win) {
       console.error(`not found win -> ${id}`);
       return;

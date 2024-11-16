@@ -59,7 +59,6 @@ export const appProtocolRegister = (appName?: string) => {
 
 /**
  * appReday之后监听
- * @param options
  */
 export const appAfterOn = () => {
   //app常用信息
