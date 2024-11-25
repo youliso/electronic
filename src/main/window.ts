@@ -307,12 +307,12 @@ export class Window {
   // 重新加载页面
   reload(win: BrowserWindow, loadType: Customize['loadType'], url: string) {
     win.customize.loadType = loadType;
-    win.customize.url = url;
     switch (loadType) {
       case 'file':
+        win.customize.route = url;
         return win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
       case 'url':
-      default:
+        win.customize.url = url;
         return win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
     }
   }
