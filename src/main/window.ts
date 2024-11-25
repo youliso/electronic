@@ -310,7 +310,7 @@ export class Window {
     switch (loadType) {
       case 'file':
         win.customize.route = url;
-        return win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
+        return win.reload();
       case 'url':
         win.customize.url = url;
         return win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
