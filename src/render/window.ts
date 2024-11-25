@@ -20,6 +20,16 @@ export function windowLoad(listener: () => void) {
 }
 
 /**
+ * 窗口重新加载
+ */
+export function windowReLoad(loadType: Customize['loadType'], url: string) {
+  return preload.invoke<void>(WindowChannel.reload, {
+    loadType,
+    url
+  });
+}
+
+/**
  * 单例模式后协议再开触发
  */
 export function windowSingleInstanceOn(listener: (argv?: string[]) => void) {

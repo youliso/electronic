@@ -28,6 +28,7 @@ export enum WindowChannel {
   status = 'window-status',
   new = 'window-new',
   load = 'window-load',
+  reload = 'window-reload',
   setAlwaysTop = 'window-always-top-set',
   setSize = 'window-size-set',
   setMinMaxSize = 'window-min-max-size-set',

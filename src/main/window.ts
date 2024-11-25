@@ -304,6 +304,19 @@ export class Window {
     }
   }
 
+  // 重新加载页面
+  reload(win: BrowserWindow, loadType: Customize['loadType'], url: string) {
+    win.customize.loadType = loadType;
+    win.customize.url = url;
+    switch (loadType) {
+      case 'file':
+        return win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
+      case 'url':
+      default:
+        return win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
+    }
+  }
+
   /**
    * 窗口关闭、隐藏、显示等常用方法（如果不传id则获取主窗口）
    */
@@ -460,6 +473,12 @@ export class Window {
         webContentsId: win.webContents.id,
         ...win.customize
       };
+    });
+    // 窗口重新加载
+    preload.handle(WindowChannel.reload, async (event, args) => {
+      const win = BrowserWindow.fromWebContents(event.sender);
+      if (!win) throw new Error('fromWebContents not');
+      await this.reload(win, args.loadType, args.url);
     });
     // 设置窗口是否置顶
     preload.handle(WindowChannel.setAlwaysTop, (_, args) => this.setAlwaysOnTop(args));
