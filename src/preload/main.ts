@@ -1,7 +1,7 @@
-import { BrowserWindow, ipcMain, webContents, type IpcMainInvokeEvent } from 'electron';
+import { BrowserWindow, ipcMain, webContents } from 'electron';
 import { PreloadInterface, PreloadInterfaceConfig, ProtocolHeader } from './common';
 
-type MainHandler<T = any> = (event: IpcMainInvokeEvent, args: T) => T | Promise<T> | void;
+type MainHandler<T = any> = (event: Electron.IpcMainInvokeEvent, args: T) => T | Promise<T> | void;
 
 class MainPreloadInterface extends PreloadInterface {
   private static instance: MainPreloadInterface;
@@ -20,21 +20,21 @@ class MainPreloadInterface extends PreloadInterface {
       this.config = Object.assign(this.config, config);
     }
     ipcMain.handle(`${this.config.key}:invoke`, async (event, args: ProtocolHeader) => {
-      const funcs = super.routeHandler(args.channel);
-      if (funcs) {
-        if (funcs.length == 1) {
-          return await funcs[0](event, args.args);
-        }
-        let values: any[] = [];
-        for (let index = 0; index < funcs.length; index++) {
-          const value = await funcs[index](event, args.args);
-          value && values.push(value);
-        }
-        if (values.length > 0) return values;
-      } else {
-        console.warn(`${args.channel} Unbound callback function`);
+      const values = await super.routeHandler(args.channel, args.args, event, true);
+      if (values && values.length > 0) {
+        return values.length == 1 ? values[0] : values;
       }
+      return;
     });
+    ipcMain.on(`${this.config.key}:send`, (event, args: ProtocolHeader) => { super.routeHandler(args.channel, args.args, event) })
+  }
+
+  on<T = any>(channel: string, listener: MainHandler<T>) {
+    super.on(channel, listener);
+  }
+
+  once<T = any>(channel: string, listener: MainHandler<T>) {
+    super.once(channel, listener);
   }
 
   handle<T = any>(channel: string, listener: MainHandler<T>) {

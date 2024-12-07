@@ -5,16 +5,16 @@ import { AppChannel } from '../channel';
 /**
  * app退出
  */
-export function quit(): Promise<void> {
-  return preload.invoke(AppChannel.quit);
+export function quit() {
+  preload.send(AppChannel.quit);
 }
 
 /**
  * app重启
  * @param once 是否立即重启
  */
-export function relaunch(once: boolean): Promise<void> {
-  return preload.invoke(AppChannel.relaunch, once);
+export function relaunch(once: boolean) {
+  preload.send(AppChannel.relaunch, once);
 }
 
 /**

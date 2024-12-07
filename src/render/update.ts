@@ -43,7 +43,7 @@ export function updateCheck(isDel: boolean = true, autoDownload: boolean = false
  * 下载更新 (如果autoDownload选项设置为 false，则可以使用此方法
  */
 export function updateDownload() {
-  return preload.invoke('update-download');
+  return preload.invoke<string[]>('update-download');
 }
 
 /**
@@ -51,5 +51,5 @@ export function updateDownload() {
  * @param isSilent 是否静默更新
  */
 export function updateInstall(isSilent: boolean) {
-  return preload.invoke('update-install', isSilent);
+  preload.send('update-install', isSilent);
 }

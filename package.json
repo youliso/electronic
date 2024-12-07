@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "5.3.5",
+  "version": "5.4.1",
   "description": "electron modules",
   "scripts": {
     "build": "tsup && node build.mjs",
@@ -33,7 +33,7 @@
     "multiple windows",
     "electron-updater"
   ],
-  "author": "youliso",
+  "author": "youliso <youliso@hotmail.com> (https://github.com/youliso)",
   "repository": {
     "type": "git",
     "url": "https://github.com/youliso/electronic"
@@ -50,9 +50,9 @@
     "**/*"
   ],
   "devDependencies": {
-    "@types/node": "^22.9.3",
+    "@types/node": "^22.10.1",
     "electron": "^33",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
   },

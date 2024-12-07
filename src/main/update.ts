@@ -48,7 +48,7 @@ export class Update {
     );
     try {
       delDir(updatePendingPath);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   /**
@@ -129,12 +129,12 @@ export class Update {
     //开启更新监听
     this.open((data: { key: string; value: any }) => preload.send('update-back', data));
     //检查更新
-    preload.handle('update-check', (event, args) =>
+    preload.handle('update-check', (_, args) =>
       this.checkUpdate(args.isDel, args.autoDownload, args.url)
     );
     //手动下载更新
-    preload.handle('update-download', (event, args) => this.downloadUpdate());
+    preload.handle('update-download', () => this.downloadUpdate());
     // 关闭程序安装新的软件 isSilent 是否静默更新
-    preload.handle<boolean>('update-install', (event, args) => this.updateQuitInstall(args));
+    preload.on<boolean>('update-install', (_, isSilent) => this.updateQuitInstall(isSilent));
   }
 }

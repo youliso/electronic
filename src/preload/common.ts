@@ -8,50 +8,38 @@ export interface PreloadInterfaceConfig {
 }
 
 export class PreloadInterface {
-  private listeners: Map<string, Array<{ once: boolean; handler: any } | undefined>> = new Map();
+  private listeners: Map<string, Array<{ once: boolean; handler: (...args: any) => any | Promise<any>; } | undefined>> = new Map();
   private defaultConfig: PreloadInterfaceConfig = {
     key: 'process-communication'
   };
 
-  constructor() {}
+  constructor() { }
 
   get defaultCfg() {
     return this.defaultConfig;
   }
 
-  routeHandler(channel: string) {
+  async routeHandler(channel: string, args: any, event?: Electron.IpcMainInvokeEvent, back?: boolean) {
     const handlers = this.listeners.get(channel);
     if (handlers) {
-      let funcs: any[] = [];
-      handlers.forEach((res, index) => {
-        if (res) {
-          funcs.push(res.handler);
-          res.once && (handlers[index] = undefined);
+      let values: any[] = [];
+      for (let index = 0; index < handlers.length; index++) {
+        const handler = handlers[index];
+        if (handler) {
+          let res: any = undefined;
+          event ? (res = await handler.handler(event, args)) : (res = await handler.handler(args));
+          back && values.push(res);
+          handler.once && handlers.splice(index, 1);
         }
-      });
-      const newHandlers = handlers.filter((handler) => !!handler);
-      newHandlers.length === 0
-        ? this.listeners.delete(channel)
-        : this.listeners.set(channel, newHandlers);
-      return funcs;
+      }
+      handlers.length === 0 && this.listeners.delete(channel);
+      if (back) {
+        return values;
+      }
+    } else {
+      console.warn(`${channel} Unbound callback function`);
     }
     return;
-  }
-
-  routeHandlerByMsg(channel: string, message: any) {
-    const handlers = this.listeners.get(channel);
-    if (handlers) {
-      handlers.forEach((res, index) => {
-        if (res) {
-          res.handler(message);
-          res.once && (handlers[index] = undefined);
-        }
-      });
-      const newHandlers = handlers.filter((handler) => !!handler);
-      newHandlers.length === 0
-        ? this.listeners.delete(channel)
-        : this.listeners.set(channel, newHandlers);
-    }
   }
 
   on(channel: string, handler: any): void {

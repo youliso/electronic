@@ -21,7 +21,7 @@ class RenderPreloadInterface extends PreloadInterface {
     }
     // @ts-ignore
     window[this.config.key].on((args: ProtocolHeader) =>
-      super.routeHandlerByMsg(args.channel, args.args)
+      super.routeHandler(args.channel, args.args)
     );
   }
 
@@ -31,6 +31,14 @@ class RenderPreloadInterface extends PreloadInterface {
 
   once<T = any>(channel: string, listener: RenderHandler<T>) {
     super.once(channel, listener);
+  }
+
+  send<T = any>(channel: string, args?: T): void {
+    //@ts-ignore
+    return window[this.config.key].send({
+      channel,
+      args
+    } satisfies ProtocolHeader);
   }
 
   invoke<R = any, T = any>(channel: string, args?: T): Promise<R> {

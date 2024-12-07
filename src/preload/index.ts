@@ -22,24 +22,18 @@ class BridgePreloadInterface extends PreloadInterface {
     }
     contextBridge.exposeInMainWorld(this.config.key, {
       bridge: async (channel: string, args: any) => {
-        const funcs = super.routeHandler(channel);
-        if (funcs) {
-          if (funcs.length == 1) {
-            return await funcs[0](args);
-          }
-          let values: any[] = [];
-          for (let index = 0; index < funcs.length; index++) {
-            const value = await funcs[index](args);
-            value && values.push(value);
-          }
-          if (values.length > 0) return values;
-        } else {
-          console.warn(`${args.channel} Unbound callback function`);
+        const values = await super.routeHandler(channel, args);
+        if (values && values.length > 0) {
+          return values.length == 1 ? values[0] : values;
         }
+        return;
       },
-      invoke: (args: any) => {
-        return ipcRenderer.invoke(`${this.config.key}:invoke`, args);
-      },
+      send: (args: any) =>
+        ipcRenderer.send(`${this.config.key}:send`, args)
+      ,
+      invoke: (args: any) =>
+        ipcRenderer.invoke(`${this.config.key}:invoke`, args)
+      ,
       on: (listener: (args: any) => void) =>
         ipcRenderer.on(`${this.config.key}:on`, (_, args) => listener(args))
     });

@@ -76,13 +76,13 @@ export const appAfterOn = () => {
   preload.handle(AppChannel.openUrl, async (_, args) => {
     return await shell.openExternal(args);
   });
-  //app退出
-  preload.handle(AppChannel.quit, () => {
-    app.quit();
-  });
   //app重启
-  preload.handle(AppChannel.relaunch, (_, args) => {
+  preload.on(AppChannel.relaunch, (_, args) => {
     app.relaunch({ args: process.argv.slice(1) });
     if (args) app.exit(0);
+  });
+  //app退出
+  preload.on(AppChannel.quit, () => {
+    app.quit();
   });
 };
