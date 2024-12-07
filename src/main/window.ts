@@ -148,15 +148,15 @@ export class Window {
   public interceptor:
     | undefined
     | ((
-        opt: Electron.BrowserWindowConstructorOptions
-      ) => Electron.BrowserWindowConstructorOptions) = undefined;
+      opt: Electron.BrowserWindowConstructorOptions
+    ) => Electron.BrowserWindowConstructorOptions) = undefined;
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
     return Window.instance;
   }
 
-  constructor() {}
+  constructor() { }
 
   setDefaultCfg(cfg: WindowDefaultCfg) {
     cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
@@ -225,7 +225,7 @@ export class Window {
       await this.load(newWin);
       // 开启DevTools
       if (loadOptions && loadOptions.openDevTools) {
-        newWin.webContents.openDevTools({ mode: 'detach' });
+        newWin.once('ready-to-show', () => newWin.webContents.openDevTools({ mode: 'detach' }));
       }
       return newWin;
     }
