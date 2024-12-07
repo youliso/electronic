@@ -19,10 +19,6 @@ declare global {
   }
 }
 
-export interface LoadOptions {
-  openDevTools?: boolean;
-}
-
 export type Position = 'center';
 
 export interface Customize {

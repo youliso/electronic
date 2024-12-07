@@ -187,19 +187,14 @@ export function windowMessageContentsSend(
   });
 }
 
-export interface LoadOptions {
-  openDevTools?: boolean;
-}
-
 /**
  * 创建并加载窗口
  */
 export function windowCreate(
   customize: Customize,
-  windowOptions?: BrowserWindowConstructorOptions,
-  loadOptions?: LoadOptions
+  windowOptions?: BrowserWindowConstructorOptions
 ): Promise<{ id: number; webContentsId: number } | undefined> {
-  return preload.invoke(WindowChannel.new, { customize, windowOptions, loadOptions });
+  return preload.invoke(WindowChannel.new, { customize, windowOptions });
 }
 
 /**

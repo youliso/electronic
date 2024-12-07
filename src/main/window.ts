@@ -6,7 +6,6 @@ import type {
 } from 'electron';
 import type {
   Customize,
-  LoadOptions,
   Position,
   WindowAlwaysOnTopOpt,
   WindowFuncOpt,
@@ -217,19 +216,11 @@ export class Window {
    */
   async new(
     customize: Customize,
-    bwOptions: BrowserWindowConstructorOptions = {},
-    loadOptions?: LoadOptions
+    bwOptions: BrowserWindowConstructorOptions = {}
   ) {
     const newWin = this.create(customize, bwOptions);
-    if (newWin) {
-      await this.load(newWin);
-      // 开启DevTools
-      if (loadOptions && loadOptions.openDevTools) {
-        newWin.once('ready-to-show', () => newWin.webContents.openDevTools({ mode: 'detach' }));
-      }
-      return newWin;
-    }
-    return null;
+    newWin && await this.load(newWin);
+    return newWin;
   }
 
   /**
@@ -457,7 +448,7 @@ export class Window {
     preload.handle(WindowChannel.status, async (_, args) => this.getStatus(args.type, args.id));
     // 创建窗口
     preload.handle(WindowChannel.new, async (_, args) => {
-      const newWin = await this.new(args.customize, args.windowOptions, args.loadOptions);
+      const newWin = await this.new(args.customize, args.windowOptions);
       if (newWin) {
         return {
           id: newWin.id,
