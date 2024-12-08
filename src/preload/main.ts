@@ -24,6 +24,7 @@ class MainPreloadInterface extends PreloadInterface {
       if (values && values.length > 0) {
         return values.length == 1 ? values[0] : values;
       }
+      console.warn(`${args.channel} Unbound callback function`);
       return;
     });
     ipcMain.on(`${this.config.key}:send`, (event, args: ProtocolHeader) => { super.routeHandler(args.channel, args.args, event) })

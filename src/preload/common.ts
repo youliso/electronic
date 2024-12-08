@@ -36,8 +36,6 @@ export class PreloadInterface {
       if (back) {
         return values;
       }
-    } else {
-      console.warn(`${channel} Unbound callback function`);
     }
     return;
   }

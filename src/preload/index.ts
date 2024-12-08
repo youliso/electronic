@@ -26,6 +26,7 @@ class BridgePreloadInterface extends PreloadInterface {
         if (values && values.length > 0) {
           return values.length == 1 ? values[0] : values;
         }
+        console.warn(`${args.channel} Unbound callback function`);
         return;
       },
       send: (args: any) =>
