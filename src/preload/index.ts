@@ -22,11 +22,11 @@ class BridgePreloadInterface extends PreloadInterface {
     }
     contextBridge.exposeInMainWorld(this.config.key, {
       bridge: async (channel: string, args: any) => {
-        const values = await super.routeHandler(channel, args);
+        const values = await super.routeHandler(channel, args, undefined, true);
         if (values && values.length > 0) {
           return values.length == 1 ? values[0] : values;
         }
-        console.warn(`${args.channel} Unbound callback function`);
+        console.warn(`${channel} Unbound callback function`);
         return;
       },
       send: (args: any) =>
