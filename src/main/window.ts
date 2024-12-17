@@ -286,14 +286,12 @@ export class Window {
     // 聚焦失焦监听
     win.on('blur', () => preload.send('window-blur-focus', 'blur', [win.id]));
     win.on('focus', () => preload.send('window-blur-focus', 'focus', [win.id]));
-    let url = win.customize.url;
-    win.customize.route && (url = `${win.customize.url}#${win.customize.route}`)
     switch (win.customize.loadType) {
       case 'file':
-        return win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
+        return win.loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions);
       case 'url':
       default:
-        return win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
+        return win.loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions);
     }
   }
 
