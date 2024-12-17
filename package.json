@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "5.4.3",
+  "version": "5.4.4",
   "description": "electron modules",
   "scripts": {
     "build": "tsup && node build.mjs",
@@ -50,7 +50,7 @@
     "**/*"
   ],
   "devDependencies": {
-    "@types/node": "^22.10.1",
+    "@types/node": "^22.10.2",
     "electron": "^33",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",
