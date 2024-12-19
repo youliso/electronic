@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "5.4.5",
+  "version": "5.4.6",
   "description": "electron modules",
   "scripts": {
     "build": "tsup && node build.mjs",
@@ -9,11 +9,15 @@
   },
   "main": "index.js",
   "module": "index.mjs",
-  "types": "type.d.ts",
+  "types": "types.d.ts",
   "exports": {
     ".": {
       "import": "./index.mjs",
       "require": "./index.js"
+    },
+    "./types": {
+      "import": "./types.d.ts",
+      "require": "./types.d.ts"
     },
     "./main": {
       "import": "./main/index.mjs",
