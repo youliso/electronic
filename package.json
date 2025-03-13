@@ -1,6 +1,6 @@
 {
   "name": "@youliso/electronic",
-  "version": "5.4.6",
+  "version": "5.5.0",
   "description": "electron modules",
   "scripts": {
     "build": "tsup && node build.mjs",
@@ -47,15 +47,15 @@
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "electron": ">=30",
-    "node": ">=20"
+    "electron": ">=34",
+    "node": ">=22"
   },
   "files": [
     "**/*"
   ],
   "devDependencies": {
     "@types/node": "^22.10.2",
-    "electron": "^33",
+    "electron": "^34",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"

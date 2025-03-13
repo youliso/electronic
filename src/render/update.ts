@@ -31,9 +31,8 @@ export function updateListenersRemove() {
  * @param autoDownload 是否在找到更新时自动下载更新
  * @param url 更新地址（不传用默认地址）
  */
-export function updateCheck(isDel: boolean = true, autoDownload: boolean = false, url?: string) {
+export function updateCheck(autoDownload: boolean = false, url?: string) {
   return preload.invoke<UpdateCheckResult | null>('update-check', {
-    isDel,
     autoDownload,
     url
   });

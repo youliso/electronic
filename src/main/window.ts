@@ -91,7 +91,7 @@ function browserWindowAssembly(
 /**
  * 窗口打开预处理
  */
-function windowOpenHandler(webContents: WebContents, parentId?: number) {
+function windowDefaultOpenHandler(webContents: WebContents, parentId?: number) {
   webContents.setWindowOpenHandler(({ url }) => {
     const win = windowInstance.create({
       url,
@@ -147,15 +147,15 @@ export class Window {
   public interceptor:
     | undefined
     | ((
-      opt: Electron.BrowserWindowConstructorOptions
-    ) => Electron.BrowserWindowConstructorOptions) = undefined;
+        opt: Electron.BrowserWindowConstructorOptions
+      ) => Electron.BrowserWindowConstructorOptions) = undefined;
 
   static getInstance() {
     if (!Window.instance) Window.instance = new Window();
     return Window.instance;
   }
 
-  constructor() { }
+  constructor() {}
 
   setDefaultCfg(cfg: WindowDefaultCfg) {
     cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
@@ -214,12 +214,9 @@ export class Window {
   /**
    * 创建并加载窗口
    */
-  async new(
-    customize: Customize,
-    bwOptions: BrowserWindowConstructorOptions = {}
-  ) {
+  async new(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
     const newWin = this.create(customize, bwOptions);
-    newWin && await this.load(newWin);
+    newWin && (await this.load(newWin));
     return newWin;
   }
 
@@ -263,7 +260,10 @@ export class Window {
   /**
    * 窗口加载
    */
-  load(win: BrowserWindow) {
+  load(
+    win: BrowserWindow,
+    openHandler?: (details: Electron.HandlerDetails) => Electron.WindowOpenHandlerResponse
+  ) {
     if (!win.customize.loadType) {
       throw new Error('[load] not loadType');
     }
@@ -271,15 +271,14 @@ export class Window {
       throw new Error('[load] not url');
     }
     // 窗口内创建拦截
-    windowOpenHandler(win.webContents);
+    openHandler
+      ? win.webContents.setWindowOpenHandler(openHandler)
+      : windowDefaultOpenHandler(win.webContents);
     // 窗口usb插拔消息监听
     process.platform === 'win32' &&
       win.hookWindowMessage(0x0219, (wParam, lParam) =>
         preload.send('window-hook-message', { wParam, lParam }, [win.id])
       );
-    win.webContents.on('did-attach-webview', (_, webContents) =>
-      windowOpenHandler(webContents, win.id)
-    );
     // 窗口最大最小监听
     win.on('maximize', () => preload.send('window-maximize-status', 'maximize', [win.id]));
     win.on('unmaximize', () => preload.send('window-maximize-status', 'unmaximize', [win.id]));
