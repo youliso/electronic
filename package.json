@@ -54,11 +54,11 @@
     "**/*"
   ],
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "electron": "^34",
-    "prettier": "^3.4.2",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2"
+    "@types/node": "^22.13.10",
+    "electron": "^34.3.3",
+    "prettier": "^3.5.3",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2"
   },
   "dependencies": {
     "electron-updater": "^6.3.9"
