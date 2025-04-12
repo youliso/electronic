@@ -219,6 +219,17 @@ export function windowAlwaysOnTop(
 }
 
 /**
+ * 窗口事件穿透
+ */
+export function windowIgnoreMouseEvents(
+  is: boolean,
+  forward?: boolean,
+  id: number = window.customize.winId
+) {
+  return preload.invoke(WindowChannel.setIgnoreMouseEvents, { id, is, forward });
+}
+
+/**
  * 设置窗口大小
  */
 export function windowSetSize(

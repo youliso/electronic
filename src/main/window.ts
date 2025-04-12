@@ -498,6 +498,18 @@ export class Window {
   }
 
   /**
+   * 事件穿透
+   */
+  setIgnoreMouseEvents(args: { id: number; is: boolean; forward?: boolean }) {
+    const win = this.get(args.id);
+    if (!win) {
+      console.error('Invalid id, the id can not be a empty');
+      return;
+    }
+    win.setIgnoreMouseEvents(args.is, { forward: args.forward });
+  }
+
+  /**
    * 开启监听
    */
   on() {
@@ -557,6 +569,10 @@ export class Window {
     });
     // 设置窗口是否置顶
     preload.handle(WindowChannel.setAlwaysTop, (_, args) => this.setAlwaysOnTop(args));
+    // 设置窗口事件穿透
+    preload.handle(WindowChannel.setIgnoreMouseEvents, (_, args) =>
+      this.setIgnoreMouseEvents(args)
+    );
     // 设置窗口大小
     preload.handle(WindowChannel.setSize, (_, args) => this.setSize(args));
     // 设置窗口(最小/最大)大小

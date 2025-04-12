@@ -30,6 +30,7 @@ export enum WindowChannel {
   load = 'window-load',
   reload = 'window-reload',
   setAlwaysTop = 'window-always-top-set',
+  setIgnoreMouseEvents = 'window-ignore-mouse-events-set',
   setSize = 'window-size-set',
   setMinMaxSize = 'window-min-max-size-set',
   setBackgroundColor = 'window-bg-color-set',
