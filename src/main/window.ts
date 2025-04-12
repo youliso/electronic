@@ -18,22 +18,118 @@ import { preload } from '../preload/main';
 
 /**
  * 计算xy
- * @param win
- * @param bwOpt
- * @param position
  */
-function countXy(win: BrowserWindow, bwOpt: BrowserWindowConstructorOptions, position?: Position) {
+function countXy(
+  bwOpt: BrowserWindowConstructorOptions,
+  win: BrowserWindow,
+  position?: Position,
+  isParentPosition?: boolean,
+  positionPadding: number = 0
+) {
+  isParentPosition ??= win.isMaximized();
   const currentWH = win.getBounds();
   const currentPosition = win.getPosition();
   const displayWorkAreaSize = screen.getPrimaryDisplay().workAreaSize;
   switch (position) {
     case 'center':
-      if (win.isMaximized()) {
-        bwOpt.x = ((displayWorkAreaSize.width - bwOpt.width!) / 2) | 0;
-        bwOpt.y = ((displayWorkAreaSize.height - bwOpt.height!) / 2) | 0;
-      } else {
+      if (isParentPosition) {
         bwOpt.x = (currentPosition[0] + (currentWH.width - bwOpt.width!) / 2) | 0;
         bwOpt.y = (currentPosition[1] + (currentWH.height - bwOpt.height!) / 2) | 0;
+      } else {
+        bwOpt.x = ((displayWorkAreaSize.width - bwOpt.width!) / 2) | 0;
+        bwOpt.y = ((displayWorkAreaSize.height - bwOpt.height!) / 2) | 0;
+      }
+      break;
+    case 'top':
+    case 'top-center':
+      if (isParentPosition) {
+        bwOpt.x = (currentPosition[0] + (currentWH.width - bwOpt.width!) / 2) | 0;
+        bwOpt.y = currentPosition[1] + positionPadding;
+      } else {
+        bwOpt.x = ((displayWorkAreaSize.width - bwOpt.width!) / 2) | 0;
+        bwOpt.y = positionPadding;
+      }
+      break;
+    case 'bottom':
+    case 'bottom-center':
+      if (isParentPosition) {
+        bwOpt.x = (currentPosition[0] + (currentWH.width - bwOpt.width!) / 2) | 0;
+        bwOpt.y = currentPosition[1] + (currentWH.height - bwOpt.height!) - positionPadding;
+      } else {
+        bwOpt.x = ((displayWorkAreaSize.width - bwOpt.width!) / 2) | 0;
+        bwOpt.y = displayWorkAreaSize.height - bwOpt.height! - positionPadding;
+      }
+      break;
+    case 'left':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + positionPadding;
+        bwOpt.y = (currentPosition[1] + (currentWH.height - bwOpt.height!) / 2) | 0;
+      } else {
+        bwOpt.x = positionPadding;
+        bwOpt.y = ((displayWorkAreaSize.height - bwOpt.height!) / 2) | 0;
+      }
+      break;
+    case 'right':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + (currentWH.width - bwOpt.width!) - positionPadding;
+        bwOpt.y = (currentPosition[1] + (currentWH.height - bwOpt.height!) / 2) | 0;
+      } else {
+        bwOpt.x = displayWorkAreaSize.width - bwOpt.width! - positionPadding;
+        bwOpt.y = ((displayWorkAreaSize.height - bwOpt.height!) / 2) | 0;
+      }
+      break;
+    case 'top-left':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + positionPadding;
+        bwOpt.y = currentPosition[1] + positionPadding;
+      } else {
+        bwOpt.x = positionPadding;
+        bwOpt.y = positionPadding;
+      }
+      break;
+    case 'top-right':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + (currentWH.width - bwOpt.width!) - positionPadding;
+        bwOpt.y = currentPosition[1] + positionPadding;
+      } else {
+        bwOpt.x = displayWorkAreaSize.width - bwOpt.width! - positionPadding;
+        bwOpt.y = positionPadding;
+      }
+      break;
+    case 'bottom-left':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + positionPadding;
+        bwOpt.y = currentPosition[1] + (currentWH.height - bwOpt.height!) - positionPadding;
+      } else {
+        bwOpt.x = positionPadding;
+        bwOpt.y = displayWorkAreaSize.height - bwOpt.height! - positionPadding;
+      }
+      break;
+    case 'bottom-right':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + (currentWH.width - bwOpt.width!) - positionPadding;
+        bwOpt.y = currentPosition[1] + (currentWH.height - bwOpt.height!) - positionPadding;
+      } else {
+        bwOpt.x = displayWorkAreaSize.width - bwOpt.width! - positionPadding;
+        bwOpt.y = displayWorkAreaSize.height - bwOpt.height! - positionPadding;
+      }
+      break;
+    case 'center-left':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + positionPadding;
+        bwOpt.y = (currentPosition[1] + (currentWH.height - bwOpt.height!) / 2) | 0;
+      } else {
+        bwOpt.x = positionPadding;
+        bwOpt.y = ((displayWorkAreaSize.height - bwOpt.height!) / 2) | 0;
+      }
+      break;
+    case 'center-right':
+      if (isParentPosition) {
+        bwOpt.x = currentPosition[0] + (currentWH.width - bwOpt.width!) - positionPadding;
+        bwOpt.y = (currentPosition[1] + (currentWH.height - bwOpt.height!) / 2) | 0;
+      } else {
+        bwOpt.x = displayWorkAreaSize.width - bwOpt.width! - positionPadding;
+        bwOpt.y = ((displayWorkAreaSize.height - bwOpt.height!) / 2) | 0;
       }
       break;
     default:
@@ -84,7 +180,14 @@ function browserWindowAssembly(
   if (customize.position && !countWin) {
     countWin = windowInstance.getMain();
   }
-  countWin && countXy(countWin, bwOpt, customize.position);
+  countWin &&
+    countXy(
+      bwOpt,
+      countWin,
+      customize.position,
+      customize.isParentPosition,
+      customize.positionPadding
+    );
   return bwOpt;
 }
 

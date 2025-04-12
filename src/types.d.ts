@@ -19,7 +19,21 @@ declare global {
   }
 }
 
-export type Position = 'center';
+export type Position =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'center'
+  | 'top-left'
+  | 'top-center'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-center'
+  | 'bottom-right'
+  | 'center-left'
+  | 'center-center'
+  | 'center-right';
 
 export interface Customize {
   /**
@@ -47,9 +61,17 @@ export interface Customize {
    */
   loadType?: 'url' | 'file';
   /**
-   * 基于父/主窗口位置默认（center）
+   * 窗口位置
    */
   position?: Position;
+  /**
+   * 窗口位置边距
+   */
+  positionPadding?: number;
+  /**
+   * 窗口位置是否根据父窗口计算
+   */
+  isParentPosition?: boolean;
   /**
    * 参数数据
    */
