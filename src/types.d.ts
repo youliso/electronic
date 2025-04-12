@@ -20,20 +20,15 @@ declare global {
 }
 
 export type Position =
-  | 'top'
-  | 'bottom'
   | 'left'
+  | 'left-top'
+  | 'left-bottom'
   | 'right'
+  | 'right-top'
+  | 'right-bottom'
   | 'center'
-  | 'top-left'
-  | 'top-center'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-center'
-  | 'bottom-right'
-  | 'center-left'
-  | 'center-center'
-  | 'center-right';
+  | 'center-top'
+  | 'center-bottom';
 
 export interface Customize {
   /**
