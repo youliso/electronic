@@ -47,7 +47,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "electron": ">=34",
+    "electron": ">=32",
     "node": ">=22"
   },
   "files": [
