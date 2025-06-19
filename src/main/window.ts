@@ -238,7 +238,8 @@ export class Window {
 
   /**
    * 创建窗口
-   * */
+   * @returns load: 是否首加载
+   */
   create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
     // 设置默认地址加载模式
     if (!customize.loadType) {
@@ -248,12 +249,11 @@ export class Window {
     if (!customize.url) {
       throw new Error('[load] not url');
     }
-
-    if (customize.isOneWindow && customize.loadType === 'file' && customize.url) {
-      for (const i of this.getAll()) {
-        if (customize.url === i.customize.url) {
-          preload.send('window-single-data', customize?.data, [i.id]);
-          return;
+    if (customize.isOneWindow && customize.loadType === 'file') {
+      for (const win of this.getAll()) {
+        if (customize.url === win.customize.url) {
+          preload.send('window-single-data', customize?.data, [win.id]);
+          return { win, load: false };
         }
       }
     }
@@ -271,7 +271,7 @@ export class Window {
     // 参数设置
     !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
-    return win;
+    return { win, load: true };
   }
 
   /**
