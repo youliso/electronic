@@ -1,9 +1,4 @@
-import type {
-  BrowserWindowConstructorOptions,
-  LoadFileOptions,
-  LoadURLOptions,
-  WebContents
-} from 'electron';
+import type { BrowserWindowConstructorOptions, LoadFileOptions, LoadURLOptions } from 'electron';
 import type {
   Customize,
   Position,
@@ -242,15 +237,6 @@ export class Window {
   }
 
   /**
-   * 创建并加载窗口
-   */
-  async new(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
-    const newWin = this.create(customize, bwOptions);
-    newWin && (await this.load(newWin));
-    return newWin;
-  }
-
-  /**
    * 创建窗口
    * */
   create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
@@ -483,17 +469,6 @@ export class Window {
     preload.handle(WindowChannel.func, (_, args) => this.func(args.type, args.id, args.data));
     // 窗口状态
     preload.handle(WindowChannel.status, async (_, args) => this.getStatus(args.type, args.id));
-    // 创建窗口
-    preload.handle(WindowChannel.new, async (_, args) => {
-      const newWin = await this.new(args.customize, args.windowOptions);
-      if (newWin) {
-        return {
-          id: newWin.id,
-          webContentsId: newWin.webContents.id
-        };
-      }
-      return null;
-    });
     // 窗口初始化加载
     preload.handle(WindowChannel.load, async (event) => {
       const win = BrowserWindow.fromWebContents(event.sender);

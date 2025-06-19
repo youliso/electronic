@@ -188,16 +188,6 @@ export function windowMessageContentsSend(
 }
 
 /**
- * 创建并加载窗口
- */
-export function windowCreate(
-  customize: Customize,
-  windowOptions?: BrowserWindowConstructorOptions
-): Promise<{ id: number; webContentsId: number } | undefined> {
-  return preload.invoke(WindowChannel.new, { customize, windowOptions });
-}
-
-/**
  * 窗口状态
  */
 export function windowStatus(

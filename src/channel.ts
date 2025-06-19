@@ -26,7 +26,6 @@ export enum WindowChannel {
   maxMinSize = 'window-max-min-size',
   func = 'window-func',
   status = 'window-status',
-  new = 'window-new',
   load = 'window-load',
   reload = 'window-reload',
   setAlwaysTop = 'window-always-top-set',
