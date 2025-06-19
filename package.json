@@ -54,10 +54,10 @@
     "**/*"
   ],
   "devDependencies": {
-    "@types/node": "^22.14.1",
-    "electron": "^35.0.2",
+    "@types/node": "^22.15.32",
+    "electron": "^35.5.1",
     "prettier": "^3.5.3",
-    "tsup": "^8.4.0",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   }
 }

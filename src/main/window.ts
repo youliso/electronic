@@ -134,7 +134,6 @@ function browserWindowAssembly(
   customize.isPackaged = app.isPackaged;
   bwOptions.webPreferences = Object.assign(
     {
-      preload: windowInstance.defaultPreload,
       contextIsolation: true,
       nodeIntegration: false,
       devTools: false,
@@ -171,58 +170,12 @@ function browserWindowAssembly(
   return bwOpt;
 }
 
-/**
- * 窗口打开预处理
- */
-function windowDefaultOpenHandler(webContents: WebContents, parentId?: number) {
-  webContents.setWindowOpenHandler(({ url }) => {
-    const win = windowInstance.create({
-      url,
-      parentId
-    });
-    win && windowInstance.load(win);
-    return { action: 'deny' };
-  });
-}
-
 function readBufferByOS(buf: Buffer) {
   return endianness() == 'LE' ? buf.readInt32LE() : buf.readInt32BE();
 }
 
-export interface WindowDefaultCfg {
-  /**
-   * 默认html加载方式
-   */
-  defaultLoadType: 'file' | 'url';
-
-  /**
-   * 默认html加载路径
-   */
-  defaultUrl: string;
-
-  /**
-   * 默认Preload加载路径
-   */
-  defaultPreload: string;
-}
-
 export class Window {
   private static instance: Window;
-
-  /**
-   * 默认html加载方式
-   */
-  defaultLoadType?: 'file' | 'url';
-
-  /**
-   * 默认html加载路径
-   */
-  defaultUrl?: string;
-
-  /**
-   * 默认Preload加载路径
-   */
-  defaultPreload?: string;
 
   /**
    * 创建拦截器
@@ -239,12 +192,6 @@ export class Window {
   }
 
   constructor() {}
-
-  setDefaultCfg(cfg: WindowDefaultCfg) {
-    cfg.defaultLoadType && (this.defaultLoadType = cfg.defaultLoadType);
-    cfg.defaultUrl && (this.defaultUrl = cfg.defaultUrl);
-    cfg.defaultPreload && (this.defaultPreload = cfg.defaultPreload);
-  }
 
   /**
    * 获取窗口
@@ -307,9 +254,18 @@ export class Window {
    * 创建窗口
    * */
   create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
-    if (customize.isOneWindow && !customize.url) {
+    // 设置默认地址加载模式
+    if (!customize.loadType) {
+      throw new Error('[load] not loadType');
+    }
+    // 设置默认地址
+    if (!customize.url) {
+      throw new Error('[load] not url');
+    }
+
+    if (customize.isOneWindow && customize.loadType === 'file' && customize.url) {
       for (const i of this.getAll()) {
-        if (customize?.route && customize.route === i.customize?.route) {
+        if (customize.url === i.customize.url) {
           preload.send('window-single-data', customize?.data, [i.id]);
           return;
         }
@@ -329,14 +285,6 @@ export class Window {
     // 参数设置
     !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
-    // 设置默认地址加载模式
-    if (!win.customize.loadType) {
-      win.customize.loadType = this.defaultLoadType;
-    }
-    // 设置默认地址
-    if (!win.customize.url) {
-      win.customize.url = this.defaultUrl;
-    }
     return win;
   }
 
@@ -354,9 +302,7 @@ export class Window {
       throw new Error('[load] not url');
     }
     // 窗口内创建拦截
-    openHandler
-      ? win.webContents.setWindowOpenHandler(openHandler)
-      : windowDefaultOpenHandler(win.webContents);
+    openHandler && win.webContents.setWindowOpenHandler(openHandler);
     // 窗口usb插拔消息监听
     process.platform === 'win32' &&
       win.hookWindowMessage(0x0219, (wParam, lParam) =>
@@ -380,14 +326,11 @@ export class Window {
   // 重新加载页面
   reload(win: BrowserWindow, loadType: Customize['loadType'], url: string) {
     win.customize.loadType = loadType;
+    win.customize.url = url;
     switch (loadType) {
       case 'file':
-        win.customize.route = url;
-        return app.isPackaged
-          ? win.loadFile(this.defaultUrl!, win.customize.loadOptions as LoadFileOptions)
-          : win.loadURL(this.defaultUrl!, win.customize.loadOptions as LoadURLOptions);
+        return win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
       case 'url':
-        win.customize.url = url;
         return win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
     }
   }

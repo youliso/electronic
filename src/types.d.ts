@@ -32,6 +32,14 @@ export type Position =
 
 export interface Customize {
   /**
+   * 加载方式
+   */
+  loadType: 'url' | 'file';
+  /**
+   * 指定网页
+   */
+  url: string;
+  /**
    * 窗口id
    */
   winId?: number;
@@ -43,18 +51,6 @@ export interface Customize {
    * 标题 (仅路由下生效)
    */
   title?: string;
-  /**
-   * 指定网页
-   */
-  url?: string;
-  /**
-   * 指定路由
-   */
-  route?: string;
-  /**
-   * 加载方式（默认url）
-   */
-  loadType?: 'url' | 'file';
   /**
    * 窗口位置
    */
