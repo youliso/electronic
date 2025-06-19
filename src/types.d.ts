@@ -72,7 +72,7 @@ export interface Customize {
    */
   parentId?: number;
   /**
-   * 此路由是否单窗口
+   * 此路由是否单窗口(仅在file模式下生效)
    */
   isOneWindow?: boolean;
   /**
