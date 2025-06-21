@@ -11,7 +11,7 @@ export function deepCopy<T>(obj: any): T {
   let temp = null;
   let key = null;
   let keys = Object.keys(obj);
-  keys.map((item, index) => {
+  keys.map((item) => {
     key = item;
     temp = obj[key];
     if (temp && typeof temp === 'object') {

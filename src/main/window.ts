@@ -1,13 +1,14 @@
 import type {
-  Customize,
+  WindowOptions,
   Position,
   WindowAlwaysOnTopOpt,
   WindowFuncOpt,
-  WindowStatusOpt
+  WindowStatusOpt,
+  WindowInfo
 } from '../types';
 import { WindowChannel } from '../channel';
 import { endianness } from 'os';
-import { app, screen, BrowserWindow, webContents } from 'electron';
+import { app, screen, BrowserWindow, webContents, BaseWindow } from 'electron';
 import { preload } from '../preload/main';
 
 /**
@@ -118,14 +119,12 @@ function countXy(
  * @returns
  */
 function browserWindowAssembly(
-  customize: Customize,
+  customize: WindowOptions,
   bwOptions: Electron.BrowserWindowConstructorOptions = {}
 ) {
   if (!customize) throw new Error('not customize');
   // darwin下modal会造成整个窗口关闭(?)
   if (process.platform === 'darwin') delete bwOptions.modal;
-  customize.silenceFunc = customize.silenceFunc || false;
-  customize.isPackaged = app.isPackaged;
   bwOptions.webPreferences = Object.assign(
     {
       contextIsolation: true,
@@ -239,7 +238,7 @@ export class Window {
    * 创建窗口
    * @returns load: 是否首加载
    */
-  create(customize: Customize, bwOptions: Electron.BrowserWindowConstructorOptions = {}) {
+  create(customize: WindowOptions, bwOptions: Electron.BrowserWindowConstructorOptions = {}) {
     // 设置默认地址加载模式
     if (!customize.loadType) {
       throw new Error('[load] not loadType');
@@ -259,8 +258,6 @@ export class Window {
     let bwOpt = browserWindowAssembly(customize, bwOptions);
     this.interceptor && (bwOpt = this.interceptor(bwOpt));
     const win = new BrowserWindow(bwOpt);
-    // 参数设置
-    !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
     return { win, load: true };
   }
@@ -312,7 +309,7 @@ export class Window {
   }
 
   // 重新加载页面
-  reload(win: BrowserWindow, loadType: Customize['loadType'], url: string) {
+  reload(win: BrowserWindow, loadType: WindowOptions['loadType'], url: string) {
     win.customize.loadType = loadType;
     win.customize.url = url;
     switch (loadType) {
@@ -347,6 +344,21 @@ export class Window {
       return;
     }
     return win[type]();
+  }
+
+  /**
+   * 获取窗口信息
+   */
+  getInfo(win: BrowserWindow): WindowInfo {
+    return {
+      winId: win.id,
+      webContentsId: win.webContents.id,
+      key: win.customize.key || '',
+      title: win.customize.title,
+      parentId: win.customize.parentId,
+      argv: process.argv,
+      data: win.customize.data
+    };
   }
 
   /**
@@ -444,42 +456,37 @@ export class Window {
    * 开启监听
    */
   on() {
-    // 窗口数据更新
-    preload.handle(WindowChannel.update, (_, args) => {
-      if (args?.id) {
-        const win = this.get(args.id);
-        if (!win) {
-          console.error('Invalid id, the id can not be a empty');
-          return;
-        }
-        win.customize = args;
-      }
-    });
     // 最大化最小化窗口
-    preload.handle<number>(WindowChannel.maxMinSize, (_, args) => {
-      if (args !== null && args !== undefined) {
-        const win = this.get(args);
-        if (!win) {
-          console.error('Invalid id, the id can not be a empty');
-          return;
-        }
-        if (win.isMaximized()) win.unmaximize();
-        else win.maximize();
+    preload.handle<number>(WindowChannel.maxMinSize, (evnet) => {
+      const win = BrowserWindow.fromWebContents(evnet.sender);
+      if (!win) {
+        console.error('Invalid id, the id can not be a empty');
+        return;
       }
+      if (win.isMaximized()) win.unmaximize();
+      else win.maximize();
     });
     // 窗口消息
-    preload.handle(WindowChannel.func, (_, args) => this.func(args.type, args.id, args.data));
+    preload.handle(WindowChannel.func, (evnet, args) => {
+      if (!args.id) {
+        const win = BrowserWindow.fromWebContents(evnet.sender);
+        win && (args.id = win.id);
+      }
+      this.func(args.type, args.id, args.data);
+    });
     // 窗口状态
-    preload.handle(WindowChannel.status, async (_, args) => this.getStatus(args.type, args.id));
+    preload.handle(WindowChannel.status, async (evnet, args) => {
+      if (!args.id) {
+        const win = BrowserWindow.fromWebContents(evnet.sender);
+        win && (args.id = win.id);
+      }
+      this.getStatus(args.type, args.id);
+    });
     // 窗口初始化加载
     preload.handle(WindowChannel.load, async (event) => {
       const win = BrowserWindow.fromWebContents(event.sender);
       if (!win) throw new Error('fromWebContents not');
-      return {
-        winId: win.id,
-        webContentsId: win.webContents.id,
-        ...win.customize
-      };
+      return this.getInfo(win);
     });
     // 窗口重新加载
     preload.handle(WindowChannel.reload, async (event, args) => {
@@ -488,27 +495,52 @@ export class Window {
       await this.reload(win, args.loadType, args.url);
     });
     // 设置窗口是否置顶
-    preload.handle(WindowChannel.setAlwaysTop, (_, args) => this.setAlwaysOnTop(args));
+    preload.handle(WindowChannel.setAlwaysTop, (event, args) => {
+      if (!args.id) {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        win && (args.id = win.id);
+      }
+      this.setAlwaysOnTop(args);
+    });
     // 设置窗口事件穿透
-    preload.handle(WindowChannel.setIgnoreMouseEvents, (_, args) =>
-      this.setIgnoreMouseEvents(args)
-    );
+    preload.handle(WindowChannel.setIgnoreMouseEvents, (event, args) => {
+      if (!args.id) {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        win && (args.id = win.id);
+      }
+      this.setIgnoreMouseEvents(args);
+    });
     // 设置窗口大小
-    preload.handle(WindowChannel.setSize, (_, args) => this.setSize(args));
+    preload.handle(WindowChannel.setSize, (event, args) => {
+      if (!args.id) {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        win && (args.id = win.id);
+      }
+      this.setSize(args);
+    });
     // 设置窗口(最小/最大)大小
-    preload.handle(WindowChannel.setMinMaxSize, (_, args) =>
-      args.type === 'min' ? this.setMinSize(args) : this.setMaxSize(args)
-    );
+    preload.handle(WindowChannel.setMinMaxSize, (event, args) => {
+      if (!args.id) {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        win && (args.id = win.id);
+      }
+      args.type === 'min' ? this.setMinSize(args) : this.setMaxSize(args);
+    });
     // 设置窗口背景颜色
-    preload.handle(WindowChannel.setBackgroundColor, (_, args) => this.setBackgroundColor(args));
+    preload.handle(WindowChannel.setBackgroundColor, (event, args) => {
+      if (!args.id) {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        win && (args.id = win.id);
+      }
+      this.setBackgroundColor(args);
+    });
     // 窗口消息
     preload.handle<{
-      id: number;
       channel: string;
       value: any;
       isback: boolean;
       acceptIds?: number[];
-    }>(WindowChannel.sendMessage, (_, args) => {
+    }>(WindowChannel.sendMessage, (event, args) => {
       if (!args) return;
       const channel = `window-message-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
@@ -516,18 +548,22 @@ export class Window {
       } else {
         args.acceptIds = this.getAll().map((win) => win.id);
         if (!args.isback) {
-          args.acceptIds = args.acceptIds.filter((id) => id !== args.id);
+          const win = BrowserWindow.fromWebContents(event.sender);
+          if (!win) {
+            console.error('Invalid id, the id can not be a empty');
+            return;
+          }
+          args.acceptIds = args.acceptIds.filter((id) => id !== win.id);
         }
       }
       preload.send(channel, args.value, args.acceptIds);
     });
     preload.handle<{
-      id: number;
       channel: string;
       value: any;
       isback: boolean;
       acceptIds?: number[];
-    }>(WindowChannel.sendMessageContents, (_, args) => {
+    }>(WindowChannel.sendMessageContents, (event, args) => {
       if (!args) return;
       const channel = `window-message-contents-${args.channel}-back`;
       if (args.acceptIds && args.acceptIds.length > 0) {
@@ -535,7 +571,12 @@ export class Window {
       } else {
         args.acceptIds = webContents.getAllWebContents().map((webContent) => webContent.id);
         if (!args.isback) {
-          args.acceptIds = args.acceptIds.filter((id) => id !== args.id);
+          const win = BrowserWindow.fromWebContents(event.sender);
+          if (!win) {
+            console.error('Invalid id, the id can not be a empty');
+            return;
+          }
+          args.acceptIds = args.acceptIds.filter((id) => id !== win.id);
         }
       }
       preload.sendByWebContents(channel, args.value, args.acceptIds);

@@ -1,22 +1,30 @@
 import type { LoadURLOptions, LoadFileOptions } from 'electron';
 
 declare global {
-  interface Window {
-    customize: Omit<Customize, 'winId' | 'webContentsId'> & {
-      winId: number;
-      webContentsId: number;
-    };
-  }
-
   namespace Electron {
     interface BrowserWindow {
-      customize: Customize;
+      customize: WindowOptions;
     }
 
     interface BrowserWindowConstructorOptions {
-      customize?: Customize;
+      customize?: WindowOptions;
     }
   }
+}
+
+interface BaseWindowOptions {
+  /**
+   * 标题 (仅路由下生效)
+   */
+  title?: string;
+  /**
+   * 父窗口id
+   */
+  parentId?: number;
+  /**
+   * 自定义参数
+   */
+  data?: any;
 }
 
 export type Position =
@@ -30,11 +38,8 @@ export type Position =
   | 'center-top'
   | 'center-bottom';
 
-export interface Customize {
-  /**
-   * 可用来标识窗口的唯一key
-   */
-  key?: string;
+// 窗口创建参数
+export interface WindowOptions extends BaseWindowOptions {
   /**
    * 加载方式
    */
@@ -44,17 +49,9 @@ export interface Customize {
    */
   url: string;
   /**
-   * 窗口id
+   * 可用来标识窗口的唯一key
    */
-  winId?: number;
-  /**
-   * 网页内容id
-   */
-  webContentsId?: number;
-  /**
-   * 标题 (仅路由下生效)
-   */
-  title?: string;
+  key?: string;
   /**
    * 窗口位置
    */
@@ -72,10 +69,6 @@ export interface Customize {
    */
   loadOptions?: LoadURLOptions | LoadFileOptions;
   /**
-   * 父窗口id
-   */
-  parentId?: number;
-  /**
    * 此路由是否单窗口(仅存在key时生效)
    */
   isOneWindow?: boolean;
@@ -83,34 +76,26 @@ export interface Customize {
    * 是否主窗口
    */
   isMainWin?: boolean;
+}
+
+// 窗口信息(渲染进程使用)
+export interface WindowInfo extends BaseWindowOptions {
   /**
-   * 是否已打包环境
+   * 可用来标识窗口的唯一key
    */
-  isPackaged?: boolean;
+  key: string;
   /**
-   * 是否独立弹框view
+   * 窗口id
    */
-  isAlone?: boolean;
+  winId?: number;
   /**
-   * 是否view
+   * 网页内容id
    */
-  isView?: boolean;
+  webContentsId?: number;
   /**
    * 进程参数
    */
   argv?: any;
-  /**
-   * 自定义参数
-   */
-  data?: any;
-  /**
-   * 窗口不触发广播func
-   */
-  silenceFunc?: boolean;
-}
-
-export interface Window {
-  customize: Customize;
 }
 
 export type WindowAlwaysOnTopOpt =
@@ -150,10 +135,6 @@ export type Accelerator = {
   key: string | string[];
   callback?: () => void;
 };
-
-export interface Window {
-  customize: Customize;
-}
 
 export interface AppInfo {
   name: string;

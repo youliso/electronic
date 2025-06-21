@@ -22,7 +22,6 @@ export enum ShortcutChannel {
 }
 
 export enum WindowChannel {
-  update = 'window-update',
   maxMinSize = 'window-max-min-size',
   func = 'window-func',
   status = 'window-status',

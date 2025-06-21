@@ -1,17 +1,21 @@
-import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
+import type {
+  WindowOptions,
+  WindowAlwaysOnTopOpt,
+  WindowFuncOpt,
+  WindowInfo,
+  WindowStatusOpt
+} from '../types';
 import { WindowChannel } from '../channel';
 import { preload } from '../preload/render';
 
 /**
  * 窗口初始化
  * */
-export function windowLoad(listener: () => void) {
+export function windowLoad(listener: (info: WindowInfo) => void) {
   preload
-    .invoke<Customize>(WindowChannel.load)
-    .then((customize) => {
-      // @ts-ignore
-      window.customize = customize;
-      listener();
+    .invoke<WindowInfo>(WindowChannel.load)
+    .then((info) => {
+      listener(info);
     })
     .catch((error) => {
       throw error;
@@ -21,7 +25,7 @@ export function windowLoad(listener: () => void) {
 /**
  * 窗口重新加载
  */
-export function windowReLoad(loadType: Customize['loadType'], url: string) {
+export function windowReLoad(loadType: WindowOptions['loadType'], url: string) {
   return preload.invoke<void>(WindowChannel.reload, {
     loadType,
     url
@@ -40,13 +44,6 @@ export function windowSingleInstanceOn(listener: (argv?: string[]) => void) {
  */
 export function windowSingleDataOn<T>(listener: (data?: T) => void) {
   preload.on<T>('window-single-data', listener);
-}
-
-/**
- * 窗口数据更新
- */
-export function windowUpdateCustomize(customize: Customize) {
-  return preload.invoke(WindowChannel.update, customize);
 }
 
 /**
@@ -130,8 +127,7 @@ export function windowMessageSend(
     channel,
     value,
     acceptIds,
-    isback,
-    id: window.customize.winId
+    isback
   });
 }
 
@@ -181,40 +177,28 @@ export function windowMessageContentsSend(
     channel,
     value,
     acceptIds,
-    isback,
-    id: window.customize.webContentsId
+    isback
   });
 }
 
 /**
  * 窗口状态
  */
-export function windowStatus(
-  type: WindowStatusOpt,
-  id: number = window.customize.winId
-): Promise<boolean> {
+export function windowStatus(type: WindowStatusOpt, id?: number): Promise<boolean> {
   return preload.invoke(WindowChannel.status, { type, id });
 }
 
 /**
  * 窗口置顶
  */
-export function windowAlwaysOnTop(
-  is: boolean,
-  type?: WindowAlwaysOnTopOpt,
-  id: number = window.customize.winId
-) {
+export function windowAlwaysOnTop(is: boolean, type?: WindowAlwaysOnTopOpt, id?: number) {
   return preload.invoke(WindowChannel.setAlwaysTop, { id, is, type });
 }
 
 /**
  * 窗口事件穿透
  */
-export function windowIgnoreMouseEvents(
-  is: boolean,
-  forward?: boolean,
-  id: number = window.customize.winId
-) {
+export function windowIgnoreMouseEvents(is: boolean, forward?: boolean, id?: number) {
   return preload.invoke(WindowChannel.setIgnoreMouseEvents, { id, is, forward });
 }
 
@@ -225,7 +209,7 @@ export function windowSetSize(
   size: number[],
   resizable: boolean = true,
   center: boolean = false,
-  id: number = window.customize.winId
+  id?: number
 ) {
   return preload.invoke(WindowChannel.setSize, { id, size, resizable, center });
 }
@@ -233,32 +217,28 @@ export function windowSetSize(
 /**
  * 设置窗口 最大/最小 大小
  */
-export function windowSetMaxMinSize(
-  type: 'max' | 'min',
-  size: number[],
-  id: number = window.customize.winId
-) {
+export function windowSetMaxMinSize(type: 'max' | 'min', size: number[], id?: number) {
   return preload.invoke(WindowChannel.setMinMaxSize, { type, id, size });
 }
 
 /**
  * 设置窗口背景颜色
  */
-export function windowSetBackgroundColor(color: string, id: number = window.customize.winId) {
+export function windowSetBackgroundColor(color: string, id?: number) {
   return preload.invoke(WindowChannel.setBackgroundColor, { id, color });
 }
 
 /**
  * 最大化&最小化当前窗口
  */
-export function windowMaxMin(id: number = window.customize.winId) {
+export function windowMaxMin(id?: number) {
   return preload.invoke(WindowChannel.maxMinSize, id);
 }
 
 /**
  * 关闭窗口 (传id则对应窗口否则全部窗口)
  */
-export function windowClose(id: number = window.customize.winId) {
+export function windowClose(id?: number) {
   return preload.invoke(WindowChannel.func, { type: 'close', id });
 }
 
@@ -267,34 +247,34 @@ export function windowClose(id: number = window.customize.winId) {
  * @param id 窗口id
  * @param time 延迟显示时间
  */
-export function windowShow(id: number = window.customize.winId) {
+export function windowShow(id?: number) {
   return preload.invoke(WindowChannel.func, { type: 'show', id });
 }
 
 /**
  * 窗口隐藏
  */
-export function windowHide(id: number = window.customize.winId) {
+export function windowHide(id?: number) {
   return preload.invoke(WindowChannel.func, { type: 'hide', id });
 }
 
 /**
  * 最小化窗口 (传id则对应窗口否则全部窗口)
  */
-export function windowMin(id: number = window.customize.winId) {
+export function windowMin(id?: number) {
   return preload.invoke(WindowChannel.func, { type: 'minimize', id });
 }
 
 /**
  * 最大化窗口 (传id则对应窗口否则全部窗口)
  */
-export function windowMax(id: number = window.customize.winId) {
+export function windowMax(id?: number) {
   return preload.invoke(WindowChannel.func, { type: 'maximize', id });
 }
 
 /**
  * window函数
  */
-export function windowFunc(type: WindowFuncOpt, data?: any[], id: number = window.customize.winId) {
+export function windowFunc(type: WindowFuncOpt, data?: any[], id?: number) {
   return preload.invoke(WindowChannel.func, { type, data, id });
 }
