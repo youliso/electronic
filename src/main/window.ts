@@ -1,4 +1,3 @@
-import type { BrowserWindowConstructorOptions, LoadFileOptions, LoadURLOptions } from 'electron';
 import type {
   Customize,
   Position,
@@ -15,7 +14,7 @@ import { preload } from '../preload/main';
  * 计算xy
  */
 function countXy(
-  bwOpt: BrowserWindowConstructorOptions,
+  bwOpt: Electron.BrowserWindowConstructorOptions,
   win: BrowserWindow,
   position?: Position,
   isParentPosition?: boolean,
@@ -120,7 +119,7 @@ function countXy(
  */
 function browserWindowAssembly(
   customize: Customize,
-  bwOptions: BrowserWindowConstructorOptions = {}
+  bwOptions: Electron.BrowserWindowConstructorOptions = {}
 ) {
   if (!customize) throw new Error('not customize');
   // darwin下modal会造成整个窗口关闭(?)
@@ -136,7 +135,7 @@ function browserWindowAssembly(
     },
     bwOptions.webPreferences
   );
-  let bwOpt: BrowserWindowConstructorOptions = Object.assign(
+  let bwOpt: Electron.BrowserWindowConstructorOptions = Object.assign(
     {
       width: 800,
       height: 600,
@@ -240,7 +239,7 @@ export class Window {
    * 创建窗口
    * @returns load: 是否首加载
    */
-  create(customize: Customize, bwOptions: BrowserWindowConstructorOptions = {}) {
+  create(customize: Customize, bwOptions: Electron.BrowserWindowConstructorOptions = {}) {
     // 设置默认地址加载模式
     if (!customize.loadType) {
       throw new Error('[load] not loadType');
@@ -249,9 +248,9 @@ export class Window {
     if (!customize.url) {
       throw new Error('[load] not url');
     }
-    if (customize.isOneWindow && customize.loadType === 'file') {
+    if (customize.isOneWindow && customize.key) {
       for (const win of this.getAll()) {
-        if (customize.url === win.customize.url) {
+        if (customize.key === win.customize.key) {
           preload.send('window-single-data', customize?.data, [win.id]);
           return { win, load: false };
         }
@@ -260,14 +259,6 @@ export class Window {
     let bwOpt = browserWindowAssembly(customize, bwOptions);
     this.interceptor && (bwOpt = this.interceptor(bwOpt));
     const win = new BrowserWindow(bwOpt);
-    // win32 取消原生窗口右键事件
-    process.platform === 'win32' &&
-      win.hookWindowMessage(278, () => {
-        win.setEnabled(false);
-        win.setEnabled(true);
-      });
-    // 子窗体关闭父窗体获焦 https://github.com/electron/electron/issues/10616
-    bwOpt.parent && win.once('close', () => bwOpt.parent?.focus());
     // 参数设置
     !customize.argv && (customize.argv = process.argv);
     win.customize = customize;
@@ -289,11 +280,19 @@ export class Window {
     }
     // 窗口内创建拦截
     openHandler && win.webContents.setWindowOpenHandler(openHandler);
-    // 窗口usb插拔消息监听
-    process.platform === 'win32' &&
-      win.hookWindowMessage(0x0219, (wParam, lParam) =>
-        preload.send('window-hook-message', { wParam, lParam }, [win.id])
-      );
+    switch (process.platform) {
+      case 'win32':
+        // 取消原生窗口右键事件
+        win.hookWindowMessage(278, () => {
+          win.setEnabled(false);
+          win.setEnabled(true);
+        });
+        // 窗口usb插拔消息监听
+        win.hookWindowMessage(0x0219, (wParam, lParam) =>
+          preload.send('window-hook-message', { wParam, lParam }, [win.id])
+        );
+        break;
+    }
     // 窗口最大最小监听
     win.on('maximize', () => preload.send('window-maximize-status', 'maximize', [win.id]));
     win.on('unmaximize', () => preload.send('window-maximize-status', 'unmaximize', [win.id]));
@@ -302,10 +301,13 @@ export class Window {
     win.on('focus', () => preload.send('window-blur-focus', 'focus', [win.id]));
     switch (win.customize.loadType) {
       case 'file':
-        return win.loadFile(win.customize.url, win.customize.loadOptions as LoadFileOptions);
+        return win.loadFile(
+          win.customize.url,
+          win.customize.loadOptions as Electron.LoadFileOptions
+        );
       case 'url':
       default:
-        return win.loadURL(win.customize.url, win.customize.loadOptions as LoadURLOptions);
+        return win.loadURL(win.customize.url, win.customize.loadOptions as Electron.LoadURLOptions);
     }
   }
 
@@ -315,9 +317,9 @@ export class Window {
     win.customize.url = url;
     switch (loadType) {
       case 'file':
-        return win.loadFile(url, win.customize.loadOptions as LoadFileOptions);
+        return win.loadFile(url, win.customize.loadOptions as Electron.LoadFileOptions);
       case 'url':
-        return win.loadURL(url, win.customize.loadOptions as LoadURLOptions);
+        return win.loadURL(url, win.customize.loadOptions as Electron.LoadURLOptions);
     }
   }
 

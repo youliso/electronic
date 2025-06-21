@@ -1,4 +1,3 @@
-import type { BrowserWindowConstructorOptions } from 'electron';
 import type { Customize, WindowAlwaysOnTopOpt, WindowFuncOpt, WindowStatusOpt } from '../types';
 import { WindowChannel } from '../channel';
 import { preload } from '../preload/render';

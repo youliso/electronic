@@ -32,6 +32,10 @@ export type Position =
 
 export interface Customize {
   /**
+   * 可用来标识窗口的唯一key
+   */
+  key?: string;
+  /**
    * 加载方式
    */
   loadType: 'url' | 'file';
@@ -72,7 +76,7 @@ export interface Customize {
    */
   parentId?: number;
   /**
-   * 此路由是否单窗口(仅在file模式下生效)
+   * 此路由是否单窗口(仅存在key时生效)
    */
   isOneWindow?: boolean;
   /**
