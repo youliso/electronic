@@ -87,15 +87,15 @@ export interface WindowInfo extends BaseWindowOptions {
   /**
    * 窗口id
    */
-  winId?: number;
+  winId: number;
   /**
    * 网页内容id
    */
-  webContentsId?: number;
+  webContentsId: number;
   /**
    * 进程参数
    */
-  argv?: any;
+  argv?: string[];
 }
 
 export type WindowAlwaysOnTopOpt =

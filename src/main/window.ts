@@ -356,7 +356,7 @@ export class Window {
       key: win.customize.key || '',
       title: win.customize.title,
       parentId: win.customize.parentId,
-      argv: process.argv,
+      argv: process.argv.splice(2),
       data: win.customize.data
     };
   }
