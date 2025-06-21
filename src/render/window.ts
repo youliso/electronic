@@ -9,13 +9,19 @@ import { WindowChannel } from '../channel';
 import { preload } from '../preload/render';
 
 /**
+ * 窗口信息(windowLoad后赋值)
+ */
+export let windowInfo: WindowInfo;
+
+/**
  * 窗口初始化
  * */
-export function windowLoad(listener: (info: WindowInfo) => void) {
+export function windowLoad(listener: () => void) {
   preload
     .invoke<WindowInfo>(WindowChannel.load)
     .then((info) => {
-      listener(info);
+      windowInfo = info;
+      listener();
     })
     .catch((error) => {
       throw error;
