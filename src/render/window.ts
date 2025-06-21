@@ -16,12 +16,12 @@ export let windowInfo: WindowInfo;
 /**
  * 窗口初始化
  * */
-export function windowLoad(listener: () => void) {
+export function windowLoad(listener: (windowInfo: WindowInfo) => void) {
   preload
     .invoke<WindowInfo>(WindowChannel.load)
     .then((info) => {
       windowInfo = info;
-      listener();
+      listener(windowInfo);
     })
     .catch((error) => {
       throw error;
