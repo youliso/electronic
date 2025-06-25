@@ -53,16 +53,20 @@ class MainPreloadInterface extends PreloadInterface {
     const value = { channel, args };
     if (ids) {
       ids.forEach((id) => {
-        const webContent = BrowserWindow.fromId(id)?.webContents;
-        if (webContent && !webContent?.isDestroyed?.()) {
-          webContent.send(key, value);
+        const win = BrowserWindow.fromId(id);
+        if (!win || win?.isDestroyed?.() || win?.webContents?.isDestroyed?.()) {
+          console.warn('This instance has already been');
+          return;
         }
+        win.webContents.send(key, value);
       });
     } else {
       BrowserWindow.getAllWindows().forEach((win) => {
-        if (win && !win.isDestroyed?.() && win?.webContents && !win.webContents?.isDestroyed?.()) {
-          win.webContents.send(key, value);
+        if (!win || win?.isDestroyed?.() || win?.webContents?.isDestroyed?.()) {
+          console.warn('This instance has already been');
+          return;
         }
+        win.webContents.send(key, value);
       });
     }
   }
@@ -73,15 +77,19 @@ class MainPreloadInterface extends PreloadInterface {
     if (ids) {
       ids.forEach((id) => {
         const webContent = webContents.fromId(id);
-        if (webContent && !webContent?.isDestroyed?.()) {
-          webContent.send(key, value);
+        if (!webContent || webContent?.isDestroyed?.()) {
+          console.warn('This instance has already been');
+          return;
         }
+        webContent.send(key, value);
       });
     } else {
       webContents.getAllWebContents().forEach((webContent) => {
-        if (webContent && !webContent?.isDestroyed?.()) {
-          webContent.send(key, value);
+        if (!webContent || webContent?.isDestroyed?.()) {
+          console.warn('This instance has already been');
+          return;
         }
+        webContent.send(key, value);
       });
     }
   }
