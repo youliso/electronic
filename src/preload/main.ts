@@ -27,7 +27,9 @@ class MainPreloadInterface extends PreloadInterface {
       console.warn(`${args.channel} Unbound callback function`);
       return;
     });
-    ipcMain.on(`${this.config.key}:send`, (event, args: ProtocolHeader) => { super.routeHandler(args.channel, args.args, event) })
+    ipcMain.on(`${this.config.key}:send`, (event, args: ProtocolHeader) => {
+      super.routeHandler(args.channel, args.args, event);
+    });
   }
 
   on<T = any>(channel: string, listener: MainHandler<T>) {
@@ -50,9 +52,18 @@ class MainPreloadInterface extends PreloadInterface {
     const key = `${this.config.key}:on`;
     const value = { channel, args };
     if (ids) {
-      ids.forEach((id) => BrowserWindow.fromId(id)?.webContents.send(key, value));
+      ids.forEach((id) => {
+        const webContent = BrowserWindow.fromId(id)?.webContents;
+        if (webContent && !webContent.isDestroyed()) {
+          webContent.send(key, value);
+        }
+      });
     } else {
-      BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(key, value));
+      BrowserWindow.getAllWindows().forEach((win) => {
+        if (win?.webContents && !win.webContents.isDestroyed()) {
+          win.webContents.send(key, value);
+        }
+      });
     }
   }
 
@@ -60,9 +71,18 @@ class MainPreloadInterface extends PreloadInterface {
     const key = `${this.config.key}:on`;
     const value = { channel, args };
     if (ids) {
-      ids.forEach((id) => webContents.fromId(id)?.send(key, value));
+      ids.forEach((id) => {
+        const webContent = webContents.fromId(id);
+        if (webContent && !webContent.isDestroyed()) {
+          webContent.send(key, value);
+        }
+      });
     } else {
-      webContents.getAllWebContents().forEach((webContent) => webContent.send(key, value));
+      webContents.getAllWebContents().forEach((webContent) => {
+        if (webContent && !webContent.isDestroyed()) {
+          webContent.send(key, value);
+        }
+      });
     }
   }
 }
