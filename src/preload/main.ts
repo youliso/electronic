@@ -54,13 +54,13 @@ class MainPreloadInterface extends PreloadInterface {
     if (ids) {
       ids.forEach((id) => {
         const webContent = BrowserWindow.fromId(id)?.webContents;
-        if (webContent && !webContent.isDestroyed()) {
+        if (webContent && !webContent?.isDestroyed?.()) {
           webContent.send(key, value);
         }
       });
     } else {
       BrowserWindow.getAllWindows().forEach((win) => {
-        if (win?.webContents && !win.webContents.isDestroyed()) {
+        if (win && !win.isDestroyed?.() && win?.webContents && !win.webContents?.isDestroyed?.()) {
           win.webContents.send(key, value);
         }
       });
@@ -73,13 +73,13 @@ class MainPreloadInterface extends PreloadInterface {
     if (ids) {
       ids.forEach((id) => {
         const webContent = webContents.fromId(id);
-        if (webContent && !webContent.isDestroyed()) {
+        if (webContent && !webContent?.isDestroyed?.()) {
           webContent.send(key, value);
         }
       });
     } else {
       webContents.getAllWebContents().forEach((webContent) => {
-        if (webContent && !webContent.isDestroyed()) {
+        if (webContent && !webContent?.isDestroyed?.()) {
           webContent.send(key, value);
         }
       });
